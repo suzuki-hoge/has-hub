@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0e7d57006af4243d1cd0aaaf3dc681471a73f9e23b7b4e3991423f2255b41465
+-- hash: c3f3b8ca72df5056f0f047c637e8667647df609c88d92eb0acdea58e0fdc3b69
 
 name:           has-hub
 version:        0.1.0.0
@@ -30,8 +30,6 @@ library
       src
   build-depends:
       base >=4.7 && <5
-  exposed-modules:
-      Lib
   other-modules:
       Paths_has_hub
   default-language: Haskell2010
@@ -57,6 +55,7 @@ test-suite has-hub-test
   build-depends:
       base >=4.7 && <5
     , has-hub
+    , hspec
   other-modules:
       Paths_has_hub
   default-language: Haskell2010
