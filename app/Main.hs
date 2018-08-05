@@ -35,18 +35,18 @@ createObjects client (ms, ps) = do
 
 run :: String -> String -> IO ()
 run gToken zToken = do
-  client <- getClient gToken "suzuki-hoge" "has-hub-workspace" zToken
+  client <- getClient gToken "suzuki-hoge" "has-hub-workspace" zToken "has-hub.log"
 
-  ve <- E.validate client []
-  vm <- M.validate client []
-  vl <- L.validate client []
-  vc <- C.validate client []
-  vp <- P.validate client []
---  ve <- E.validate client [E.Number 9, E.Number 10]
---  vm <- M.validate client [Title "sprint 6", Title "sprint 8"]
---  vl <- L.validate client [Label "bug", Label "setup", Label "dev", Label "実装", Label "ほげら"]
---  vc <- C.validate client [Collaborator "suzuki-john", Collaborator "suzuki-hoge"]
---  vp <- P.validate client [PipelineName "backlog", PipelineName "foo", PipelineName "sprint backlog"]
+--  ve <- E.validate client []
+--  vm <- M.validate client []
+--  vl <- L.validate client []
+--  vc <- C.validate client []
+--  vp <- P.validate client []
+  ve <- E.validate client [E.Number 9, E.Number 10]
+  vm <- M.validate client [M.Title "sprint 6", M.Title "sprint 8"]
+  vl <- L.validate client [Label "bug", Label "setup", Label "dev", Label "実装", Label "ほげら"]
+  vc <- C.validate client [Collaborator "suzuki-john", Collaborator "suzuki-hoge"]
+  vp <- P.validate client [PipelineName "backlog", PipelineName "foo", PipelineName "sprint backlog"]
 
   let vs = f <$> ve <*> vm <*> vl <*> vc <*> vp
 
@@ -54,10 +54,7 @@ run gToken zToken = do
     Success x -> createObjects client x
     Failure x -> printFixMe x
 
--- todo proxy
 -- todo module EpicAndIssue
-
--- todo log
 
 
 main :: IO ()

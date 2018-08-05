@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bb86ff529d2f72bf84372acf7902a124b816ce38fea557e35e7f91bfef654222
+-- hash: c15a0e215cf354d07a452d05040301d004c303fc0d0244a448ac1ada66ffa916
 
 name:           has-hub
 version:        0.1.0.0
@@ -40,10 +40,14 @@ library
     , lens
     , lens-aeson
     , split
+    , time
+    , uri-encode
+    , utf8-string
   exposed-modules:
       HasHub.Client
       HasHub.Client.Data
       HasHub.Client.Fetcher
+      HasHub.Logger
       HasHub.Object.Collaborator
       HasHub.Object.Collaborator.Data
       HasHub.Object.Epic
@@ -79,6 +83,9 @@ executable has-hub-exe
     , lens
     , lens-aeson
     , split
+    , time
+    , uri-encode
+    , utf8-string
   other-modules:
       Paths_has_hub
   default-language: Haskell2010
@@ -103,6 +110,9 @@ test-suite has-hub-test
     , lens
     , lens-aeson
     , split
+    , time
+    , uri-encode
+    , utf8-string
   other-modules:
       HasHub.Object.Collaborator.DataSpec
       HasHub.Object.Epic.DataSpec

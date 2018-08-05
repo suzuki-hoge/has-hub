@@ -17,12 +17,18 @@ module HasHub.Client
 import Network.HTTP.Client (parseRequest_, Request(..), RequestBody(..))
 import Network.HTTP.Types (renderSimpleQuery, Method)
 
-import Data.ByteString (ByteString)
-import Data.ByteString.Char8 (pack)
+import qualified Data.ByteString as BS (ByteString)
+import qualified Data.ByteString.Char8 as BS (pack)
 
-import qualified Data.ByteString.Lazy.Internal as L (ByteString)
+import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
 
 import Data.Maybe (fromJust)
+import Data.List.Split (splitOn)
+import Data.List.Utils (replace)
+import Data.Time.Clock (getCurrentTime)
+import Data.Time.LocalTime (getCurrentTimeZone, utcToLocalTime)
+
+import Text.Printf (printf)
 
 import Control.Lens ((^?))
 import Data.Aeson.Lens (key, _Integer)
@@ -32,22 +38,36 @@ import HasHub.Client.Data
 import HasHub.Client.Fetcher
 
 
-getClient :: GitHubToken -> Owner -> RepositoryName -> ZenHubToken -> IO Client
-getClient gToken owner repoName zToken = do
-  putStrLn "\ninitialize"
+getClient :: GitHubToken -> Owner -> RepositoryName -> ZenHubToken -> FilePath -> IO Client
+getClient gToken owner repoName zToken logPath = do
+  cid <- getClientId
 
-  let gHeaders = [("User-Agent", "curl"), ("Authorization", pack . ("token " ++) $ gToken)]
+  printf "\ninitialize Client(%s)\n" cid
+
+  let fetcher = secureFetching cid logPath
+
+  let gHeaders = [("User-Agent", "curl"), ("Authorization", BS.pack . ("token " ++) $ gToken)]
   let gEndpoint = ("https://api.github.com/repos/" ++) . (owner ++) . ("/" ++) $ repoName
 
-  let zHeaders = [("content-type", "application/json"), ("User-Agent", "curl"), ("X-Authentication-Token", pack zToken)]
+  let zHeaders = [("content-type", "application/json"), ("User-Agent", "curl"), ("X-Authentication-Token", BS.pack zToken)]
   rid <- getRepositoryId fetcher gEndpoint gHeaders
   let zEndpoint = "https://api.zenhub.io/p1/repositories/" ++ show rid
 
   return $ Client fetcher (GitHubConnector gHeaders gEndpoint) (ZenHubConnector zHeaders zEndpoint rid)
 
 
+getClientId :: IO String
+getClientId = do
+  utc <- getCurrentTime
+  tz <- getCurrentTimeZone
+  return $ parse $ utcToLocalTime tz utc
+
+    where
+      parse = (replace "-" "") . (replace ":" "") . (replace " " "") . head . (splitOn ".") . show
+
+
 type Resource = String
-type Queries = [(ByteString, ByteString)]
+type Queries = [(BS.ByteString, BS.ByteString)]
 
 
 getRepositoryId :: Fetcher -> GitHubEndpoint -> GitHubHeaders -> IO RepositoryId
@@ -62,7 +82,7 @@ getRepositoryId (Fetcher fetcher) gEndpoint gHeader = do
   return . read . show . fromJust $ json ^? key "id" . _Integer
 
 
-getGitHub :: Client -> Resource -> Queries -> IO L.ByteString
+getGitHub :: Client -> Resource -> Queries -> IO LBS.ByteString
 getGitHub (Client (Fetcher fetcher) (GitHubConnector gHeader gEndpoint) _) resource queries = do
   let request = (parseRequest_ $ gEndpoint ++ resource) {
       method = "GET"
@@ -72,8 +92,8 @@ getGitHub (Client (Fetcher fetcher) (GitHubConnector gHeader gEndpoint) _) resou
   fetcher request
 
 
-postGitHub :: (ToJSON body) => Client -> Resource -> body -> IO L.ByteString
-postGitHub (Client (Fetcher fetcher) (GitHubConnector gHeader gEndpoint) _) resource body = do
+postGitHub :: (ToJSON body) => Client -> Resource -> body -> IO LBS.ByteString
+postGitHub(Client (Fetcher fetcher) (GitHubConnector gHeader gEndpoint) _) resource body = do
   let request = (parseRequest_ $ gEndpoint ++ resource) {
       method = "POST"
     , requestHeaders = gHeader
@@ -82,7 +102,7 @@ postGitHub (Client (Fetcher fetcher) (GitHubConnector gHeader gEndpoint) _) reso
   fetcher request
 
 
-getZenHub :: Client -> Resource -> IO L.ByteString
+getZenHub :: Client -> Resource -> IO LBS.ByteString
 getZenHub (Client (Fetcher fetcher) _ (ZenHubConnector zHeader zEndpoint _)) resource = do
   let request = (parseRequest_ $ zEndpoint ++ resource) {
       method = "GET"
@@ -91,15 +111,15 @@ getZenHub (Client (Fetcher fetcher) _ (ZenHubConnector zHeader zEndpoint _)) res
   fetcher request
 
 
-postZenHub :: (ToJSON body) => Client -> Resource -> body -> IO L.ByteString
+postZenHub :: (ToJSON body) => Client -> Resource -> body -> IO LBS.ByteString
 postZenHub = updateZenHub "POST"
 
 
-putZenHub :: (ToJSON body) => Client -> Resource -> body -> IO L.ByteString
+putZenHub :: (ToJSON body) => Client -> Resource -> body -> IO LBS.ByteString
 putZenHub = updateZenHub "PUT"
 
 
-updateZenHub :: (ToJSON body) => Method -> Client -> Resource -> body -> IO L.ByteString
+updateZenHub :: (ToJSON body) => Method -> Client -> Resource -> body -> IO LBS.ByteString
 updateZenHub method (Client (Fetcher fetcher) _ (ZenHubConnector zHeader zEndpoint _)) resource body = do
   let request = (parseRequest_ $ zEndpoint ++ resource) {
       method = method

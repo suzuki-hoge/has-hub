@@ -31,6 +31,9 @@ dependencies:
 - lens
 - split
 - MissingH
+- uri-encode
+- utf8-string
+- time
 
 library:
   source-dirs: src
