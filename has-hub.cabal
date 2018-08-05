@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c3f3b8ca72df5056f0f047c637e8667647df609c88d92eb0acdea58e0fdc3b69
+-- hash: bb86ff529d2f72bf84372acf7902a124b816ce38fea557e35e7f91bfef654222
 
 name:           has-hub
 version:        0.1.0.0
@@ -29,7 +29,34 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      MissingH
+    , aeson
+    , base >=4.7 && <5
+    , bytestring
+    , either
+    , http-client
+    , http-client-tls
+    , http-types
+    , lens
+    , lens-aeson
+    , split
+  exposed-modules:
+      HasHub.Client
+      HasHub.Client.Data
+      HasHub.Client.Fetcher
+      HasHub.Object.Collaborator
+      HasHub.Object.Collaborator.Data
+      HasHub.Object.Epic
+      HasHub.Object.Epic.Data
+      HasHub.Object.FixMe
+      HasHub.Object.Issue
+      HasHub.Object.Issue.Data
+      HasHub.Object.Label
+      HasHub.Object.Label.Data
+      HasHub.Object.Milestone
+      HasHub.Object.Milestone.Data
+      HasHub.Object.Pipeline
+      HasHub.Object.Pipeline.Data
   other-modules:
       Paths_has_hub
   default-language: Haskell2010
@@ -40,8 +67,18 @@ executable has-hub-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      MissingH
+    , aeson
+    , base >=4.7 && <5
+    , bytestring
+    , either
     , has-hub
+    , http-client
+    , http-client-tls
+    , http-types
+    , lens
+    , lens-aeson
+    , split
   other-modules:
       Paths_has_hub
   default-language: Haskell2010
@@ -53,9 +90,25 @@ test-suite has-hub-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      MissingH
+    , aeson
+    , base >=4.7 && <5
+    , bytestring
+    , either
     , has-hub
     , hspec
+    , http-client
+    , http-client-tls
+    , http-types
+    , lens
+    , lens-aeson
+    , split
   other-modules:
+      HasHub.Object.Collaborator.DataSpec
+      HasHub.Object.Epic.DataSpec
+      HasHub.Object.Issue.DataSpec
+      HasHub.Object.Label.DataSpec
+      HasHub.Object.Milestone.DataSpec
+      HasHub.Object.Pipeline.DataSpec
       Paths_has_hub
   default-language: Haskell2010

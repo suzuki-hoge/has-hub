@@ -21,6 +21,16 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- either
+- http-client
+- http-client-tls
+- http-types
+- bytestring
+- aeson
+- lens-aeson
+- lens
+- split
+- MissingH
 
 library:
   source-dirs: src
