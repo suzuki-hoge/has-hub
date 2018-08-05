@@ -1,0 +1,85 @@
+@startuml
+
+participant Yaml
+participant Main
+participant Client
+participant GitHub
+participant ZenHub
+
+hide footbox
+
+== Validate Yaml ==
+Yaml <-- Main : validate\nPath
+Yaml --> Main : Validation [FixMe] [YamlObject]
+
+== Create Milestone ==
+Main --> Client : create
+Client --> GitHub : post\nGitHubConnector, Title, Maybe DueOn
+Client <-- GitHub : Number
+Client --> ZenHub : post\nZenHubConnector, Number, StartOn
+Main <-- Client : Milestone
+
+== Validate Epics ==
+Main --> Client : validate\n[EpicNumber]
+loop
+    Client --> ZenHub : get\nZenHubConnector
+    Client <-- ZenHub : Maybe EpicNumber
+end
+Main <-- Client : Validation [FixMe] [EpicNumber]
+
+== Validate Milestones ==
+Main --> Client : validate\n[Name]
+Client --> GitHub : get\nGitHubConnector
+Client <-- GitHub : [Number, Title, Maybe DueOn]
+loop
+    Client --> ZenHub : post\nZenHubConnector, Number
+    Client <-- ZenHub : Maybe StartOn
+end
+Main <-- Client : Validation [FixMe] [Milestone]
+
+== Validate Labels ==
+Main --> Client : validate\n[Label]
+Client --> GitHub : get\nGitHubConnector
+Client <-- GitHub : [Label]
+Main <-- Client : Validation [FixMe] [Label]
+
+== Validate Collaborators ==
+Main --> Client : validate\n[Collaborator]
+Client --> GitHub : get\nGitHubConnector
+Client <-- GitHub : [Collaborator]
+Main <-- Client : Validation [FixMe] [Collaborator]
+
+== Validate Pipelines ==
+Main --> Client : validate\n[Name]
+Client --> ZenHub : get\nZenHubConnector
+Client <-- ZenHub : [Pipeline]
+Main <-- Client : Validation [FixMe] [Pipeline]
+
+Main --> Main : init [(EpicLinkNumber, Epic)]
+
+loop
+    == Post Epic ==
+    Main --> Main : get [Epic] by [EpicLinkNumber]
+    Main --> Client : Title, Body, Maybe Milestone,\n[Collaborator], [Label], [Epic],\nMaybe Pipeline, Maybe Estimate
+    Client --> GitHub : Post Issue
+    Client <-- GitHub : Number
+    Client --> ZenHub : post\nZenHubConnector, Number
+    Main <-- Client : Epic
+    Main --> Main : push (EpicLinkNumber, Epic)
+end
+
+loop
+    == Post Issue ==
+    Main --> Main : get [Epic] by [EpicLinkNumber]
+    Main --> Client : Title, Body, Maybe Milestone,\n[Collaborator], [Label], [Epic],\nMaybe Pipeline, Maybe Estimate
+    Client --> GitHub : post\nGitHubConnector\nTitle, Body, Milestone, [Collaborator], [Label]
+    Client <-- GitHub : Number
+    loop
+        Client --> ZenHub : post\nZenHubConnector, Number, EpicNumber, RepositoryId
+    end
+    Client --> ZenHub : post\nZenHubConnector, Number, PipelineId
+    Client --> ZenHub : put:\nZenHubConnector, Number, Estimate
+end
+
+@enduml
+
