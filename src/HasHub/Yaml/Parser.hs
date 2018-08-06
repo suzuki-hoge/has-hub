@@ -1,15 +1,15 @@
 module HasHub.Yaml.Parser
 (
   parseObjects
+, parseMilestones
 , module HasHub.Yaml.Parser.Data
 )
 where
 
 
 import Data.Either.Validation (Validation(..))
-
 import Data.Yaml (decodeFileEither, ParseException(..), YamlException(..))
-
+import Data.Aeson (FromJSON(..))
 import Data.String.Utils (startswith)
 
 import Control.Exception
@@ -17,17 +17,25 @@ import Control.Exception
 import HasHub.Yaml.Parser.Data
 
 
-parseObjects :: FilePath -> IO (Validation [String] [Object])
-parseObjects path = do
-  e <- (decodeFileEither path >>= evaluate) `catch` parseFailure
+parse :: (FromJSON a) => (a -> b) -> FilePath -> IO (Validation [String] [b])
+parse mapper path = do
+  e <- (decodeFileEither path >>= evaluate) `catch` failure
 
   return $ case e of
-    Right(rawObjects)                                                       -> Success $ map rawToEpicOrIssue rawObjects
+    Right(xs)                                    -> Success $ map mapper xs
     Left(InvalidYaml (Just (YamlException msg)))
-      | "Yaml file not found:" `startswith` msg                             -> Failure ["no such File(" ++ path ++ ")"]
-      | otherwise                                                           -> Failure ["invalid yaml file"]
-    otherwise                                                               -> Failure ["invalid yaml file"]
+      | "Yaml file not found:" `startswith` msg  -> Failure ["no such File(" ++ path ++ ")"]
+      | otherwise                                -> Failure ["invalid yaml file"]
+    otherwise                                    -> Failure ["invalid yaml file"]
 
     where
-      parseFailure :: SomeException -> IO (Either ParseException [RawObject])
-      parseFailure e = return $ Left (InvalidYaml Nothing)
+      failure :: (FromJSON a) => SomeException -> IO (Either ParseException [a])
+      failure e = return $ Left (InvalidYaml Nothing)
+
+
+parseObjects :: FilePath -> IO (Validation [String] [Object])
+parseObjects = parse rawToEpicOrIssue
+
+
+parseMilestones :: FilePath -> IO (Validation [String] [Milestone])
+parseMilestones = parse id

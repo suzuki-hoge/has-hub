@@ -60,3 +60,12 @@ rawToEpicOrIssue (RawObject epicLinkNumber title body epics estimate milestone l
     (??) :: Maybe [a] -> [a]
     (??) Nothing = []
     (??) (Just xs) = xs
+
+
+data Milestone = Milestone
+                  String         -- title
+                  (Maybe String) -- start_on
+                  (Maybe String) -- due_on
+               deriving (Eq, Show)
+instance FromJSON Milestone where
+  parseJSON (Object v) = Milestone <$> (v .: "title") <*> (v .:? "start_on") <*> (v .:? "due_on")
