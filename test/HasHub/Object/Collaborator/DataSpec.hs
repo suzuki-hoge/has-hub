@@ -15,6 +15,6 @@ spec :: Spec
 spec = do
   describe "parse github json" $ do
     it "name" $ do
-      let exp = decode "{\"login\": \"suzuki-hoge\"}" :: Maybe Collaborator
-      let act = Just $ Collaborator "suzuki-hoge"
-      exp `shouldBe` act
+      let exp = Just $ Collaborator "suzuki-hoge"
+      let act = decode "{\"login\": \"suzuki-hoge\"}"
+      act `shouldBe` exp

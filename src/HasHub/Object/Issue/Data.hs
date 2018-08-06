@@ -3,6 +3,7 @@
 
 module HasHub.Object.Issue.Data where
 
+
 import Data.Aeson (FromJSON(..), Value(Object), ToJSON(..), (.:), (.:?), (.=), object)
 
 import Data.List.Utils (replace)
