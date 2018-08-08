@@ -11,6 +11,7 @@ module HasHub.Client
 , postZenHub
 , putZenHub
 , HasHub.Client.Data.Client(..)
+, asRepositoryId
 ) where
 
 

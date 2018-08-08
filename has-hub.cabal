@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 84373c547a78e47e1075c05cbd8f4bee7a87a230d6518608f99a5bf0e04a2a6e
+-- hash: f362e1a6eebac69873b75028aab7db57b0f84a2bfabe214d6c1e7e70e5233f75
 
 name:           has-hub
 version:        0.1.0.0
@@ -51,19 +51,16 @@ library
       HasHub.Logger
       HasHub.Object.Collaborator
       HasHub.Object.Collaborator.Data
-      HasHub.Object.Epic
-      HasHub.Object.Epic.Data
       HasHub.Object.FixMe
-      HasHub.Object.Issue
-      HasHub.Object.Issue.Data
       HasHub.Object.Label
       HasHub.Object.Label.Data
       HasHub.Object.Milestone
       HasHub.Object.Milestone.Data
+      HasHub.Object.Object
+      HasHub.Object.Object.Data
       HasHub.Object.Pipeline
       HasHub.Object.Pipeline.Data
       HasHub.Yaml.Parser
-      HasHub.Yaml.Parser.Data
   other-modules:
       Paths_has_hub
   default-language: Haskell2010
@@ -119,11 +116,11 @@ test-suite has-hub-test
     , utf8-string
     , yaml
   other-modules:
+      HasHub.Fixture
       HasHub.Object.Collaborator.DataSpec
-      HasHub.Object.Epic.DataSpec
-      HasHub.Object.Issue.DataSpec
       HasHub.Object.Label.DataSpec
       HasHub.Object.Milestone.DataSpec
+      HasHub.Object.Object.DataSpec
       HasHub.Object.Pipeline.DataSpec
       HasHub.Yaml.ParserSpec
       Paths_has_hub
