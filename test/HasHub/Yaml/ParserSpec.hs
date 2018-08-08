@@ -10,36 +10,35 @@ import Data.Either.Validation (Validation(..))
 
 import HasHub.Yaml.Parser
 
+import HasHub.Object.Object.Data
+import HasHub.Object.Milestone.Data
+
+import qualified HasHub.Fixture as F
+
 
 spec :: Spec
 spec = do
   describe "parse objects yaml file" $ do
-    let emptyBody = ""
-    let noEpics = []
-    let noEstimate = Nothing
-    let noMilestone = Nothing
-    let noLabels = []
-    let noAssignees = []
-    let noPipeline = Nothing
-
+    it "minimum parameter epic" $ do
+      1 `shouldBe` 1
     describe "parse success" $ do
       it "minimum parameter epic" $ do
-        let exp = Success $ [EpicObject "?2" "post module" emptyBody noEpics noEstimate noMilestone noLabels noAssignees noPipeline]
+        let exp = Success $ [EpicYamlObject "?2" F.title F.emptyBody F.noEpicNumbers F.noEstimate F.noMilestoneTitle F.noLabels F.noCollaborators F.noPipelineName]
         let act = parseObjects "test/yaml/objects/success/minimum_parameter_epic.yaml"
         act `shouldReturn` exp
 
       it "full parameter epic" $ do
-        let exp = Success $ [EpicObject "?2" "post module" "post user data and write recode." ["#1"] (Just 3.0) (Just "sprint 1") ["dev"] ["John"] (Just "sprint backlog")]
+        let exp = Success $ [EpicYamlObject "?2" F.title F.body F.noEpicNumbers F.justEstimate F.justMilestoneTitle F.labels F.collaborators F.justPipelineName]
         let act = parseObjects "test/yaml/objects/success/full_parameter_epic.yaml"
         act `shouldReturn` exp
 
       it "epic and issue" $ do
-        let exp = Success $ [EpicObject "?2" "post module" "post user data and write recode." ["#1"] noEstimate noMilestone noLabels noAssignees noPipeline, IssueObject "user api" "write recode." ["?2"] (Just 0.5) (Just "sprint 1") ["dev"] ["John"] (Just "sprint backlog")]
+        let exp = Success $ [EpicYamlObject "?2" F.title F.body F.noEpicNumbers F.noEstimate F.noMilestoneTitle F.noLabels F.noCollaborators F.noPipelineName, IssueYamlObject F.title2 F.body2 F.noEpicNumbers F.justEstimate2 F.justMilestoneTitle F.labels F.collaborators F.justPipelineName]
         let act = parseObjects "test/yaml/objects/success/epic_and_issue.yaml"
         act `shouldReturn` exp
 
       it "contained unknown key" $ do
-        let exp = Success $ [EpicObject "?2" "post module" emptyBody noEpics noEstimate noMilestone noLabels noAssignees noPipeline]
+        let exp = Success $ [EpicYamlObject "?2" F.title F.emptyBody F.noEpicNumbers F.noEstimate F.noMilestoneTitle F.noLabels F.noCollaborators F.noPipelineName]
         let act = parseObjects "test/yaml/objects/success/contained_unknown_key.yaml"
         act `shouldReturn` exp
 
@@ -60,12 +59,12 @@ spec = do
 
     describe "parse success" $ do
       it "minimum parameter milestone" $ do
-        let exp = Success $ [Milestone "sprint 1" noStartOn noDueOn]
+        let exp = Success $ [YamlWrappedMilestone "sprint 1" noStartOn noDueOn]
         let act = parseMilestones "test/yaml/milestones/success/minimum_parameter_milestone.yaml"
         act `shouldReturn` exp
 
       it "full parameter milestone" $ do
-        let exp = Success $ [Milestone "sprint 1" (Just "2018-01-01") (Just "2018-01-31")]
+        let exp = Success $ [YamlWrappedMilestone "sprint 1" (Just "2018-01-01") (Just "2018-01-31")]
         let act = parseMilestones "test/yaml/milestones/success/full_parameter_milestone.yaml"
         act `shouldReturn` exp
 

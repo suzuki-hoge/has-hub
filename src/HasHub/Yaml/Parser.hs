@@ -2,7 +2,6 @@ module HasHub.Yaml.Parser
 (
   parseObjects
 , parseMilestones
-, module HasHub.Yaml.Parser.Data
 )
 where
 
@@ -14,7 +13,12 @@ import Data.String.Utils (startswith)
 
 import Control.Exception
 
-import HasHub.Yaml.Parser.Data
+import HasHub.Object.Milestone.Data
+import HasHub.Object.Collaborator.Data
+import HasHub.Object.Label.Data
+import HasHub.Object.Pipeline.Data
+import HasHub.Object.Object.Data
+import HasHub.Object.Milestone.Data
 
 
 parse :: (FromJSON a) => (a -> b) -> FilePath -> IO (Validation [String] [b])
@@ -33,9 +37,25 @@ parse mapper path = do
       failure e = return $ Left (InvalidYaml Nothing)
 
 
-parseObjects :: FilePath -> IO (Validation [String] [Object])
+parseObjects :: FilePath -> IO (Validation [String] [YamlObject])
 parseObjects = parse rawToEpicOrIssue
+  where
+    rawToEpicOrIssue :: YamlWrappedObject -> YamlObject
+    rawToEpicOrIssue (YamlWrappedObject meln t b es me mmt ls cs mpn) = createEither meln (Title t) (Body <?> b) (EpicNumber <??> es) (Estimate <$> me) (MilestoneTitle <$> mmt) (Label <??> ls) (Collaborator <??> cs) (PipelineName <$> mpn)
 
 
-parseMilestones :: FilePath -> IO (Validation [String] [Milestone])
+    createEither (Just eln) = EpicYamlObject eln
+    createEither Nothing    = IssueYamlObject
+
+    (<?>) :: (String -> a) -> Maybe String -> a
+    f <?> Nothing = f ""
+    f <?> (Just xs) = f xs
+
+
+    (<??>) :: (a -> b) -> Maybe [a] -> [b]
+    f <??> Nothing = []
+    f <??> (Just xs) = map f xs
+
+
+parseMilestones :: FilePath -> IO (Validation [String] [YamlWrappedMilestone])
 parseMilestones = parse id

@@ -1,0 +1,134 @@
+{-# LANGUAGE OverloadedStrings #-}
+
+
+module HasHub.Object.Object.Data where
+
+
+-- todo import list
+import qualified Data.ByteString.Lazy.Internal as LBS (ByteString) -- todo check LBS
+
+import Data.Aeson (FromJSON(..), Value(Object), decode, (.:), (.:?), ToJSON(..), object, (.=))
+import Data.Aeson.Types (Parser, parseMaybe)
+
+import Data.List.Utils (replace)
+
+import HasHub.Object.Milestone.Data
+import HasHub.Object.Collaborator.Data
+import HasHub.Object.Label.Data
+import HasHub.Object.Pipeline.Data
+
+
+data IssueNumber = IssueNumber Int deriving (Eq)
+instance FromJSON IssueNumber where
+  parseJSON (Object v) = IssueNumber <$> (v .: "number")
+instance Show IssueNumber where
+  show (IssueNumber v) = "#" ++ show v
+
+
+newtype Title = Title String deriving (Eq, Show)
+
+
+newtype Body = Body String deriving (Eq, Show)
+
+
+data CreateIssueInput = CreateIssueInput Title Body (Maybe Milestone) [Collaborator] [Label]
+instance ToJSON CreateIssueInput where
+  toJSON (CreateIssueInput (Title t) (Body b) mm cs ls) = object $ [
+      "title"     .= t
+    , "body"      .= b
+    , "assignees" .= map (\(Collaborator c) -> c) cs
+    , "labels"    .= map (\(Label l) -> l) ls
+    ] ++ maybe [] (\(Milestone (MilestoneNumber n) _ _ _) -> ["milestone" .= n]) mm
+
+
+type RepositoryId = Int
+
+
+data SetEpicInput = SetEpicInput IssueNumber RepositoryId
+instance ToJSON SetEpicInput where
+  toJSON (SetEpicInput (IssueNumber n) rid) = object $ [
+      "add_issues" .= [object ["repo_id" .= rid, "issue_number" .= n]]
+    ]
+
+
+data SetPipelineInput = SetPipelineInput Pipeline
+instance ToJSON SetPipelineInput where
+  toJSON (SetPipelineInput (Pipeline id name)) = object $ [
+      "pipeline_id" .= id
+    , "position"    .= ("bottom" :: String)
+    ]
+
+
+newtype Estimate = Estimate Double deriving Eq
+instance Show Estimate where
+  show (Estimate v) = replace ".0" "" $ show v
+
+
+data SetEstimateInput = SetEstimateInput Estimate -- todo instance ToResource ?
+instance ToJSON SetEstimateInput where
+  toJSON (SetEstimateInput (Estimate e)) = object $ [
+      "estimate" .= e
+    ]
+
+
+data ConvertToEpicInput = ConvertToEpicInput
+instance ToJSON ConvertToEpicInput where
+  toJSON _ = object $ []
+
+
+data EpicNumber = EpicNumber Int deriving (Eq)
+instance FromJSON EpicNumber where
+  parseJSON (Object v) = EpicNumber <$> (v .: "issue_number")
+instance Show EpicNumber where
+  show (EpicNumber v) = "#" ++ show v
+
+
+data Epic= Epic EpicNumber Title deriving Eq
+instance Show Epic where
+  show (Epic number title) = show number ++ " " ++ show title
+
+
+parseInList :: LBS.ByteString -> Maybe [EpicNumber]
+parseInList json = parseMaybe extract =<< decode json
+  where
+    extract :: Value -> Parser [EpicNumber]
+    extract (Object v) = v .: "epic_issues"
+    -- https://artyom.me/aeson#parsing-without-creating-extra-types
+
+
+data YamlObject = EpicYamlObject
+                  String           -- epic-link-number
+                  Title
+                  Body
+                  [EpicNumber]
+                  (Maybe Estimate)           --todo order by g -> z
+                  (Maybe MilestoneTitle)
+                  [Label]
+                  [Collaborator]
+                  (Maybe PipelineName)
+            | IssueYamlObject
+                  Title
+                  Body
+                  [EpicNumber]
+                  (Maybe Estimate)
+                  (Maybe MilestoneTitle)
+                  [Label]
+                  [Collaborator]
+                  (Maybe PipelineName)
+            deriving (Eq, Show)
+
+
+
+data YamlWrappedObject = YamlWrappedObject
+                  (Maybe String)   -- epic-link-number
+                  String           -- title
+                  (Maybe String)   -- body
+                  (Maybe [Int])    -- epics                -- tmp Int, todo #1, ?1
+                  (Maybe Double)   -- estimate
+                  (Maybe String)   -- milestone
+                  (Maybe [String]) -- labels
+                  (Maybe [String]) -- assignees
+                  (Maybe String)   -- pipeline
+               deriving Show
+instance FromJSON YamlWrappedObject where
+  parseJSON (Object v) = YamlWrappedObject <$> (v .:? "epic-link-number") <*> (v .: "title") <*> (v .:? "body") <*> (v .:? "epics") <*> (v .:? "estimate") <*> (v .:? "milestone") <*> (v .:? "labels") <*> (v .:? "assignees") <*> (v .:? "pipeline")

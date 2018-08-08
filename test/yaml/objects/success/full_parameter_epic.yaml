@@ -1,9 +1,9 @@
 - epic-link-number : ?2
   title            : post module
-  body             : post user data and write recode.
-  epics            : ["#1"]
+  body             : post user data and write record.
+  epics            : [] # todo
   estimate         : 3
   milestone        : sprint 1
-  labels           : [dev]
-  assignees        : [John]
+  labels           : [setup, dev]
+  assignees        : [suzuki-hoge]
   pipeline         : sprint backlog

@@ -17,7 +17,7 @@ import HasHub.Object.Milestone.Data
 import HasHub.Object.FixMe (FixMe, areAllContains)
 
 
-validate :: C.Client -> [Title] -> IO (Validation [FixMe] [Milestone])
+validate :: C.Client -> [MilestoneTitle] -> IO (Validation [FixMe] [Milestone])
 validate client needles = do
   putStrLn "\nvalidate Milestones"
 
@@ -47,20 +47,20 @@ getAll client = do
         return $ Milestone number title startOn dueOn
 
 
-create :: C.Client -> Title -> Maybe StartOn -> Maybe DueOn -> IO Milestone
+create :: C.Client -> MilestoneTitle -> Maybe StartOn -> Maybe DueOn -> IO Milestone
 create client title startOn dueOn = do
   printf "\n  create Milestone(%s)\n" (show title)
 
   json <- C.postGitHub client "/milestones" $ GitHubInput title dueOn
 
-  let number = fromJust $ (decode json :: Maybe Number)
+  let number = fromJust $ (decode json :: Maybe MilestoneNumber)
 
   mapM_ (setStartOn client number) startOn
 
   return $ Milestone number title startOn dueOn
 
     where
-      setStartOn :: C.Client -> Number -> StartOn -> IO ()
+      setStartOn :: C.Client -> MilestoneNumber -> StartOn -> IO ()
       setStartOn client number startOn = do
         printf "  set StartOn(%s)\n" (show startOn)
 
@@ -69,5 +69,5 @@ create client title startOn dueOn = do
         return ()
 
 
-milestoneResource :: Number -> C.Resource
-milestoneResource (Number n) = "/milestones/" ++ (show $ n) ++ "/start_date"
+milestoneResource :: MilestoneNumber -> C.Resource
+milestoneResource (MilestoneNumber n) = "/milestones/" ++ (show $ n) ++ "/start_date"
