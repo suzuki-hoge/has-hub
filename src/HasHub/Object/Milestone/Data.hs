@@ -63,6 +63,6 @@ instance FromJSON YamlWrappedMilestone where
   parseJSON (Object v) = YamlWrappedMilestone <$> (v .: "title") <*> (v .:? "start_on") <*> (v .:? "due_on")
 
 
-filterBy :: [Milestone] -> Maybe MilestoneTitle -> Maybe Milestone
-filterBy ms Nothing = Nothing
-filterBy ms (Just mt) = listToMaybe $ filter (\(Milestone _ t _ _) -> t == mt) ms
+intersect :: [Milestone] -> Maybe MilestoneTitle -> Maybe Milestone
+intersect ms Nothing = Nothing
+intersect ms (Just mt) = listToMaybe $ filter (\(Milestone _ t _ _) -> t == mt) ms

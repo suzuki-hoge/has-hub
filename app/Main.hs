@@ -14,6 +14,7 @@ import HasHub.Object.Milestone as M
 import HasHub.Object.Label as L
 import HasHub.Object.Collaborator as C
 import HasHub.Object.Pipeline as P
+import HasHub.Object.Object as O
 import HasHub.Object.FixMe
 
 import HasHub.Yaml.Parser
@@ -45,10 +46,11 @@ run gToken zToken = do
 
       let ms = [Milestone (MilestoneNumber 1) (MilestoneTitle "sprint 1") (Just $ StartOn "2018-04-01T00:00:00Z") (Just $ DueOn "2018-04-30T23:59:59Z")]
       let ps = [Pipeline "5b0577fa2133e1068138aabc" "sprint backlog"]
+      let links = [LinkedEpic (EpicQuestionNumber 1) (EpicNumber 51)]
 
-      es <- mapM (createEpic client ms ps) obs
+      paireds <- mapM (createEpic client ms ps links) obs
 
-      print es
+      print paireds
 
     Failure x -> do
       print x

@@ -22,17 +22,18 @@ import HasHub.Object.Label.Data
 import HasHub.Object.Pipeline.Data as P
 
 
-createEpic :: Client -> [Milestone] -> [Pipeline] -> YamlObject -> IO Epic
-createEpic client milestones pipelines (EpicYamlObject eln title body epicNumbers estimate milestoneTitle labels collaborators pipelineName) = do
-  let milestone = milestones `M.filterBy` milestoneTitle
-  let pipeline = pipelines `P.filterBy` pipelineName
+createEpic :: Client -> [Milestone] -> [Pipeline] -> [LinkedEpic] -> YamlObject -> IO LinkedEpic
+createEpic client milestones pipelines links (EpicYamlObject eln title body epicLinkNumbers estimate milestoneTitle labels collaborators pipelineName) = do
+  let milestone = M.intersect milestones milestoneTitle
+  let pipeline = P.intersect pipelines pipelineName
+  let epicNumbers = fixEpicNumbers links epicLinkNumbers
 
   number <- createIssue client title body milestone collaborators labels epicNumbers pipeline estimate
 
   convertToEpic client number
 
   let (IssueNumber n) = number
-  return $ Epic (EpicNumber n) title
+  return $ LinkedEpic eln (EpicNumber n)
 
 
 createIssue :: Client -> Title -> Body -> (Maybe Milestone) -> [Collaborator] -> [Label] -> [EpicNumber] -> (Maybe Pipeline) -> (Maybe Estimate) -> IO IssueNumber

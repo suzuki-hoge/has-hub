@@ -17,12 +17,11 @@ import HasHub.Object.Collaborator.Data
 import HasHub.Object.Label.Data
 import HasHub.Object.Pipeline.Data
 
+import Data.List (intersectBy)
 
-data IssueNumber = IssueNumber Int deriving (Eq)
+data IssueNumber = IssueNumber Int deriving (Eq, Show)
 instance FromJSON IssueNumber where
   parseJSON (Object v) = IssueNumber <$> (v .: "number")
-instance Show IssueNumber where
-  show (IssueNumber v) = "#" ++ show v
 
 
 newtype Title = Title String deriving (Eq, Show)
@@ -76,14 +75,17 @@ instance ToJSON ConvertToEpicInput where
   toJSON _ = object $ []
 
 
-data EpicNumber = EpicNumber Int deriving (Eq)
+data EpicLinkNumber = EpicSharpNumber Int
+                    | EpicQuestionNumber Int
+                    deriving (Eq, Show)
+
+
+data EpicNumber = EpicNumber Int deriving (Eq, Show)
 instance FromJSON EpicNumber where
   parseJSON (Object v) = EpicNumber <$> (v .: "issue_number")
-instance Show EpicNumber where
-  show (EpicNumber v) = "#" ++ show v
 
 
-data Epic= Epic EpicNumber Title deriving Eq
+data Epic = Epic EpicNumber Title deriving Eq
 instance Show Epic where
   show (Epic number title) = show number ++ " " ++ show title
 
@@ -96,12 +98,15 @@ parseInList json = parseMaybe extract =<< decode json
     -- https://artyom.me/aeson#parsing-without-creating-extra-types
 
 
+data LinkedEpic = LinkedEpic EpicLinkNumber EpicNumber deriving Show
+
+
 data YamlObject = EpicYamlObject
-                  String           -- epic-link-number
+                  EpicLinkNumber
                   Title
                   Body
-                  [EpicNumber]
-                  (Maybe Estimate)           --todo order by g -> z
+                  [EpicLinkNumber]
+                  (Maybe Estimate)           -- todo order by g -> z
                   (Maybe MilestoneTitle)
                   [Label]
                   [Collaborator]
@@ -109,7 +114,7 @@ data YamlObject = EpicYamlObject
             | IssueYamlObject
                   Title
                   Body
-                  [EpicNumber]
+                  [EpicLinkNumber]
                   (Maybe Estimate)
                   (Maybe MilestoneTitle)
                   [Label]
@@ -123,7 +128,7 @@ data YamlWrappedObject = YamlWrappedObject
                   (Maybe String)   -- epic-link-number
                   String           -- title
                   (Maybe String)   -- body
-                  (Maybe [Int])    -- epics                -- tmp Int, todo #1, ?1
+                  (Maybe [String]) -- epics
                   (Maybe Double)   -- estimate
                   (Maybe String)   -- milestone
                   (Maybe [String]) -- labels
@@ -132,3 +137,14 @@ data YamlWrappedObject = YamlWrappedObject
                deriving Show
 instance FromJSON YamlWrappedObject where
   parseJSON (Object v) = YamlWrappedObject <$> (v .:? "epic-link-number") <*> (v .: "title") <*> (v .:? "body") <*> (v .:? "epics") <*> (v .:? "estimate") <*> (v .:? "milestone") <*> (v .:? "labels") <*> (v .:? "assignees") <*> (v .:? "pipeline")
+
+
+fixEpicNumbers :: [LinkedEpic] -> [EpicLinkNumber] -> [EpicNumber]
+fixEpicNumbers les elns = map (findAndConvert les) elns
+  where
+    findAndConvert :: [LinkedEpic] -> EpicLinkNumber -> EpicNumber
+    findAndConvert les (EpicSharpNumber n) = EpicNumber n
+    findAndConvert les eqn = mapped !! 0
+      where
+        filtered = filter (\(LinkedEpic eln en) -> eln == eqn) les
+        mapped = map (\(LinkedEpic eln en) -> en) filtered
