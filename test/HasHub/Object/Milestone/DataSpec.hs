@@ -10,6 +10,8 @@ import Data.Aeson (decode, encode)
 
 import HasHub.Object.Milestone.Data
 
+import qualified HasHub.Fixture as F
+
 
 spec :: Spec
 spec = do
@@ -65,4 +67,20 @@ spec = do
     it "with start_on and with due_on" $ do
       let exp = "sprint 1 (2018-04-01 ~ 2018-04-30)"
       let act = show $ Milestone (MilestoneNumber 1) (MilestoneTitle "sprint 1") (Just $ StartOn "2018-04-01T00:00:00Z") (Just $ DueOn "2018-04-30T00:00:00Z")
+      act `shouldBe` exp
+
+  describe "intersect" $ do
+    it "non-empty and just" $ do
+      let exp = F.justMilestone
+      let act = intersect [F.milestone] F.justMilestoneTitle
+      act `shouldBe` exp
+
+    it "non-empty and nothing" $ do
+      let exp = Nothing
+      let act = intersect [F.milestone] Nothing
+      act `shouldBe` exp
+
+    it "empty and nothing" $ do
+      let exp = Nothing
+      let act = intersect [] Nothing
       act `shouldBe` exp

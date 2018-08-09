@@ -23,22 +23,22 @@ spec = do
       1 `shouldBe` 1
     describe "parse success" $ do
       it "minimum parameter epic" $ do
-        let exp = Success $ [EpicYamlObject "?2" F.title F.emptyBody F.noEpicNumbers F.noEstimate F.noMilestoneTitle F.noLabels F.noCollaborators F.noPipelineName]
+        let exp = Success $ [EpicYamlObject F.ownEpicLinkNumber F.title F.emptyBody F.noEpicLinkNumbers F.noEstimate F.noMilestoneTitle F.noLabels F.noCollaborators F.noPipelineName]
         let act = parseObjects "test/yaml/objects/success/minimum_parameter_epic.yaml"
         act `shouldReturn` exp
 
       it "full parameter epic" $ do
-        let exp = Success $ [EpicYamlObject "?2" F.title F.body F.noEpicNumbers F.justEstimate F.justMilestoneTitle F.labels F.collaborators F.justPipelineName]
+        let exp = Success $ [EpicYamlObject F.ownEpicLinkNumber F.title F.body F.parentEpicLinkNumbers F.justEstimate F.justMilestoneTitle F.labels F.collaborators F.justPipelineName]
         let act = parseObjects "test/yaml/objects/success/full_parameter_epic.yaml"
         act `shouldReturn` exp
 
       it "epic and issue" $ do
-        let exp = Success $ [EpicYamlObject "?2" F.title F.body F.noEpicNumbers F.noEstimate F.noMilestoneTitle F.noLabels F.noCollaborators F.noPipelineName, IssueYamlObject F.title2 F.body2 F.noEpicNumbers F.justEstimate2 F.justMilestoneTitle F.labels F.collaborators F.justPipelineName]
+        let exp = Success $ [EpicYamlObject F.ownEpicLinkNumber F.title F.body F.noEpicLinkNumbers F.noEstimate F.noMilestoneTitle F.noLabels F.noCollaborators F.noPipelineName, IssueYamlObject F.title2 F.body2 F.noEpicLinkNumbers F.justEstimate2 F.justMilestoneTitle F.labels F.collaborators F.justPipelineName]
         let act = parseObjects "test/yaml/objects/success/epic_and_issue.yaml"
         act `shouldReturn` exp
 
       it "contained unknown key" $ do
-        let exp = Success $ [EpicYamlObject "?2" F.title F.emptyBody F.noEpicNumbers F.noEstimate F.noMilestoneTitle F.noLabels F.noCollaborators F.noPipelineName]
+        let exp = Success $ [EpicYamlObject F.ownEpicLinkNumber F.title F.emptyBody F.noEpicLinkNumbers F.noEstimate F.noMilestoneTitle F.noLabels F.noCollaborators F.noPipelineName]
         let act = parseObjects "test/yaml/objects/success/contained_unknown_key.yaml"
         act `shouldReturn` exp
 

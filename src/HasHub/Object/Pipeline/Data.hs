@@ -31,6 +31,6 @@ parseInList json = parseMaybe extract =<< decode json
     -- https://artyom.me/aeson#parsing-without-creating-extra-types
 
 
-filterBy :: [Pipeline] -> Maybe PipelineName -> Maybe Pipeline
-filterBy ps Nothing = Nothing
-filterBy ps (Just (PipelineName pn)) = listToMaybe $ filter (\(Pipeline _ n) -> n == pn) ps
+intersect :: [Pipeline] -> Maybe PipelineName -> Maybe Pipeline
+intersect ps Nothing = Nothing
+intersect ps (Just (PipelineName pn)) = listToMaybe $ filter (\(Pipeline _ n) -> n == pn) ps

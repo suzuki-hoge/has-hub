@@ -20,8 +20,12 @@ body2 = Body "write record."
 emptyBody = Body ""
 
 
-epicNumbers = [EpicNumber 1]
-noEpicNumbers = []
+ownEpicLinkNumber = EpicQuestionNumber 2
+parentEpicLinkNumber = EpicQuestionNumber 1
+
+
+parentEpicLinkNumbers = [parentEpicLinkNumber]
+noEpicLinkNumbers = []
 
 
 milestoneTitle = MilestoneTitle "sprint 1"
@@ -44,6 +48,7 @@ noLabels = []
 pipelineName = PipelineName "sprint backlog"
 justPipelineName = Just pipelineName
 noPipelineName = Nothing
+
 
 pipeline = Pipeline "12345678" "sprint backlog"
 justPipeline = Just pipeline
