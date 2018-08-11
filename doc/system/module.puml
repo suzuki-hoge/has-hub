@@ -1,0 +1,89 @@
+@startuml
+
+namespace HasHub {
+  namespace Command {
+    class CreateObjects
+    class CreateMilestones
+    class ReferAll
+    class GenerateSample
+  }
+  namespace Object {
+    namespace Connection {
+      class Connector
+      class Fetcher
+      class Type
+      class Logger
+      Connector -d-> Fetcher
+      Connector -d-> Type
+      Fetcher -d-> Logger
+    }
+    namespace Object {
+      class Validator
+      class Client
+      class Type
+      class Parser
+      Validator -r-> Type
+      Client -l-> Type
+      Parser -d--> Type
+    }
+    namespace Milestone {
+      class Validator
+      class Client
+      class Type
+      class Parser
+      Validator -r-> Type
+      Client -l-> Type
+      Parser -d-> Type
+    }
+    namespace Label {
+      class Validator
+      class Client
+      class Type
+      Validator -r-> Type
+      Client -l-> Type
+    }
+    namespace Collaborator {
+      class Validator
+      class Client
+      class Type
+      Validator -r-> Type
+      Client -l-> Type
+    }
+    namespace Pipeline {
+      class Validator
+      class Client
+      class Type
+      Validator -r-> Type
+      Client -l-> Type
+    }
+  }
+  class FixMe
+  namespace Yaml {
+    class Reader
+    class Writer
+  }
+}
+
+HasHub.Object.Object.Client -d-> HasHub.Object.Connection.Connector
+HasHub.Object.Milestone.Client -d-> HasHub.Object.Connection.Connector
+HasHub.Object.Label.Client -d-> HasHub.Object.Connection.Connector
+HasHub.Object.Collaborator.Client -d-> HasHub.Object.Connection.Connector
+HasHub.Object.Pipeline.Client -d-> HasHub.Object.Connection.Connector
+
+HasHub.Object.Object.Validator -u> HasHub.FixMe
+HasHub.Object.Milestone.Validator -u-> HasHub.FixMe
+HasHub.Object.Label.Validator -u-> HasHub.FixMe
+HasHub.Object.Collaborator.Validator -u---> HasHub.FixMe
+HasHub.Object.Pipeline.Validator -u-> HasHub.FixMe
+
+HasHub.Object.Object.Parser -u> HasHub.Yaml.Reader
+HasHub.Object.Milestone.Parser -u---> HasHub.Yaml.Reader
+
+HasHub.Yaml.Reader -d-> HasHub.FixMe
+
+HasHub.Command.CreateObjects -[hidden]d-> HasHub.Yaml.Writer
+HasHub.Command.CreateMilestones -[hidden]d-> HasHub.Yaml.Writer
+HasHub.Command.ReferAll -[hidden]d-> HasHub.Yaml.Writer
+HasHub.Command.GenerateSample -[hidden]d-> HasHub.Yaml.Writer
+
+@enduml
