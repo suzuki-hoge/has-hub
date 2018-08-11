@@ -2,35 +2,38 @@
 
 namespace HasHub {
   namespace Command {
-    class CreateObjects
-    class CreateMilestones
-    class ReferAll
+    class CreateObjects {
+      Client...
+    }
+    class CreateMilestones {
+      Client
+    }
+    class ReferAll {
+      Client...
+    }
     class GenerateSample
   }
   namespace Object {
-    namespace Connection {
-      class Connector
-      class LocalSession
-      class Type
-      class Logger
-      Connector --> Type
-      Connector --> Logger
-      Logger --> LocalSession
-      Connector --> LocalSession
-      LocalSession -r-> Type
-    }
     namespace Object {
-      class Validator
-      class Client
+      class Validator {
+        FixMe
+      }
+      class Client {
+        Connector
+      }
       class Type
       class Parser
       Validator -r-> Type
       Client -l-> Type
-      Parser -d--> Type
+      Parser -d-> Type
     }
     namespace Milestone {
-      class Validator
-      class Client
+      class Validator {
+        FixMe
+      }
+      class Client {
+        Connector
+      }
       class Type
       class Parser
       Validator -r-> Type
@@ -38,26 +41,49 @@ namespace HasHub {
       Parser -d-> Type
     }
     namespace Label {
-      class Validator
-      class Client
+      class Validator {
+        FixMe
+      }
+      class Client {
+        Connector
+      }
       class Type
       Validator -r-> Type
       Client -l-> Type
     }
     namespace Collaborator {
-      class Validator
-      class Client
+      class Validator {
+        FixMe
+      }
+      class Client {
+        Connector
+      }
       class Type
       Validator -r-> Type
       Client -l-> Type
     }
     namespace Pipeline {
-      class Validator
-      class Client
+      class Validator {
+        FixMe
+      }
+      class Client {
+        Connector
+      }
       class Type
       Validator -r-> Type
       Client -l-> Type
     }
+  }
+  namespace Connection {
+    class Connector
+    class LocalSession
+    class Type
+    class Logger
+    Connector --> Type
+    Connector --> Logger
+    Logger --> LocalSession
+    Connector --> LocalSession
+    LocalSession -r-> Type
   }
   class FixMe
   namespace Yaml {
@@ -66,26 +92,15 @@ namespace HasHub {
   }
 }
 
-HasHub.Object.Object.Client -d-> HasHub.Object.Connection.Connector
-HasHub.Object.Milestone.Client -d-> HasHub.Object.Connection.Connector
-HasHub.Object.Label.Client -d-> HasHub.Object.Connection.Connector
-HasHub.Object.Collaborator.Client -d-> HasHub.Object.Connection.Connector
-HasHub.Object.Pipeline.Client -d-> HasHub.Object.Connection.Connector
+HasHub.Command.CreateObjects -d-> HasHub.Yaml.Reader
+HasHub.Command.CreateMilestones -d-> HasHub.Yaml.Reader
+HasHub.Command.GenerateSample -d--> HasHub.Yaml.Writer
 
-HasHub.Object.Object.Validator -u> HasHub.FixMe
-HasHub.Object.Milestone.Validator -u-> HasHub.FixMe
-HasHub.Object.Label.Validator -u-> HasHub.FixMe
-HasHub.Object.Collaborator.Validator -u---> HasHub.FixMe
-HasHub.Object.Pipeline.Validator -u-> HasHub.FixMe
+HasHub.Yaml.Reader -d-> HasHub.Object.Object.Parser
+HasHub.Yaml.Reader -d-> HasHub.Object.Milestone.Parser
 
-HasHub.Object.Object.Parser -u> HasHub.Yaml.Reader
-HasHub.Object.Milestone.Parser -u---> HasHub.Yaml.Reader
+HasHub.Yaml.Reader -l-> HasHub.FixMe
 
-HasHub.Yaml.Reader -d-> HasHub.FixMe
-
-HasHub.Command.CreateObjects -[hidden]d-> HasHub.Yaml.Writer
-HasHub.Command.CreateMilestones -[hidden]d-> HasHub.Yaml.Writer
-HasHub.Command.ReferAll -[hidden]d-> HasHub.Yaml.Writer
-HasHub.Command.GenerateSample -[hidden]d-> HasHub.Yaml.Writer
+HasHub.Object.Milestone.Type -[hidden]d-> HasHub.Connection.Connector
 
 @enduml
