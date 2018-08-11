@@ -1,7 +1,8 @@
 module HasHub.Object.FixMe
 (
-  FixMe
+  FixMe(..)
 , areAllContains
+, mergeAll
 )
 where
 
@@ -16,11 +17,13 @@ data FixMe = FixMe [String] [Error] deriving Show
 
 
 areAllContains :: (Eq a, Show a) => [a] -> [a] -> Validation [FixMe] [a]
-areAllContains haystacks needles = errorToFixMe merged haystacks
+areAllContains haystacks needles = errorToFixMe (mergeAll vs haystacks) haystacks
   where
     vs = map (contains haystacks) needles
-    merged = if vs == [] then Success haystacks else foldl1 merge vs
 
+
+mergeAll :: (Eq a) => [Validation [Error] [a]] -> [a] -> Validation [Error] [a]
+mergeAll vs or = if vs == [] then Success or else foldl1 merge vs
 
 
 errorToFixMe :: (Eq a, Show a) => Validation [Error] [a] -> [a] -> Validation [FixMe] [a]

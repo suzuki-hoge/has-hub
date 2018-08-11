@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f362e1a6eebac69873b75028aab7db57b0f84a2bfabe214d6c1e7e70e5233f75
+-- hash: f46ef6072253779e02d49b29463c91a2ddcfc898138b6f626ab5ca17c8856a9f
 
 name:           has-hub
 version:        0.1.0.0
@@ -39,6 +39,7 @@ library
     , http-types
     , lens
     , lens-aeson
+    , regex-posix
     , split
     , time
     , uri-encode
@@ -82,6 +83,7 @@ executable has-hub-exe
     , http-types
     , lens
     , lens-aeson
+    , regex-posix
     , split
     , time
     , uri-encode
@@ -110,6 +112,7 @@ test-suite has-hub-test
     , http-types
     , lens
     , lens-aeson
+    , regex-posix
     , split
     , time
     , uri-encode

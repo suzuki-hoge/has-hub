@@ -40,17 +40,31 @@ run :: String -> String -> IO ()
 run gToken zToken = do
   vs <- parseObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/objects/success/full_parameter_epic.yaml"
 
+
   case vs of
     Success obs -> do
       client <- getClient gToken "suzuki-hoge" "has-hub-workspace" zToken "has-hub.log"
 
-      let ms = [Milestone (MilestoneNumber 1) (MilestoneTitle "sprint 1") (Just $ StartOn "2018-04-01T00:00:00Z") (Just $ DueOn "2018-04-30T23:59:59Z")]
-      let ps = [Pipeline "5b0577fa2133e1068138aabc" "sprint backlog"]
-      let links = [LinkedEpic (EpicQuestionNumber 1) (EpicNumber 51)]
+      print =<< O.validateAllExists client [SharpEpicNumber "#1"]
 
-      paireds <- mapM (createEpic client ms ps links) obs
+      print $ O.validateNoDuplicate [EpicLinkNumber "#1", EpicLinkNumber "#1"]
 
-      print paireds
+      print $ O.validateLinking [(1, EpicLinkNumber "?1")] [(2, QuestionEpicNumber "?1")]
+      print $ O.validateLinking [(1, EpicLinkNumber "?1")] [(2, QuestionEpicNumber "?2")]
+      print $ O.validateLinking [(5, EpicLinkNumber "?1")] [(2, QuestionEpicNumber "?1")]
+
+      print $ O.epicLinkNumberFormat [EpicLinkNumber "?1"]
+      print $ O.parentEpicNumberFormat [SharpEpicNumber "#1", QuestionEpicNumber "?1"]
+
+--      let vo = O.validateNoDuplicate [QuestionEpicNumber 3, QuestionEpicNumber 1, QuestionEpicNumber 2, QuestionEpicNumber 1]
+
+--      let ms = [Milestone (MilestoneNumber 1) (MilestoneTitle "sprint 1") (Just $ StartOn "2018-04-01T00:00:00Z") (Just $ DueOn "2018-04-30T23:59:59Z")]
+--      let ps = [Pipeline "5b0577fa2133e1068138aabc" "sprint backlog"]
+--      let links = [LinkedEpic (QuestionEpicNumber 1) (EpicNumber 51)]
+--
+--      paireds <- mapM (createEpic client ms ps links) obs
+--
+--      print paireds
 
     Failure x -> do
       print x

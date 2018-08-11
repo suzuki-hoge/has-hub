@@ -20,11 +20,11 @@ body2 = Body "write record."
 emptyBody = Body ""
 
 
-ownEpicLinkNumber = EpicQuestionNumber 2
-parentEpicLinkNumber = EpicQuestionNumber 1
+epicLinkNumber = EpicLinkNumber "?2"
+parentEpicNumber = QuestionEpicNumber "?1"
 
 
-parentEpicLinkNumbers = [parentEpicLinkNumber]
+parentEpicNumbers = [parentEpicNumber]
 noEpicLinkNumbers = []
 
 

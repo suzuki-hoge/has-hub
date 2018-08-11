@@ -44,7 +44,7 @@ parseObjects = parse rawToEpicOrIssue
     rawToEpicOrIssue (YamlWrappedObject meln t b es me mmt ls cs mpn) = createEither meln (Title t) (Body <?> b) (toEpicLinkNumber <??> es) (Estimate <$> me) (MilestoneTitle <$> mmt) (Label <??> ls) (Collaborator <??> cs) (PipelineName <$> mpn)
 
 
-    createEither (Just eln) = EpicYamlObject (toEpicLinkNumber eln)
+    createEither (Just eln) = EpicYamlObject (EpicLinkNumber eln)
     createEither Nothing    = IssueYamlObject
 
     (<?>) :: (String -> a) -> Maybe String -> a
@@ -56,11 +56,8 @@ parseObjects = parse rawToEpicOrIssue
     f <??> Nothing = []
     f <??> (Just xs) = map f xs
 
-    toEpicLinkNumber :: String -> EpicLinkNumber
-    toEpicLinkNumber s = if head s == '#' then EpicSharpNumber n else EpicQuestionNumber n
-      where
-        n :: Int
-        n = read $ tail s
+    toEpicLinkNumber :: String -> ParentEpicNumber
+    toEpicLinkNumber s = if head s == '#' then SharpEpicNumber s else QuestionEpicNumber s
 
 
 parseMilestones :: FilePath -> IO (Validation [String] [YamlWrappedMilestone])
