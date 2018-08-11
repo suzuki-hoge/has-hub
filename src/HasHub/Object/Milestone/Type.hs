@@ -4,7 +4,10 @@
 module HasHub.Object.Milestone.Type where
 
 
-import Data.Aeson (FromJSON(..), Value(Object), (.:), (.:?), ToJSON(..), object, (.=))
+import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
+import Data.Aeson (FromJSON(..), Value(Object), (.:), (.:?), decode, ToJSON(..), object, (.=))
+
+import Data.Maybe (fromJust)
 
 
 data MilestoneNumber2 = MilestoneNumber2 Int deriving (Eq, Show)
@@ -42,3 +45,7 @@ data Milestone2 = Milestone2 MilestoneNumber2 MilestoneTitle2 (Maybe StartOn2) (
 
 toMilestoneTitle :: Milestone2 -> MilestoneTitle2
 toMilestoneTitle (Milestone2 _ title _ _) = title
+
+
+decodeJust :: LBS.ByteString -> [CreateMilestoneOutput]
+decodeJust = fromJust . decode

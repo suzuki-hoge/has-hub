@@ -14,7 +14,4 @@ import HasHub.Object.Label.Type
 
 
 referAll :: IO [Label2]
-referAll = do
-  json <- getGitHub "/labels"
-
-  return $ fromJust $ (decode json :: Maybe [Label2])
+referAll = decodeJust <$> getGitHub "/labels"

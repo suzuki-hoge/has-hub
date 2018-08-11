@@ -14,7 +14,4 @@ import HasHub.Object.Collaborator.Type
 
 
 referAll :: IO [Collaborator2]
-referAll = do
-  json <- getGitHub "/collaborators"
-
-  return $ fromJust $ (decode json :: Maybe [Collaborator2])
+referAll = decodeJust <$> getGitHub "/collaborators"
