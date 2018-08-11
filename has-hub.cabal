@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 84d363436263d98a7d6ea2be40203c453ba6afb324d6d16ce091cb184186fa97
+-- hash: d6c4d1b69329f13c57f945125afb677aafcf4e9fb609df9ed1f6aa14fdeb3025
 
 name:           has-hub
 version:        0.1.0.0
@@ -56,7 +56,10 @@ library
       HasHub.FixMe2
       HasHub.Logger
       HasHub.Object.Collaborator
+      HasHub.Object.Collaborator.Client
       HasHub.Object.Collaborator.Data
+      HasHub.Object.Collaborator.Type
+      HasHub.Object.Collaborator.Validator
       HasHub.Object.FixMe
       HasHub.Object.Label
       HasHub.Object.Label.Client
