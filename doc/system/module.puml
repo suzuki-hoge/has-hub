@@ -10,12 +10,14 @@ namespace HasHub {
   namespace Object {
     namespace Connection {
       class Connector
-      class Fetcher
+      class LocalSession
       class Type
       class Logger
-      Connector -d-> Fetcher
-      Connector -d-> Type
-      Fetcher -d-> Logger
+      Connector --> Type
+      Connector --> Logger
+      Logger --> LocalSession
+      Connector --> LocalSession
+      LocalSession -r-> Type
     }
     namespace Object {
       class Validator
