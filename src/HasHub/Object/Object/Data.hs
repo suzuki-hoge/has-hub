@@ -18,6 +18,7 @@ import HasHub.Object.Label.Data
 import HasHub.Object.Pipeline.Data
 
 import Data.List (intersectBy)
+import Text.Regex.Posix ((=~))
 
 data IssueNumber = IssueNumber Int deriving (Eq, Show)
 instance FromJSON IssueNumber where
@@ -75,9 +76,10 @@ instance ToJSON ConvertToEpicInput where
   toJSON _ = object $ []
 
 
-data EpicLinkNumber = EpicSharpNumber Int
-                    | EpicQuestionNumber Int
-                    deriving (Eq, Show)
+newtype EpicLinkNumber = EpicLinkNumber String deriving (Eq, Ord, Show)
+
+
+data ParentEpicNumber = SharpEpicNumber String | QuestionEpicNumber String deriving (Eq, Ord, Show)
 
 
 data EpicNumber = EpicNumber Int deriving (Eq, Show)
@@ -105,7 +107,7 @@ data YamlObject = EpicYamlObject
                   EpicLinkNumber
                   Title
                   Body
-                  [EpicLinkNumber]
+                  [ParentEpicNumber]
                   (Maybe Estimate)           -- todo order by g -> z
                   (Maybe MilestoneTitle)
                   [Label]
@@ -114,7 +116,7 @@ data YamlObject = EpicYamlObject
             | IssueYamlObject
                   Title
                   Body
-                  [EpicLinkNumber]
+                  [ParentEpicNumber]
                   (Maybe Estimate)
                   (Maybe MilestoneTitle)
                   [Label]
@@ -139,12 +141,16 @@ instance FromJSON YamlWrappedObject where
   parseJSON (Object v) = YamlWrappedObject <$> (v .:? "epic-link-number") <*> (v .: "title") <*> (v .:? "body") <*> (v .:? "epics") <*> (v .:? "estimate") <*> (v .:? "milestone") <*> (v .:? "labels") <*> (v .:? "assignees") <*> (v .:? "pipeline")
 
 
-fixEpicNumbers :: [LinkedEpic] -> [EpicLinkNumber] -> [EpicNumber]
-fixEpicNumbers les elns = map (findAndConvert les) elns
-  where
-    findAndConvert :: [LinkedEpic] -> EpicLinkNumber -> EpicNumber
-    findAndConvert les (EpicSharpNumber n) = EpicNumber n
-    findAndConvert les eqn = mapped !! 0
-      where
-        filtered = filter (\(LinkedEpic eln en) -> eln == eqn) les
-        mapped = map (\(LinkedEpic eln en) -> en) filtered
+--fixEpicNumbers :: [LinkedEpic] -> [EpicLinkNumber] -> [EpicNumber]
+--fixEpicNumbers les elns = map (findAndConvert les) elns
+--  where
+--    findAndConvert :: [LinkedEpic] -> EpicLinkNumber -> EpicNumber
+--    findAndConvert les (SharpEpicNumber n) = EpicNumber n
+--    findAndConvert les (QuestionEpicNumber n) = (mapped n) !! 0
+--      where
+--        filtered = filter (\(LinkedEpic eln en) -> eln == qen) les
+--        mapped n = map (\(LinkedEpic eln (EpicNumber n')) -> n' == n) filtered
+
+
+isNumberedBy :: String -> Char -> Bool
+isNumberedBy s c = s =~ ("^\\" ++ [c] ++ "[0-9]+$")
