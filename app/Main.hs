@@ -6,10 +6,20 @@ module Main where
 
 import HasHub.Connection.Connector (set) -- todo
 
+import HasHub.Object.Milestone.Client as MC
 import HasHub.Object.Label.Client as LC
 import HasHub.Object.Collaborator.Client as CC
+import qualified HasHub.Object.Milestone.Validator as MV
 import qualified HasHub.Object.Label.Validator as LV
 import qualified HasHub.Object.Collaborator.Validator as CV
+
+
+ma :: IO ()
+ma = do
+  ms <- map toMilestoneTitle <$> MC.referAll
+  print $ [MilestoneTitle2 "sprint 1"] `MV.areAllIn` ms
+  print $ [MilestoneTitle2 "unknown"] `MV.areAllIn` ms
+
 
 la :: IO ()
 la = do
@@ -27,5 +37,6 @@ ca = do
 
 main = do
   set
+  ma
   la
   ca
