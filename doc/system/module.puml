@@ -21,10 +21,13 @@ namespace HasHub {
       class Client {
         Connector
       }
-      class Type
+      class Type {
+        Connection.Type (RepositoryId)
+      }
       class Parser
       Validator -r-> Type
-      Client -l-> Type
+      Client --> Type
+      Client -l-> Parser
       Parser -d-> Type
     }
     namespace Milestone {
@@ -37,7 +40,8 @@ namespace HasHub {
       class Type
       class Parser
       Validator -r-> Type
-      Client -l-> Type
+      Client --> Type
+      Client -l-> Parser
       Parser -d-> Type
     }
     namespace Label {
@@ -97,7 +101,7 @@ HasHub.Command.CreateMilestones -d-> HasHub.Yaml.Reader
 HasHub.Command.GenerateSample -d--> HasHub.Yaml.Writer
 
 HasHub.Yaml.Reader -d-> HasHub.Object.Object.Parser
-HasHub.Yaml.Reader -d-> HasHub.Object.Milestone.Parser
+HasHub.Yaml.Reader -d--> HasHub.Object.Milestone.Parser
 
 HasHub.Yaml.Reader -l-> HasHub.FixMe
 

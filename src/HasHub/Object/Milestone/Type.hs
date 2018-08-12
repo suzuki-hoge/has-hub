@@ -33,6 +33,10 @@ instance FromJSON CreateMilestoneOutput where
   parseJSON (Object v) = CreateMilestoneOutput <$> (MilestoneNumber2 <$> v .: "number") <*> (MilestoneTitle2 <$> v .: "title") <*> (fmap DueOn2 <$> v .:? "due_on")
 
 
+decodeJust :: LBS.ByteString -> [CreateMilestoneOutput]
+decodeJust = fromJust . decode
+
+
 newtype StartOn2 = StartOn2 String deriving (Eq, Show)
 instance ToJSON StartOn2 where
   toJSON (StartOn2 s) = object ["start_date" .= s]
@@ -41,11 +45,3 @@ instance FromJSON StartOn2 where
 
 
 data Milestone2 = Milestone2 MilestoneNumber2 MilestoneTitle2 (Maybe StartOn2) (Maybe DueOn2) deriving (Eq, Show)
-
-
-toMilestoneTitle :: Milestone2 -> MilestoneTitle2
-toMilestoneTitle (Milestone2 _ title _ _) = title
-
-
-decodeJust :: LBS.ByteString -> [CreateMilestoneOutput]
-decodeJust = fromJust . decode

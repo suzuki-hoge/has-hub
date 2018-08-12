@@ -7,9 +7,9 @@ module HasHub.Connection.Connector
 , getGitHub
 , getZenHub
 , postGitHub
-, postGitHub'_
-, postZenHub
-, putZenHub'
+, postZenHub_
+, postZenHub'_
+, putZenHub_
 )
 where
 
@@ -60,19 +60,19 @@ postGitHub :: (ToJSON body) => Resource -> body -> IO LBS.ByteString
 postGitHub = secureUpdate "POST" LS.getGitHubHeaders LS.getGitHubEndpoint
 
 
-postGitHub'_ :: (ToJSON body) => Resource -> (RepositoryId -> body) -> IO ()
-postGitHub'_ resource bodyF = do
+postZenHub_ :: (ToJSON body) => Resource -> body -> IO ()
+postZenHub_ = secureUpdate_ "POST" LS.getZenHubHeaders LS.getZenHubEndpoint
+
+
+postZenHub'_ :: (ToJSON body) => Resource -> (RepositoryId -> body) -> IO ()
+postZenHub'_ resource bodyF = do
   repositoryId <- getRepositoryId
   let body = bodyF repositoryId
-  secureUpdate_ "POST" LS.getGitHubHeaders LS.getGitHubEndpoint resource body
+  secureUpdate_ "POST" LS.getZenHubHeaders LS.getZenHubEndpoint resource body
 
 
-postZenHub :: (ToJSON body) => Resource -> body -> IO ()
-postZenHub = secureUpdate_ "POST" LS.getZenHubHeaders LS.getZenHubEndpoint
-
-
-putZenHub' :: (ToJSON body) => Resource -> body -> IO ()
-putZenHub' = secureUpdate_ "PUT" LS.getZenHubHeaders LS.getZenHubEndpoint
+putZenHub_ :: (ToJSON body) => Resource -> body -> IO ()
+putZenHub_ = secureUpdate_ "PUT" LS.getZenHubHeaders LS.getZenHubEndpoint
 
 
 secureGet :: IO RequestHeaders -> IO String -> Resource -> IO LBS.ByteString

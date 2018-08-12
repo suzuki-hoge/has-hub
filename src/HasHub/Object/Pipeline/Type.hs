@@ -28,7 +28,3 @@ decodeJust = fromJust . parseInObject
     parseInObject :: LBS.ByteString -> Maybe [Pipeline2]
     parseInObject json = decode json >>= parseMaybe (\(Object v) -> v .: "pipelines")
     -- https://artyom.me/aeson#parsing-without-creating-extra-types
-
-
-toPipelineName :: Pipeline2 -> PipelineName2
-toPipelineName (Pipeline2 _ name) = name

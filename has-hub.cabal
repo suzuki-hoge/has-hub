@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b314ef5c93c2c61eb6325420f10899410a5fa430dcbf4c35c738f0e437cb564e
+-- hash: 1e01d5b54da5ff6855fb260bca9391f97f1ce03a9b979c30bf030634e61077e4
 
 name:           has-hub
 version:        0.1.0.0
@@ -72,7 +72,11 @@ library
       HasHub.Object.Milestone.Type
       HasHub.Object.Milestone.Validator
       HasHub.Object.Object
+      HasHub.Object.Object.Client
       HasHub.Object.Object.Data
+      HasHub.Object.Object.Parser
+      HasHub.Object.Object.Type
+      HasHub.Object.Object.Validator
       HasHub.Object.Pipeline
       HasHub.Object.Pipeline.Client
       HasHub.Object.Pipeline.Data

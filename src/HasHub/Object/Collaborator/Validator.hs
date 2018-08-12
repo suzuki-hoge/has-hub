@@ -5,4 +5,11 @@ module HasHub.Object.Collaborator.Validator
 where
 
 
-import HasHub.FixMe2 (areAllIn)
+import HasHub.Object.Collaborator.Type
+
+import HasHub.FixMe2 (Error2, Validation)
+import qualified HasHub.FixMe2 as F (areAllIn)
+
+
+areAllIn :: [Collaborator2] -> [Collaborator2] -> Validation [Error2] ()
+areAllIn = F.areAllIn
