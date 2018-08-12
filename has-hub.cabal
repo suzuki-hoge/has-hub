@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1e01d5b54da5ff6855fb260bca9391f97f1ce03a9b979c30bf030634e61077e4
+-- hash: bb3b26b04bc6149aa16def3efbaadc17c790ca360afec77f23b7ef9211a17df1
 
 name:           has-hub
 version:        0.1.0.0
@@ -83,6 +83,7 @@ library
       HasHub.Object.Pipeline.Type
       HasHub.Object.Pipeline.Validator
       HasHub.Yaml.Parser
+      HasHub.Yaml.Reader
   other-modules:
       Paths_has_hub
   default-language: Haskell2010

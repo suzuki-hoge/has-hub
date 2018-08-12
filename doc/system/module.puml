@@ -3,15 +3,19 @@
 namespace HasHub {
   namespace Command {
     class CreateObjects {
+      Parser
       Client...
     }
     class CreateMilestones {
+      Parser
       Client
     }
     class ReferAll {
       Client...
     }
-    class GenerateSample
+    class GenerateSample {
+      Writer
+    }
   }
   namespace Object {
     namespace Object {
@@ -96,14 +100,12 @@ namespace HasHub {
   }
 }
 
-HasHub.Command.CreateObjects -d-> HasHub.Yaml.Reader
-HasHub.Command.CreateMilestones -d-> HasHub.Yaml.Reader
-HasHub.Command.GenerateSample -d--> HasHub.Yaml.Writer
+HasHub.Command.GenerateSample -[hidden]d-> HasHub.Yaml.Writer
 
-HasHub.Yaml.Reader -d-> HasHub.Object.Object.Parser
-HasHub.Yaml.Reader -d--> HasHub.Object.Milestone.Parser
+HasHub.Object.Object.Parser -u-> HasHub.Yaml.Reader
+HasHub.Object.Milestone.Parser -u--> HasHub.Yaml.Reader
 
-HasHub.Yaml.Reader -l-> HasHub.FixMe
+HasHub.Yaml.Reader --> HasHub.FixMe
 
 HasHub.Object.Milestone.Type -[hidden]d-> HasHub.Connection.Connector
 
