@@ -1,13 +1,14 @@
 module HasHub.Object.Object.Validator
 (
   areAllIn
+, module HasHub.FixMe
 )
 where
 
 
 import Text.Regex.Posix ((=~))
 
-import HasHub.FixMe (Error, Validation)
+import HasHub.FixMe (Error, Validation(..))
 import qualified HasHub.FixMe as F (areAllIn)
 
 import HasHub.Object.Object.Type

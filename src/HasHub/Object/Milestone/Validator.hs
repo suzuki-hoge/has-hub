@@ -1,12 +1,13 @@
 module HasHub.Object.Milestone.Validator
 (
   areAllIn
+, module HasHub.FixMe
 )
 where
 
 
 import HasHub.Object.Milestone.Type
-import HasHub.FixMe (Error, Validation)
+import HasHub.FixMe (Error, Validation(..))
 import qualified HasHub.FixMe as F (areAllIn)
 
 

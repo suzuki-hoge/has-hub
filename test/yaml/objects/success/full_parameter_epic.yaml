@@ -1,8 +1,8 @@
-- epic-link-number : ?2
+- epic-link-number : ?1
   title            : post module
   body             : post user data and write record.
-  pipeline         : sprint backlog
-  labels           : [setup, dev]
+  pipeline         : backlog
+  labels           : [setup]
   assignees        : [suzuki-hoge]
   milestone        : sprint 1
   estimate         : 3

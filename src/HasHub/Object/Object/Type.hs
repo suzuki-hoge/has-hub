@@ -66,13 +66,6 @@ decodeJust' = fromJust . decode
 newtype Estimate = Estimate Double deriving (Eq, Show)
 
 
-data SetEpicInput = SetEpicInput IssueNumber RepositoryId
-instance ToJSON SetEpicInput where
-  toJSON (SetEpicInput (IssueNumber n) rid) = object $ [
-      "add_issues" .= [object ["repo_id" .= rid, "issue_number" .= n]]
-    ]
-
-
 data SetPipelineInput = SetPipelineInput Pipeline
 instance ToJSON SetPipelineInput where
   toJSON (SetPipelineInput (Pipeline (PipelineId i) _)) = object $ [
@@ -85,6 +78,13 @@ data SetEstimateInput = SetEstimateInput Estimate
 instance ToJSON SetEstimateInput where
   toJSON (SetEstimateInput (Estimate e)) = object $ [
       "estimate" .= e
+    ]
+
+
+data SetEpicInput = SetEpicInput IssueNumber RepositoryId
+instance ToJSON SetEpicInput where
+  toJSON (SetEpicInput (IssueNumber n) rid) = object $ [
+      "add_issues" .= [object ["repo_id" .= rid, "issue_number" .= n]]
     ]
 
 

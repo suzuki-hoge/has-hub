@@ -1,6 +1,7 @@
 module HasHub.Yaml.Reader
 (
   readYaml
+, module HasHub.FixMe
 )
 where
 

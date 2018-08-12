@@ -30,9 +30,9 @@ setup g z = do
 
 op :: IO ()
 op = do
-  OP.read "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/objects/success/full_parameter_epic.yaml" >>= print
-  OP.read "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/failure/invalid_yaml.yaml" >>= print
-  OP.read "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/failure/xxxxxxxxxxxx.yaml" >>= print
+  OP.readObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/objects/success/full_parameter_epic.yaml" >>= print
+  OP.readObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/failure/invalid_yaml.yaml" >>= print
+  OP.readObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/failure/xxxxxxxxxxxx.yaml" >>= print
 
 
 oc :: IO ()
@@ -72,7 +72,7 @@ pc = do
 
 createObjects :: IO ()
 createObjects = do
-  parsed <- OP.read "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/objects/success/full_parameter_epic.yaml"
+  parsed <- OP.readObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/objects/success/full_parameter_epic.yaml"
   case parsed of
     Success(objs) -> do
       let obj = objs !! 0

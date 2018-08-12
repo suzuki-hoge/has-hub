@@ -1,7 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 
-module HasHub.Object.Object.Parser where
+module HasHub.Object.Object.Parser
+(
+  readObjects
+, YamlObject(..)
+, YamlWrappedObject(..)
+, module HasHub.FixMe
+)
+where
 
 
 import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
@@ -56,8 +63,8 @@ instance FromJSON YamlWrappedObject where
   parseJSON (Object v) = YamlWrappedObject <$> (v .:? "epic-link-number") <*> (v .: "title") <*> (v .:? "body") <*> (v .:? "pipeline") <*> (v .:? "labels") <*> (v .:? "assignees") <*> (v .:? "milestone") <*> (v .:? "estimate") <*> (v .:? "epics")
 
 
-read :: FilePath -> IO (Validation [Error] [YamlObject])
-read = readYaml mapping
+readObjects :: FilePath -> IO (Validation [Error] [YamlObject])
+readObjects = readYaml mapping
   where
     mapping :: YamlWrappedObject -> YamlObject
     mapping (YamlWrappedObject meln t mb mpn ls cs mmt me es) = createEither meln (Title t) (Body <?> mb) (PipelineName <$> mpn) (Label <??> ls) (Collaborator <??> cs) (MilestoneTitle <$> mmt) (Estimate <$> me) (toParent <??> es)
