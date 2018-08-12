@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bb3b26b04bc6149aa16def3efbaadc17c790ca360afec77f23b7ef9211a17df1
+-- hash: d8bbe7640735158ee8aad71284667b120e0a24b50b4fa5ae0adcf54ee37634e8
 
 name:           has-hub
 version:        0.1.0.0
@@ -46,43 +46,27 @@ library
     , utf8-string
     , yaml
   exposed-modules:
-      HasHub.Client
-      HasHub.Client.Data
-      HasHub.Client.Fetcher
       HasHub.Connection.Connector
       HasHub.Connection.LocalSession
       HasHub.Connection.Logger
       HasHub.Connection.Type
       HasHub.FixMe2
-      HasHub.Logger
-      HasHub.Object.Collaborator
       HasHub.Object.Collaborator.Client
-      HasHub.Object.Collaborator.Data
       HasHub.Object.Collaborator.Type
       HasHub.Object.Collaborator.Validator
-      HasHub.Object.FixMe
-      HasHub.Object.Label
       HasHub.Object.Label.Client
-      HasHub.Object.Label.Data
       HasHub.Object.Label.Type
       HasHub.Object.Label.Validator
-      HasHub.Object.Milestone
       HasHub.Object.Milestone.Client
-      HasHub.Object.Milestone.Data
       HasHub.Object.Milestone.Type
       HasHub.Object.Milestone.Validator
-      HasHub.Object.Object
       HasHub.Object.Object.Client
-      HasHub.Object.Object.Data
       HasHub.Object.Object.Parser
       HasHub.Object.Object.Type
       HasHub.Object.Object.Validator
-      HasHub.Object.Pipeline
       HasHub.Object.Pipeline.Client
-      HasHub.Object.Pipeline.Data
       HasHub.Object.Pipeline.Type
       HasHub.Object.Pipeline.Validator
-      HasHub.Yaml.Parser
       HasHub.Yaml.Reader
   other-modules:
       Paths_has_hub
