@@ -13,5 +13,5 @@ import HasHub.Connection.Connector (getGitHub)
 import HasHub.Object.Label.Type
 
 
-referAll :: IO [Label2]
+referAll :: IO [Label]
 referAll = decodeJust <$> getGitHub "/labels"

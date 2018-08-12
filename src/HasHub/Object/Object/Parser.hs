@@ -16,32 +16,32 @@ import HasHub.Object.Milestone.Type
 import HasHub.Object.Pipeline.Type
 import HasHub.Connection.Type (RepositoryId)
 
-import HasHub.FixMe2 (Validation(..), Error2)
+import HasHub.FixMe (Validation(..), Error)
 
 
-data YamlObject2 = EpicYamlObject2
-                  EpicLinkNumber2
-                  Title2
-                  Body2
-                  (Maybe PipelineName2)
-                  [Label2]
-                  [Collaborator2]
-                  (Maybe MilestoneTitle2)
-                  (Maybe Estimate2)
-                  [ParentEpicNumber2]
-            | IssueYamlObject2
-                  Title2
-                  Body2
-                  (Maybe PipelineName2)
-                  [Label2]
-                  [Collaborator2]
-                  (Maybe MilestoneTitle2)
-                  (Maybe Estimate2)
-                  [ParentEpicNumber2]
+data YamlObject = EpicYamlObject
+                  EpicLinkNumber
+                  Title
+                  Body
+                  (Maybe PipelineName)
+                  [Label]
+                  [Collaborator]
+                  (Maybe MilestoneTitle)
+                  (Maybe Estimate)
+                  [ParentEpicNumber]
+            | IssueYamlObject
+                  Title
+                  Body
+                  (Maybe PipelineName)
+                  [Label]
+                  [Collaborator]
+                  (Maybe MilestoneTitle)
+                  (Maybe Estimate)
+                  [ParentEpicNumber]
             deriving (Eq, Show)
 
 
-data YamlWrappedObject2 = YamlWrappedObject2
+data YamlWrappedObject = YamlWrappedObject
                   (Maybe String)   -- epic-link-number
                   String           -- title
                   (Maybe String)   -- body
@@ -52,18 +52,18 @@ data YamlWrappedObject2 = YamlWrappedObject2
                   (Maybe Double)   -- estimate
                   (Maybe [String]) -- epics
                deriving Show
-instance FromJSON YamlWrappedObject2 where
-  parseJSON (Object v) = YamlWrappedObject2 <$> (v .:? "epic-link-number") <*> (v .: "title") <*> (v .:? "body") <*> (v .:? "pipeline") <*> (v .:? "labels") <*> (v .:? "assignees") <*> (v .:? "milestone") <*> (v .:? "estimate") <*> (v .:? "epics")
+instance FromJSON YamlWrappedObject where
+  parseJSON (Object v) = YamlWrappedObject <$> (v .:? "epic-link-number") <*> (v .: "title") <*> (v .:? "body") <*> (v .:? "pipeline") <*> (v .:? "labels") <*> (v .:? "assignees") <*> (v .:? "milestone") <*> (v .:? "estimate") <*> (v .:? "epics")
 
 
-read :: FilePath -> IO (Validation [Error2] [YamlObject2])
+read :: FilePath -> IO (Validation [Error] [YamlObject])
 read = readYaml mapping
   where
-    mapping :: YamlWrappedObject2 -> YamlObject2
-    mapping (YamlWrappedObject2 meln t mb mpn ls cs mmt me es) = createEither meln (Title2 t) (Body2 <?> mb) (PipelineName2 <$> mpn) (Label2 <??> ls) (Collaborator2 <??> cs) (MilestoneTitle2 <$> mmt) (Estimate2 <$> me) (toParent <??> es)
+    mapping :: YamlWrappedObject -> YamlObject
+    mapping (YamlWrappedObject meln t mb mpn ls cs mmt me es) = createEither meln (Title t) (Body <?> mb) (PipelineName <$> mpn) (Label <??> ls) (Collaborator <??> cs) (MilestoneTitle <$> mmt) (Estimate <$> me) (toParent <??> es)
       where
-        createEither (Just eln) = EpicYamlObject2 (EpicLinkNumber2 eln)
-        createEither Nothing    = IssueYamlObject2
+        createEither (Just eln) = EpicYamlObject (EpicLinkNumber eln)
+        createEither Nothing    = IssueYamlObject
 
         (<?>) :: (String -> a) -> Maybe String -> a
         f <?> Nothing = f ""
@@ -74,5 +74,5 @@ read = readYaml mapping
         f <??> Nothing = []
         f <??> (Just xs) = map f xs
 
-        toParent :: String -> ParentEpicNumber2
-        toParent s = if head s == '#' then SharpEpicNumber2 s else QuestionEpicNumber2 s
+        toParent :: String -> ParentEpicNumber
+        toParent s = if head s == '#' then SharpEpicNumber s else QuestionEpicNumber s

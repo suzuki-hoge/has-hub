@@ -17,35 +17,35 @@ import HasHub.Object.Collaborator.Type hiding (decodeJust)
 import HasHub.Object.Milestone.Type hiding (decodeJust)
 
 
-referAll :: IO [EpicNumber2]
+referAll :: IO [EpicNumber]
 referAll = decodeJust <$> getZenHub "/epics"
 
 
-create :: YamlObject2 -> [Milestone2] -> [Pipeline2] -> [LinkedEpic2] -> IO [LinkedEpic2]
-create (EpicYamlObject2 epicLinkNumber title body pipelineName labels collaborators milestoneTitles estimate parentEpicNumbers) milestones pipelines linkedEpics = do
+create :: YamlObject -> [Milestone] -> [Pipeline] -> [LinkedEpic] -> IO [LinkedEpic]
+create (EpicYamlObject epicLinkNumber title body pipelineName labels collaborators milestoneTitles estimate parentEpicNumbers) milestones pipelines linkedEpics = do
   let milestone = Nothing -- todo integration
   let pipeline = Nothing  -- todo integration
   let epicNumbers = []    -- todo integration
   (\x -> [x]) <$> createEpic epicLinkNumber title body pipeline labels collaborators milestone estimate epicNumbers
-create (IssueYamlObject2 title body pipelineName labels collaborators milestoneTitles estimate parentEpicNumbers) milestones pipelines linkedEpics = do
+create (IssueYamlObject title body pipelineName labels collaborators milestoneTitles estimate parentEpicNumbers) milestones pipelines linkedEpics = do
   let milestone = Nothing -- todo integration
   let pipeline = Nothing  -- todo integration
   let epicNumbers = []    -- todo integration
   (\_ -> []) <$> createIssue title body pipeline labels collaborators milestone estimate epicNumbers
 
 
-createEpic :: EpicLinkNumber2 -> Title2 -> Body2 -> (Maybe Pipeline2) -> [Label2] -> [Collaborator2] -> (Maybe Milestone2) -> (Maybe Estimate2) -> [EpicNumber2] -> IO LinkedEpic2
+createEpic :: EpicLinkNumber -> Title -> Body -> (Maybe Pipeline) -> [Label] -> [Collaborator] -> (Maybe Milestone) -> (Maybe Estimate) -> [EpicNumber] -> IO LinkedEpic
 createEpic epicLinkNumber title body pipeline labels collaborators milestone estimate epicNumbers = do
   issueNumber <- createIssue title body pipeline labels collaborators milestone estimate epicNumbers
 
   epicNumber <- convertToEpic issueNumber
 
-  return $ LinkedEpic2 epicLinkNumber epicNumber
+  return $ LinkedEpic epicLinkNumber epicNumber
 
 
-createIssue :: Title2 -> Body2 -> (Maybe Pipeline2) -> [Label2] -> [Collaborator2] -> (Maybe Milestone2) -> (Maybe Estimate2) -> [EpicNumber2] -> IO IssueNumber2
+createIssue :: Title -> Body -> (Maybe Pipeline) -> [Label] -> [Collaborator] -> (Maybe Milestone) -> (Maybe Estimate) -> [EpicNumber] -> IO IssueNumber
 createIssue title body pipeline labels collaborators milestone estimate epicNumbers = do
-  number <- decodeJust' <$> (postGitHub "/issues" $ CreateIssueInput2 title body milestone collaborators labels) -- todo order
+  number <- decodeJust' <$> (postGitHub "/issues" $ CreateIssueInput title body milestone collaborators labels) -- todo order
 
   mapM_ (setPipeline number) pipeline
   mapM_ (setEstimate number) estimate
@@ -54,37 +54,37 @@ createIssue title body pipeline labels collaborators milestone estimate epicNumb
   return number
 
 
-setPipeline :: IssueNumber2 -> Pipeline2 -> IO ()
+setPipeline :: IssueNumber -> Pipeline -> IO ()
 setPipeline number pipeline = do
-  postZenHub_ (toResource number) $ SetPipelineInput2 pipeline
+  postZenHub_ (toResource number) $ SetPipelineInput pipeline
     where
-      toResource :: IssueNumber2 -> String                                              -- todo resource interface
-      toResource (IssueNumber2 n) = "/issues/" ++ (show $ n) ++ "/moves"
+      toResource :: IssueNumber -> String                                              -- todo resource interface
+      toResource (IssueNumber n) = "/issues/" ++ (show $ n) ++ "/moves"
 
 
-setEstimate :: IssueNumber2 -> Estimate2 -> IO ()
+setEstimate :: IssueNumber -> Estimate -> IO ()
 setEstimate number estimate = do
-  putZenHub_ (toResource number) $ SetEstimateInput2 estimate
+  putZenHub_ (toResource number) $ SetEstimateInput estimate
     where
-      toResource :: IssueNumber2 -> String                                              -- todo resource interface
-      toResource (IssueNumber2 n) = "/issues/" ++ (show $ n) ++ "/estimate"
+      toResource :: IssueNumber -> String                                              -- todo resource interface
+      toResource (IssueNumber n) = "/issues/" ++ (show $ n) ++ "/estimate"
 
 
-setEpic :: IssueNumber2 -> EpicNumber2 -> IO ()
+setEpic :: IssueNumber -> EpicNumber -> IO ()
 setEpic issueNumber epicNumber = do
-   postZenHub'_ (toResource epicNumber) $ SetEpicInput2 issueNumber
+   postZenHub'_ (toResource epicNumber) $ SetEpicInput issueNumber
      where
-       toResource :: EpicNumber2 -> String                                              -- todo resource interface
-       toResource (EpicNumber2 n) = "/epics/" ++ (show $ n) ++ "/update_issues"
+       toResource :: EpicNumber -> String                                              -- todo resource interface
+       toResource (EpicNumber n) = "/epics/" ++ (show $ n) ++ "/update_issues"
 
 
-convertToEpic :: IssueNumber2 -> IO EpicNumber2
+convertToEpic :: IssueNumber -> IO EpicNumber
 convertToEpic number = do
-  postZenHub_ (toResource number) $ ConvertToEpicInput2
+  postZenHub_ (toResource number) $ ConvertToEpicInput
 
   return $ convert number
     where
-      toResource :: IssueNumber2 -> String                                              -- todo resource interface
-      toResource (IssueNumber2 n) = "/issues/" ++ (show $ n) ++ "/convert_to_epic"
+      toResource :: IssueNumber -> String                                              -- todo resource interface
+      toResource (IssueNumber n) = "/issues/" ++ (show $ n) ++ "/convert_to_epic"
 
-      convert (IssueNumber2 n) = EpicNumber2 n
+      convert (IssueNumber n) = EpicNumber n

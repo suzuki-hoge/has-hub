@@ -13,11 +13,11 @@ import HasHub.Connection.Connector (getGitHub, getZenHub)
 import HasHub.Object.Milestone.Type
 
 
-referAll :: IO [Milestone2]
+referAll :: IO [Milestone]
 referAll = decodeJust <$> getGitHub "/milestones" >>= mapM withStartOn
   where
-    withStartOn :: CreateMilestoneOutput -> IO Milestone2
+    withStartOn :: CreateMilestoneOutput -> IO Milestone
     withStartOn (CreateMilestoneOutput number title dueOn) = do
-      let (MilestoneNumber2 n) = number                                                  -- todo resource interface
+      let (MilestoneNumber n) = number                                                  -- todo resource interface
       startOn <- decode <$> getZenHub ("/milestones/" ++ (show $ n) ++ "/start_date")
-      return $ Milestone2 number title startOn dueOn
+      return $ Milestone number title startOn dueOn

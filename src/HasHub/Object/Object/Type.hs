@@ -17,78 +17,77 @@ import HasHub.Object.Pipeline.Type
 import HasHub.Connection.Type (RepositoryId)
 
 
-data IssueNumber2 = IssueNumber2 Int deriving (Eq, Show)
-instance FromJSON IssueNumber2 where
-  parseJSON (Object v) = IssueNumber2 <$> (v .: "number")
+data IssueNumber = IssueNumber Int deriving (Eq, Show)
+instance FromJSON IssueNumber where
+  parseJSON (Object v) = IssueNumber <$> (v .: "number")
 
 
-newtype Title2 = Title2 String deriving (Eq, Show)
+newtype Title = Title String deriving (Eq, Show)
 
 
-newtype Body2 = Body2 String deriving (Eq, Show)
+newtype Body = Body String deriving (Eq, Show)
 
 
--- todo definition order p -> l -> a...
-data CreateIssueInput2 = CreateIssueInput2 Title2 Body2 (Maybe Milestone2) [Collaborator2] [Label2] -- todo order
-instance ToJSON CreateIssueInput2 where
-  toJSON (CreateIssueInput2 (Title2 t) (Body2 b) mm cs ls) = object $ [
+data CreateIssueInput = CreateIssueInput Title Body (Maybe Milestone) [Collaborator] [Label]
+instance ToJSON CreateIssueInput where
+  toJSON (CreateIssueInput (Title t) (Body b) mm cs ls) = object $ [
       "title"     .= t
     , "body"      .= b
-    , "assignees" .= map (\(Collaborator2 c) -> c) cs
-    , "labels"    .= map (\(Label2 l) -> l) ls
-    ] ++ maybe [] (\(Milestone2 (MilestoneNumber2 n) _ _ _) -> ["milestone" .= n]) mm
+    , "assignees" .= map (\(Collaborator c) -> c) cs
+    , "labels"    .= map (\(Label l) -> l) ls
+    ] ++ maybe [] (\(Milestone (MilestoneNumber n) _ _ _) -> ["milestone" .= n]) mm
 
 
-data LinkedEpic2 = LinkedEpic2 EpicLinkNumber2 EpicNumber2 deriving Show
+data LinkedEpic = LinkedEpic EpicLinkNumber EpicNumber deriving Show
 
 
-newtype EpicLinkNumber2 = EpicLinkNumber2 String deriving (Eq, Ord, Show)
+newtype EpicLinkNumber = EpicLinkNumber String deriving (Eq, Ord, Show)
 
 
-data ParentEpicNumber2 = SharpEpicNumber2 String | QuestionEpicNumber2 String deriving (Eq, Ord, Show)
+data ParentEpicNumber = SharpEpicNumber String | QuestionEpicNumber String deriving (Eq, Ord, Show)
 
 
-data EpicNumber2 = EpicNumber2 Int deriving (Eq, Show)
-instance FromJSON EpicNumber2 where
-  parseJSON (Object v) = EpicNumber2 <$> (v .: "issue_number")
+data EpicNumber = EpicNumber Int deriving (Eq, Show)
+instance FromJSON EpicNumber where
+  parseJSON (Object v) = EpicNumber <$> (v .: "issue_number")
 
 
-decodeJust :: LBS.ByteString -> [EpicNumber2]
+decodeJust :: LBS.ByteString -> [EpicNumber]
 decodeJust = fromJust . parseInObject
   where
-    parseInObject :: LBS.ByteString -> Maybe [EpicNumber2]
+    parseInObject :: LBS.ByteString -> Maybe [EpicNumber]
     parseInObject json = decode json >>= parseMaybe (\(Object v) -> v .: "epic_issues")
 
 
-decodeJust' :: LBS.ByteString -> IssueNumber2
+decodeJust' :: LBS.ByteString -> IssueNumber -- todo name?
 decodeJust' = fromJust . decode
 
 
-newtype Estimate2 = Estimate2 Double deriving (Eq, Show)
+newtype Estimate = Estimate Double deriving (Eq, Show)
 
 
-data SetEpicInput2 = SetEpicInput2 IssueNumber2 RepositoryId
-instance ToJSON SetEpicInput2 where
-  toJSON (SetEpicInput2 (IssueNumber2 n) rid) = object $ [
+data SetEpicInput = SetEpicInput IssueNumber RepositoryId
+instance ToJSON SetEpicInput where
+  toJSON (SetEpicInput (IssueNumber n) rid) = object $ [
       "add_issues" .= [object ["repo_id" .= rid, "issue_number" .= n]]
     ]
 
 
-data SetPipelineInput2 = SetPipelineInput2 Pipeline2
-instance ToJSON SetPipelineInput2 where
-  toJSON (SetPipelineInput2 (Pipeline2 (PipelineId2 i) _)) = object $ [
+data SetPipelineInput = SetPipelineInput Pipeline
+instance ToJSON SetPipelineInput where
+  toJSON (SetPipelineInput (Pipeline (PipelineId i) _)) = object $ [
       "pipeline_id" .= i
     , "position"    .= ("bottom" :: String)
     ]
 
 
-data SetEstimateInput2 = SetEstimateInput2 Estimate2
-instance ToJSON SetEstimateInput2 where
-  toJSON (SetEstimateInput2 (Estimate2 e)) = object $ [
+data SetEstimateInput = SetEstimateInput Estimate
+instance ToJSON SetEstimateInput where
+  toJSON (SetEstimateInput (Estimate e)) = object $ [
       "estimate" .= e
     ]
 
 
-data ConvertToEpicInput2 = ConvertToEpicInput2
-instance ToJSON ConvertToEpicInput2 where
+data ConvertToEpicInput = ConvertToEpicInput
+instance ToJSON ConvertToEpicInput where
   toJSON _ = object $ []

@@ -13,5 +13,5 @@ import HasHub.Connection.Connector (getGitHub)
 import HasHub.Object.Collaborator.Type
 
 
-referAll :: IO [Collaborator2]
+referAll :: IO [Collaborator]
 referAll = decodeJust <$> getGitHub "/collaborators"

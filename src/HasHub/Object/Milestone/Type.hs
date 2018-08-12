@@ -10,38 +10,38 @@ import Data.Aeson (FromJSON(..), Value(Object), (.:), (.:?), decode, ToJSON(..),
 import Data.Maybe (fromJust)
 
 
-data MilestoneNumber2 = MilestoneNumber2 Int deriving (Eq, Show)
-instance FromJSON MilestoneNumber2 where
-  parseJSON (Object v) = MilestoneNumber2 <$> (v .: "number")
+data MilestoneNumber = MilestoneNumber Int deriving (Eq, Show)
+instance FromJSON MilestoneNumber where
+  parseJSON (Object v) = MilestoneNumber <$> (v .: "number")
 
 
-newtype MilestoneTitle2 = MilestoneTitle2 String deriving (Eq, Show)
+newtype MilestoneTitle = MilestoneTitle String deriving (Eq, Show)
 
 
-newtype DueOn2 = DueOn2 String deriving (Eq, Show)
+newtype DueOn = DueOn String deriving (Eq, Show)
 
 
-data CreateMilestoneInput = CreateMilestoneInput MilestoneTitle2 (Maybe DueOn2) deriving (Eq, Show)
+data CreateMilestoneInput = CreateMilestoneInput MilestoneTitle (Maybe DueOn) deriving (Eq, Show)
 instance ToJSON CreateMilestoneInput where
-  toJSON (CreateMilestoneInput (MilestoneTitle2 t) dueOn) = object $ [
+  toJSON (CreateMilestoneInput (MilestoneTitle t) dueOn) = object $ [
     "title" .= t
-    ] ++ maybe [] (\(DueOn2 d) -> ["due_on" .= d]) dueOn
+    ] ++ maybe [] (\(DueOn d) -> ["due_on" .= d]) dueOn
 
 
-data CreateMilestoneOutput = CreateMilestoneOutput MilestoneNumber2 MilestoneTitle2 (Maybe DueOn2) deriving (Eq, Show)
+data CreateMilestoneOutput = CreateMilestoneOutput MilestoneNumber MilestoneTitle (Maybe DueOn) deriving (Eq, Show)
 instance FromJSON CreateMilestoneOutput where
-  parseJSON (Object v) = CreateMilestoneOutput <$> (MilestoneNumber2 <$> v .: "number") <*> (MilestoneTitle2 <$> v .: "title") <*> (fmap DueOn2 <$> v .:? "due_on")
+  parseJSON (Object v) = CreateMilestoneOutput <$> (MilestoneNumber <$> v .: "number") <*> (MilestoneTitle <$> v .: "title") <*> (fmap DueOn <$> v .:? "due_on")
 
 
 decodeJust :: LBS.ByteString -> [CreateMilestoneOutput]
 decodeJust = fromJust . decode
 
 
-newtype StartOn2 = StartOn2 String deriving (Eq, Show)
-instance ToJSON StartOn2 where
-  toJSON (StartOn2 s) = object ["start_date" .= s]
-instance FromJSON StartOn2 where
-  parseJSON (Object v) = StartOn2 <$> (v .: "start_date")
+newtype StartOn = StartOn String deriving (Eq, Show)
+instance ToJSON StartOn where
+  toJSON (StartOn s) = object ["start_date" .= s]
+instance FromJSON StartOn where
+  parseJSON (Object v) = StartOn <$> (v .: "start_date")
 
 
-data Milestone2 = Milestone2 MilestoneNumber2 MilestoneTitle2 (Maybe StartOn2) (Maybe DueOn2) deriving (Eq, Show)
+data Milestone = Milestone MilestoneNumber MilestoneTitle (Maybe StartOn) (Maybe DueOn) deriving (Eq, Show)

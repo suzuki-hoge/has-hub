@@ -6,12 +6,12 @@ where
 
 
 import HasHub.Object.Pipeline.Type
-import HasHub.FixMe2 (Error2, Validation)
-import qualified HasHub.FixMe2 as F (areAllIn)
+import HasHub.FixMe (Error, Validation)
+import qualified HasHub.FixMe as F (areAllIn)
 
 
-areAllIn :: [PipelineName2] -> [Pipeline2] -> Validation [Error2] ()
+areAllIn :: [PipelineName] -> [Pipeline] -> Validation [Error] ()
 areAllIn needles haystacks = needles `F.areAllIn` (map toPipelineName haystacks)
   where
-    toPipelineName :: Pipeline2 -> PipelineName2
-    toPipelineName (Pipeline2 _ name) = name
+    toPipelineName :: Pipeline -> PipelineName
+    toPipelineName (Pipeline _ name) = name

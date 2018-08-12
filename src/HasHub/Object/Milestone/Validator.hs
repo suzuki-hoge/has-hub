@@ -6,12 +6,12 @@ where
 
 
 import HasHub.Object.Milestone.Type
-import HasHub.FixMe2 (Error2, Validation)
-import qualified HasHub.FixMe2 as F (areAllIn)
+import HasHub.FixMe (Error, Validation)
+import qualified HasHub.FixMe as F (areAllIn)
 
 
-areAllIn :: [MilestoneTitle2] -> [Milestone2] -> Validation [Error2] ()
+areAllIn :: [MilestoneTitle] -> [Milestone] -> Validation [Error] ()
 areAllIn needles haystacks = needles `F.areAllIn` (map toMilestoneTitle haystacks)
   where
-    toMilestoneTitle :: Milestone2 -> MilestoneTitle2
-    toMilestoneTitle (Milestone2 _ title _ _) = title
+    toMilestoneTitle :: Milestone -> MilestoneTitle
+    toMilestoneTitle (Milestone _ title _ _) = title

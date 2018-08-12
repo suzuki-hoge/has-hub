@@ -11,10 +11,10 @@ import Data.String.Utils (startswith)
 
 import Control.Exception
 
-import HasHub.FixMe2 (Validation(..), Error2)
+import HasHub.FixMe (Validation(..), Error)
 
 
-readYaml :: (FromJSON a) => (a -> b) -> FilePath -> IO (Validation [Error2] [b])
+readYaml :: (FromJSON a) => (a -> b) -> FilePath -> IO (Validation [Error] [b])
 readYaml mapper path = do
   e <- (decodeFileEither path >>= evaluate) `catch` failure
 

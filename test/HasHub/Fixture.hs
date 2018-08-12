@@ -58,5 +58,5 @@ noPipeline = Nothing
 estimate = Estimate 3.0
 justEstimate = Just estimate
 estimate2 = Estimate 0.5
-justEstimate2 = Just estimate2
+justEstimate = Just estimate2
 noEstimate = Nothing

@@ -10,10 +10,10 @@ import Data.Aeson (FromJSON(..), Value(Object), (.:), decode)
 import Data.Maybe (fromJust)
 
 
-newtype Label2 = Label2 String deriving (Eq, Show)
-instance FromJSON Label2 where
-  parseJSON (Object v) = Label2 <$> (v .: "name")
+newtype Label = Label String deriving (Eq, Show)
+instance FromJSON Label where
+  parseJSON (Object v) = Label <$> (v .: "name")
 
 
-decodeJust :: LBS.ByteString -> [Label2]
+decodeJust :: LBS.ByteString -> [Label]
 decodeJust = fromJust . decode

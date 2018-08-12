@@ -33,7 +33,7 @@ spec = do
         act `shouldReturn` exp
 
       it "epic and issue" $ do
-        let exp = Success $ [EpicYamlObject F.epicLinkNumber F.title F.body F.noEpicLinkNumbers F.noEstimate F.noMilestoneTitle F.noLabels F.noCollaborators F.noPipelineName, IssueYamlObject F.title2 F.body2 F.noEpicLinkNumbers F.justEstimate2 F.justMilestoneTitle F.labels F.collaborators F.justPipelineName]
+        let exp = Success $ [EpicYamlObject F.epicLinkNumber F.title F.body F.noEpicLinkNumbers F.noEstimate F.noMilestoneTitle F.noLabels F.noCollaborators F.noPipelineName, IssueYamlObject F.title2 F.body2 F.noEpicLinkNumbers F.justEstimate F.justMilestoneTitle F.labels F.collaborators F.justPipelineName]
         let act = parseObjects "test/yaml/objects/success/epic_and_issue.yaml"
         act `shouldReturn` exp
 

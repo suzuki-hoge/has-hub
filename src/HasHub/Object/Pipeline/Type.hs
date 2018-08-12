@@ -11,20 +11,20 @@ import Data.Aeson.Types (Parser, parseMaybe)
 import Data.Maybe (fromJust)
 
 
-newtype PipelineId2 = PipelineId2 String deriving (Eq, Show)
+newtype PipelineId = PipelineId String deriving (Eq, Show)
 
 
-newtype PipelineName2 = PipelineName2 String deriving (Eq, Show)
+newtype PipelineName = PipelineName String deriving (Eq, Show)
 
 
-data Pipeline2 = Pipeline2 PipelineId2 PipelineName2 deriving (Eq, Show)
-instance FromJSON Pipeline2 where
-  parseJSON (Object v) = Pipeline2 <$> (PipelineId2 <$> v .: "id") <*> (PipelineName2 <$> v .: "name")
+data Pipeline = Pipeline PipelineId PipelineName deriving (Eq, Show)
+instance FromJSON Pipeline where
+  parseJSON (Object v) = Pipeline <$> (PipelineId <$> v .: "id") <*> (PipelineName <$> v .: "name")
 
 
-decodeJust :: LBS.ByteString -> [Pipeline2]
+decodeJust :: LBS.ByteString -> [Pipeline]
 decodeJust = fromJust . parseInObject
   where
-    parseInObject :: LBS.ByteString -> Maybe [Pipeline2]
+    parseInObject :: LBS.ByteString -> Maybe [Pipeline]
     parseInObject json = decode json >>= parseMaybe (\(Object v) -> v .: "pipelines")
     -- https://artyom.me/aeson#parsing-without-creating-extra-types

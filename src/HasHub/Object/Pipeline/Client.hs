@@ -10,6 +10,6 @@ import HasHub.Connection.Connector (getZenHub)
 import HasHub.Object.Pipeline.Type
 
 
-referAll :: IO [Pipeline2]
+referAll :: IO [Pipeline]
 referAll = decodeJust <$> getZenHub "/board"
 
