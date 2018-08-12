@@ -1,0 +1,113 @@
+@startuml
+
+namespace HasHub {
+  namespace Command {
+    class CreateObjects {
+      Parser
+      Client...
+    }
+    class CreateMilestones {
+      Parser
+      Client
+    }
+    class ReferAll {
+      Client...
+    }
+    class GenerateSample {
+      Writer
+    }
+  }
+  namespace Object {
+    namespace Object {
+      class Validator {
+        FixMe
+      }
+      class Client {
+        Connector
+      }
+      class Type {
+        Connection.Type (RepositoryId)
+      }
+      class Parser
+      Validator -r-> Type
+      Client --> Type
+      Client -l-> Parser
+      Parser -d-> Type
+    }
+    namespace Milestone {
+      class Validator {
+        FixMe
+      }
+      class Client {
+        Connector
+      }
+      class Type
+      class Parser
+      Validator -r-> Type
+      Client --> Type
+      Client -l-> Parser
+      Parser -d-> Type
+    }
+    namespace Label {
+      class Validator {
+        FixMe
+      }
+      class Client {
+        Connector
+      }
+      class Type
+      Validator -r-> Type
+      Client -l-> Type
+    }
+    namespace Collaborator {
+      class Validator {
+        FixMe
+      }
+      class Client {
+        Connector
+      }
+      class Type
+      Validator -r-> Type
+      Client -l-> Type
+    }
+    namespace Pipeline {
+      class Validator {
+        FixMe
+      }
+      class Client {
+        Connector
+      }
+      class Type
+      Validator -r-> Type
+      Client -l-> Type
+    }
+  }
+  namespace Connection {
+    class Connector
+    class LocalSession
+    class Type
+    class Logger
+    Connector --> Type
+    Connector --> Logger
+    Logger --> LocalSession
+    Connector --> LocalSession
+    LocalSession -r-> Type
+  }
+  class FixMe
+  namespace Yaml {
+    class Reader
+    class Writer
+  }
+}
+
+HasHub.Command.GenerateSample -[hidden]d-> HasHub.Yaml.Writer
+
+HasHub.Object.Object.Parser -u-> HasHub.Yaml.Reader
+HasHub.Object.Milestone.Parser -u--> HasHub.Yaml.Reader
+
+HasHub.Yaml.Reader --> HasHub.FixMe
+
+HasHub.Object.Milestone.Type -[hidden]d-> HasHub.Connection.Connector
+
+@enduml
+

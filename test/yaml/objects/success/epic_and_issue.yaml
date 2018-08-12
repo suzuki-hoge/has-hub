@@ -1,16 +1,13 @@
-- epic-link-number : ?2
+- epic-link-number : ?1
   title            : post module
   body             : post user data and write record.
-  epics            : [] # todo
-  milestone        :
-  labels           :
-  assignees        : []
+  pipeline         : backlog
 
 - title            : user api
   body             : write record.
-  epics            : [] # todo
+  epics            : ["?1"]
   estimate         : 0.5
-  milestone        : sprint 1
-  labels           : [setup, dev]
+  milestone        : sprint 2
+  labels           : [setup]
   assignees        : [suzuki-hoge]
   pipeline         : sprint backlog

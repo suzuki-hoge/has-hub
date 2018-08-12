@@ -6,92 +6,80 @@ module Main where
 
 import Data.Either.Validation (Validation(..))
 
-import HasHub.Client (getClient, Client(..))
+import HasHub.Connection.Connector (set) -- todo
 
-import HasHub.Object.Object (createEpic)
+import HasHub.Object.Object.Parser as OP
 
-import HasHub.Object.Milestone as M
-import HasHub.Object.Label as L
-import HasHub.Object.Collaborator as C
-import HasHub.Object.Pipeline as P
-import HasHub.Object.Object as O
-import HasHub.Object.FixMe
+import HasHub.Object.Object.Client as OC
+import HasHub.Object.Milestone.Client as MC
+import HasHub.Object.Label.Client as LC
+import HasHub.Object.Collaborator.Client as CC
+import HasHub.Object.Pipeline.Client as PC
 
-import HasHub.Yaml.Parser
-
-
---f :: [E.Number] -> [Milestone] -> [Label] -> [Collaborator] -> [Pipeline] -> ([Milestone], [Pipeline])
---f es ms ls cs ps = (ms, ps)
---
---
---printFixMe :: [FixMe] -> IO ()
---printFixMe fs = do
---  mapM_ print fs
---
---
---createObjects :: Client -> ([Milestone], [Pipeline]) -> IO ()
---createObjects client (ms, ps) = do
---  -- epic <- E.create client (I.Title "API の実装") (I.Body "+ [ ] 実装\n+ [ ] テスト") (Just $ M.MilestoneNumber 1) [Collaborator "suzuki-hoge"] [Label "開発"] [E.Epic (E.Number 3) (E.Title "joining"), E.Epic (E.Number 9) (E.Title "グループ機能")] (Just $ Pipeline (PipelineId "5b0577fa2133e1068138aabc") ("進行中")) (Just $ I.Estimate (1 :: Double))
---
---  print ()
---
---
-run :: String -> String -> IO ()
-run gToken zToken = do
-  vs <- parseObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/objects/success/full_parameter_epic.yaml"
+import qualified HasHub.Object.Object.Validator as OV
+import qualified HasHub.Object.Milestone.Validator as MV
+import qualified HasHub.Object.Label.Validator as LV
+import qualified HasHub.Object.Collaborator.Validator as CV
+import qualified HasHub.Object.Pipeline.Validator as PV
 
 
-  case vs of
-    Success obs -> do
-      client <- getClient gToken "suzuki-hoge" "has-hub-workspace" zToken "has-hub.log"
+setup :: String -> String -> IO ()
+setup g z = do
+  set g z
 
-      print =<< O.validateAllExists client [SharpEpicNumber "#1"]
 
-      print $ O.validateNoDuplicate [EpicLinkNumber "#1", EpicLinkNumber "#1"]
+op :: IO ()
+op = do
+  OP.readObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/objects/success/full_parameter_epic.yaml" >>= print
+  OP.readObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/failure/invalid_yaml.yaml" >>= print
+  OP.readObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/failure/xxxxxxxxxxxx.yaml" >>= print
 
-      print $ O.validateLinking [(1, EpicLinkNumber "?1")] [(2, QuestionEpicNumber "?1")]
-      print $ O.validateLinking [(1, EpicLinkNumber "?1")] [(2, QuestionEpicNumber "?2")]
-      print $ O.validateLinking [(5, EpicLinkNumber "?1")] [(2, QuestionEpicNumber "?1")]
 
-      print $ O.epicLinkNumberFormat [EpicLinkNumber "?1"]
-      print $ O.parentEpicNumberFormat [SharpEpicNumber "#1", QuestionEpicNumber "?1"]
+oc :: IO ()
+oc = do
+  os <- OC.referAll
+  print $ [SharpEpicNumber "#3", QuestionEpicNumber "?99"] `OV.areAllIn` os
+  print $ [SharpEpicNumber "#1"] `OV.areAllIn` os
 
---      let vo = O.validateNoDuplicate [QuestionEpicNumber 3, QuestionEpicNumber 1, QuestionEpicNumber 2, QuestionEpicNumber 1]
 
---      let ms = [Milestone (MilestoneNumber 1) (MilestoneTitle "sprint 1") (Just $ StartOn "2018-04-01T00:00:00Z") (Just $ DueOn "2018-04-30T23:59:59Z")]
---      let ps = [Pipeline "5b0577fa2133e1068138aabc" "sprint backlog"]
---      let links = [LinkedEpic (QuestionEpicNumber 1) (EpicNumber 51)]
---
---      paireds <- mapM (createEpic client ms ps links) obs
---
---      print paireds
+mc :: IO ()
+mc = do
+  ms <- MC.referAll
+  print $ [MilestoneTitle "sprint 1"] `MV.areAllIn` ms
+  print $ [MilestoneTitle "unknown"] `MV.areAllIn` ms
 
-    Failure x -> do
+
+lc :: IO ()
+lc = do
+  ls <- LC.referAll
+  print $ [Label "setup"] `LV.areAllIn` ls
+  print $ [Label "unknown"] `LV.areAllIn` ls
+
+
+cc :: IO ()
+cc = do
+  cs <- CC.referAll
+  print $ [Collaborator "suzuki-hoge"] `CV.areAllIn` cs
+  print $ [Collaborator "unknown"] `CV.areAllIn` cs
+
+
+pc :: IO ()
+pc = do
+  ps <- PC.referAll
+  print $ [PipelineName "sprint backlog"] `PV.areAllIn` ps
+  print $ [PipelineName "unknown"] `PV.areAllIn` ps
+
+
+createObjects :: IO ()
+createObjects = do
+  parsed <- OP.readObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/objects/success/full_parameter_epic.yaml"
+  case parsed of
+    Success(objs) -> do
+      let obj = objs !! 0
+      x <- create obj [] [] []
       print x
+    Failure(errs) -> do
+      print "parse error"
 
 
---  ve <- E.validate client []
---  vm <- M.validate client []
---  vl <- L.validate client []
---  vc <- C.validate client []
---  vp <- P.validate client []
---  ve <- E.validate client [E.Number 9, E.Number 10]
---  vm <- M.validate client [M.Title "sprint 6", M.Title "sprint 8"]
---  vl <- L.validate client [Label "bug", Label "setup", Label "dev", Label "実装", Label "ほげら"]
---  vc <- C.validate client [Collaborator "suzuki-john", Collaborator "suzuki-hoge"]
---  vp <- P.validate client [PipelineName "backlog", PipelineName "foo", PipelineName "sprint backlog"]
---
---  let vs = f <$> ve <*> vm <*> vl <*> vc <*> vp
---
---  case vs of
---    Success x -> createObjects client x
---    Failure x -> printFixMe x
-
-  print "run"
-
-
-main :: IO ()
 main = undefined
-
-
--- todo next step is spec migration

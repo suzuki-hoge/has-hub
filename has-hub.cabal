@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f46ef6072253779e02d49b29463c91a2ddcfc898138b6f626ab5ca17c8856a9f
+-- hash: 99d486cc1c4e305674fc8c30d0aef4063adbb092dec6724a74ea378e5da1849c
 
 name:           has-hub
 version:        0.1.0.0
@@ -46,22 +46,28 @@ library
     , utf8-string
     , yaml
   exposed-modules:
-      HasHub.Client
-      HasHub.Client.Data
-      HasHub.Client.Fetcher
-      HasHub.Logger
-      HasHub.Object.Collaborator
-      HasHub.Object.Collaborator.Data
-      HasHub.Object.FixMe
-      HasHub.Object.Label
-      HasHub.Object.Label.Data
-      HasHub.Object.Milestone
-      HasHub.Object.Milestone.Data
-      HasHub.Object.Object
-      HasHub.Object.Object.Data
-      HasHub.Object.Pipeline
-      HasHub.Object.Pipeline.Data
-      HasHub.Yaml.Parser
+      HasHub.Connection.Connector
+      HasHub.Connection.LocalSession
+      HasHub.Connection.Logger
+      HasHub.Connection.Type
+      HasHub.FixMe
+      HasHub.Object.Collaborator.Client
+      HasHub.Object.Collaborator.Type
+      HasHub.Object.Collaborator.Validator
+      HasHub.Object.Label.Client
+      HasHub.Object.Label.Type
+      HasHub.Object.Label.Validator
+      HasHub.Object.Milestone.Client
+      HasHub.Object.Milestone.Type
+      HasHub.Object.Milestone.Validator
+      HasHub.Object.Object.Client
+      HasHub.Object.Object.Parser
+      HasHub.Object.Object.Type
+      HasHub.Object.Object.Validator
+      HasHub.Object.Pipeline.Client
+      HasHub.Object.Pipeline.Type
+      HasHub.Object.Pipeline.Validator
+      HasHub.Yaml.Reader
   other-modules:
       Paths_has_hub
   default-language: Haskell2010
@@ -119,12 +125,19 @@ test-suite has-hub-test
     , utf8-string
     , yaml
   other-modules:
-      HasHub.Fixture
-      HasHub.Object.Collaborator.DataSpec
-      HasHub.Object.Label.DataSpec
-      HasHub.Object.Milestone.DataSpec
-      HasHub.Object.Object.DataSpec
-      HasHub.Object.Pipeline.DataSpec
-      HasHub.Yaml.ParserSpec
+      Fixture
+      HasHub.FixMeSpec
+      HasHub.Object.Collaborator.TypeSpec
+      HasHub.Object.Collaborator.ValidatorSpec
+      HasHub.Object.Label.TypeSpec
+      HasHub.Object.Label.ValidatorSpec
+      HasHub.Object.Milestone.TypeSpec
+      HasHub.Object.Milestone.ValidatorSpec
+      HasHub.Object.Object.ParserSpec
+      HasHub.Object.Object.TypeSpec
+      HasHub.Object.Object.ValidatorSpec
+      HasHub.Object.Pipeline.TypeSpec
+      HasHub.Object.Pipeline.ValidatorSpec
+      HasHub.Yaml.ReaderSpec
       Paths_has_hub
   default-language: Haskell2010
