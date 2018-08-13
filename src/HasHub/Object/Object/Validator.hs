@@ -61,8 +61,8 @@ import qualified HasHub.FixMe as F (areAllIn)
 --    dups = sort xs \\ (nub . sort) xs
 
 
-areAllIn :: [ParentEpicNumber] -> [EpicNumber] -> Validation [Error] ()
-areAllIn needles haystacks = concatMap toEpicNumberIfSharp needles `F.areAllIn` haystacks
+areAllIn :: [ParentEpicNumber] -> [Epic] -> Validation [Error] ()
+areAllIn needles haystacks = concatMap toEpicNumberIfSharp needles `F.areAllIn` map _number haystacks
   where
     toEpicNumberIfSharp :: ParentEpicNumber -> [EpicNumber]
     toEpicNumberIfSharp (SharpEpicNumber s) = [EpicNumber $ (read . tail) s]

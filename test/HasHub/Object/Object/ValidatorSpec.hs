@@ -13,7 +13,7 @@ spec = do
   describe "are all in" $ do
     describe "success" $ do
       it "all in" $ do
-        let act = [F.sharpEpicNumber] `areAllIn` [F.epicNumber1]
+        let act = [F.sharpEpicNumber] `areAllIn` [F.epic]
 
         act `shouldBe` Success ()
 

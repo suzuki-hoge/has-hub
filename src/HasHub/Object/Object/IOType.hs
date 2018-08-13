@@ -22,9 +22,15 @@ import HasHub.Connection.Type (ToResource(..), RepositoryId)
 -- input
 
 
-data ReferEpicResourcer = ReferEpicResourcer
+data ReferIssueInput = ReferIssueInput
 
-instance ToResource ReferEpicResourcer where
+instance ToResource ReferIssueInput where
+  toResource _ = "/issues"
+
+
+data ReferEpicInput = ReferEpicInput
+
+instance ToResource ReferEpicInput where
   toResource _ = "/epics"
 
 
@@ -104,3 +110,20 @@ instance FromJSON IssueNumber where
 
 asIssueNumber :: LBS.ByteString -> IssueNumber
 asIssueNumber = fromJust . decode
+
+
+data ReferIssueOutput = ReferIssueOutput IssueNumber Title deriving (Eq, Show)
+
+instance FromJSON ReferIssueOutput where
+  parseJSON (Object v) = ReferIssueOutput <$> (IssueNumber <$> v .: "number") <*> (Title <$> v .: "title")
+
+asIssueOutputs :: LBS.ByteString -> [ReferIssueOutput]
+asIssueOutputs = fromJust . decode
+
+
+_epic :: ReferIssueOutput -> Epic
+_epic (ReferIssueOutput issueNumber title) = Epic (_epicNumber issueNumber) title
+
+
+isEpic :: [EpicNumber] -> ReferIssueOutput -> Bool
+isEpic epicNumbers (ReferIssueOutput issueNumber _) = (_epicNumber issueNumber) `elem` epicNumbers

@@ -29,6 +29,12 @@ title1 = Title "registration module"
 title2 = Title "user registration api"
 
 
+referIssueOutput = ReferIssueOutput issueNumber title2
+
+
+epic = Epic epicNumber1 title1
+
+
 body1 = Body "post user data and write record."
 body2 = Body "write record."
 
