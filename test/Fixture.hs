@@ -4,10 +4,15 @@ module Fixture where
 import HasHub.Connection.Type (RepositoryId)
 
 import HasHub.Object.Object.Type
-import HasHub.Object.Milestone.Type
-import HasHub.Object.Collaborator.Type
-import HasHub.Object.Label.Type
+import HasHub.Object.Object.IOType
 import HasHub.Object.Pipeline.Type
+import HasHub.Object.Pipeline.IOType
+import HasHub.Object.Label.Type
+import HasHub.Object.Label.IOType
+import HasHub.Object.Collaborator.Type
+import HasHub.Object.Collaborator.IOType
+import HasHub.Object.Milestone.Type
+import HasHub.Object.Milestone.IOType
 
 
 epicNumber1 = EpicNumber 1

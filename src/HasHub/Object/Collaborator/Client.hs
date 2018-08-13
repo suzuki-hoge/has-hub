@@ -6,10 +6,11 @@ module HasHub.Object.Collaborator.Client
 where
 
 
+import HasHub.Object.Collaborator.IOType
 import HasHub.Object.Collaborator.Type
 
 import HasHub.Connection.Connector (getGitHub)
 
 
 referAll :: IO [Collaborator]
-referAll = decodeJust <$> getGitHub ReferInput
+referAll = asCollaborators <$> getGitHub ReferInput

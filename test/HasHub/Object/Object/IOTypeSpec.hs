@@ -1,14 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 
-module HasHub.Object.Object.TypeSpec where
+module HasHub.Object.Object.IOTypeSpec where
 
 
 import Test.Hspec
 
 import Data.Aeson (encode)
 
-import HasHub.Object.Object.Type
+import HasHub.Object.Object.IOType
 
 import HasHub.Connection.Type (toResource)
 
@@ -62,11 +62,11 @@ spec = do
 
   describe "output" $ do
     it "issue-number" $ do
-      let act = decodeJust' "{\"number\": 2}"
+      let act = asIssueNumber "{\"number\": 2}"
 
       act `shouldBe` F.issueNumber
 
     it "epic-number" $ do
-      let act = decodeJust "{\"epic_issues\": [{\"issue_number\": 1}, {\"issue_number\": 2}]}"
+      let act = asEpicNumbers "{\"epic_issues\": [{\"issue_number\": 1}, {\"issue_number\": 2}]}"
 
       act `shouldBe` [F.epicNumber1, F.epicNumber2]

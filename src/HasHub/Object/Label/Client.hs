@@ -6,10 +6,11 @@ module HasHub.Object.Label.Client
 where
 
 
+import HasHub.Object.Label.IOType
 import HasHub.Object.Label.Type
 
 import HasHub.Connection.Connector (getGitHub)
 
 
 referAll :: IO [Label]
-referAll = decodeJust <$> getGitHub ReferInput
+referAll = asLabels <$> getGitHub ReferInput

@@ -6,6 +6,11 @@ module HasHub.Object.Object.Parser
   readObjects
 , YamlObject(..)
 , YamlWrappedObject(..)
+, module HasHub.Object.Object.Type
+, module HasHub.Object.Pipeline.Type
+, module HasHub.Object.Label.Type
+, module HasHub.Object.Collaborator.Type
+, module HasHub.Object.Milestone.Type
 , module HasHub.FixMe
 )
 where
@@ -17,11 +22,10 @@ import Data.Aeson (FromJSON(..), Value(Object), (.:), (.:?))
 import HasHub.Yaml.Reader (readYaml)
 
 import HasHub.Object.Object.Type
+import HasHub.Object.Pipeline.Type
 import HasHub.Object.Label.Type
 import HasHub.Object.Collaborator.Type
 import HasHub.Object.Milestone.Type
-import HasHub.Object.Pipeline.Type
-import HasHub.Connection.Type (RepositoryId)
 
 import HasHub.FixMe (Validation(..), Error)
 

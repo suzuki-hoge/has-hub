@@ -1,12 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 
-module HasHub.Object.Collaborator.TypeSpec where
+module HasHub.Object.Label.IOTypeSpec where
 
 
 import Test.Hspec
 
-import HasHub.Object.Collaborator.Type
+import HasHub.Object.Label.IOType
 
 import HasHub.Connection.Type (toResource)
 
@@ -19,10 +19,10 @@ spec = do
     it "refer" $ do
       let act = toResource ReferInput
 
-      act `shouldBe` "/collaborators"
+      act `shouldBe` "/labels"
 
   describe "output" $ do
     it "name" $ do
-      let act = decodeJust "[{\"login\": \"suzuki-hoge\"}]"
+      let act = asLabels "[{\"name\": \"\229\174\159\232\163\133\"}, {\"name\": \"dev\"}]"
 
-      act `shouldBe` [F.collaborator]
+      act `shouldBe` [F.label1, F.label2]

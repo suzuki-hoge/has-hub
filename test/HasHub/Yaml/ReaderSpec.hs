@@ -10,6 +10,8 @@ import Data.Aeson (FromJSON(..), Value(Object), (.:))
 
 import HasHub.Yaml.Reader
 
+import HasHub.FixMe (Validation(..), Error)
+
 
 newtype Foo = Foo String deriving (Eq, Show)
 instance FromJSON Foo where
