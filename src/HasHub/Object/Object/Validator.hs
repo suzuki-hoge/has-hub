@@ -8,10 +8,10 @@ where
 
 import Text.Regex.Posix ((=~))
 
+import HasHub.Object.Object.Type
+
 import HasHub.FixMe (Error, Validation(..))
 import qualified HasHub.FixMe as F (areAllIn)
-
-import HasHub.Object.Object.Type
 
 
 --type RowNum = Int
@@ -62,7 +62,7 @@ import HasHub.Object.Object.Type
 
 
 areAllIn :: [ParentEpicNumber] -> [EpicNumber] -> Validation [Error] ()
-areAllIn needles haystacks = (concatMap toEpicNumberIfSharp needles) `F.areAllIn` haystacks
+areAllIn needles haystacks = concatMap toEpicNumberIfSharp needles `F.areAllIn` haystacks
   where
     toEpicNumberIfSharp :: ParentEpicNumber -> [EpicNumber]
     toEpicNumberIfSharp (SharpEpicNumber s) = [EpicNumber $ (read . tail) s]

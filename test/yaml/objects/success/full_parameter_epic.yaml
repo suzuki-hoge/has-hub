@@ -1,9 +1,0 @@
-- epic-link-number : ?1
-  title            : post module
-  body             : post user data and write record.
-  pipeline         : backlog
-  labels           : [setup]
-  assignees        : [suzuki-hoge]
-  milestone        : sprint 1
-  estimate         : 3
-  epics            : ["?1", "#1"]

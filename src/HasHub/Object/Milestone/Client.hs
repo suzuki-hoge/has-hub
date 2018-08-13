@@ -6,15 +6,16 @@ module HasHub.Object.Milestone.Client
 where
 
 
-import HasHub.Connection.Connector (getGitHub, getZenHub)
+import HasHub.Object.Milestone.IOType
 import HasHub.Object.Milestone.Type
+
+import HasHub.Connection.Connector (getGitHub, getZenHub)
 
 
 referAll :: IO [Milestone]
-referAll = decodeJust <$> getGitHub "/milestones" >>= mapM withStartOn
+referAll = asGitHubOutputs <$> getGitHub ReferGitHubInput >>= mapM withStartOn
   where
-    withStartOn :: ReferMilestoneOutput -> IO Milestone
-    withStartOn (ReferMilestoneOutput number title dueOn) = do
-      let (MilestoneNumber n) = number                                                  -- todo resource interface
-      startOn <- decodeJust'' <$> getZenHub ("/milestones/" ++ (show $ n) ++ "/start_date")
+    withStartOn :: ReferGitHubOutput -> IO Milestone
+    withStartOn (ReferGitHubOutput number title dueOn) = do
+      startOn <- asStartOn <$> getZenHub (ReferStartOnInput number)
       return $ Milestone number title startOn dueOn

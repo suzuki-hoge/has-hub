@@ -1,7 +1,6 @@
 module HasHub.Yaml.Reader
 (
   readYaml
-, module HasHub.FixMe
 )
 where
 
@@ -20,11 +19,11 @@ readYaml mapper path = do
   e <- (decodeFileEither path >>= evaluate) `catch` failure
 
   return $ case e of
-    Right(xs)                                    -> Success $ map mapper xs
+    Right xs                                     -> Success $ map mapper xs
     Left(InvalidYaml (Just (YamlException msg)))
       | "Yaml file not found:" `startswith` msg  -> Failure ["no such File(" ++ path ++ ")"]
       | otherwise                                -> Failure ["invalid yaml file"]
-    otherwise                                    -> Failure ["invalid yaml file"]
+    _                                            -> Failure ["invalid yaml file"]
 
     where
       failure :: (FromJSON a) => SomeException -> IO (Either ParseException [a])

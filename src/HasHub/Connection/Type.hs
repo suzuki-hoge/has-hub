@@ -13,10 +13,19 @@ type Owner = String
 type Repository = String
 
 
-type Endpoint = String
-
-
 type RepositoryId = Int
 
 
+type Endpoint = String
+
+
 type Resource = String
+
+
+class ToResource a where
+  toResource :: a -> Resource
+
+
+data RepositoryIdInput = RepositoryIdInput
+instance ToResource RepositoryIdInput where
+  toResource _ = ""

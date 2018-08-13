@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 99d486cc1c4e305674fc8c30d0aef4063adbb092dec6724a74ea378e5da1849c
+-- hash: 6e04c35d5c2140b18ccf62581b3547e8125b10e2a65160e7c4100ec41a26ed4e
 
 name:           has-hub
 version:        0.1.0.0
@@ -52,19 +52,24 @@ library
       HasHub.Connection.Type
       HasHub.FixMe
       HasHub.Object.Collaborator.Client
+      HasHub.Object.Collaborator.IOType
       HasHub.Object.Collaborator.Type
       HasHub.Object.Collaborator.Validator
       HasHub.Object.Label.Client
+      HasHub.Object.Label.IOType
       HasHub.Object.Label.Type
       HasHub.Object.Label.Validator
       HasHub.Object.Milestone.Client
+      HasHub.Object.Milestone.IOType
       HasHub.Object.Milestone.Type
       HasHub.Object.Milestone.Validator
       HasHub.Object.Object.Client
+      HasHub.Object.Object.IOType
       HasHub.Object.Object.Parser
       HasHub.Object.Object.Type
       HasHub.Object.Object.Validator
       HasHub.Object.Pipeline.Client
+      HasHub.Object.Pipeline.IOType
       HasHub.Object.Pipeline.Type
       HasHub.Object.Pipeline.Validator
       HasHub.Yaml.Reader
@@ -127,16 +132,16 @@ test-suite has-hub-test
   other-modules:
       Fixture
       HasHub.FixMeSpec
-      HasHub.Object.Collaborator.TypeSpec
+      HasHub.Object.Collaborator.IOTypeSpec
       HasHub.Object.Collaborator.ValidatorSpec
-      HasHub.Object.Label.TypeSpec
+      HasHub.Object.Label.IOTypeSpec
       HasHub.Object.Label.ValidatorSpec
-      HasHub.Object.Milestone.TypeSpec
+      HasHub.Object.Milestone.IOTypeSpec
       HasHub.Object.Milestone.ValidatorSpec
+      HasHub.Object.Object.IOTypeSpec
       HasHub.Object.Object.ParserSpec
-      HasHub.Object.Object.TypeSpec
       HasHub.Object.Object.ValidatorSpec
-      HasHub.Object.Pipeline.TypeSpec
+      HasHub.Object.Pipeline.IOTypeSpec
       HasHub.Object.Pipeline.ValidatorSpec
       HasHub.Yaml.ReaderSpec
       Paths_has_hub

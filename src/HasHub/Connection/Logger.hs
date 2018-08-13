@@ -1,6 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
-
 module HasHub.Connection.Logger
 (
   logRequest
@@ -11,13 +8,13 @@ where
 
 import Network.HTTP.Client as C (Request(..), RequestBody(..))
 
-import HasHub.Connection.LocalSession as LS
-
 import Data.ByteString.Char8 as BS (unpack)
 import Data.ByteString.Lazy.Char8 as LBS (ByteString, unpack)
 import Data.List (intersperse)
 import Data.String.Utils (strip)
 import Codec.Binary.UTF8.String (decodeString)
+
+import HasHub.Connection.LocalSession as LS
 
 
 logRequest :: Request -> IO ()
@@ -32,7 +29,7 @@ logRequest request = logging (toString request)
 
       in case method of
         "GET" -> getRequest url
-        _ -> updateRequest method url request
+        _     -> updateRequest method url request
 
     getRequest :: String -> String
     getRequest url = "[GET] " ++ url
@@ -40,8 +37,9 @@ logRequest request = logging (toString request)
     updateRequest :: String -> String -> Request -> String
     updateRequest method url request = "[" ++ method ++ "] " ++ url ++ " " ++ parameters
       where
-        (RequestBodyLBS body) = requestBody request
-        parameters = if body == "" then "{}" else decodeString $ LBS.unpack body
+        (RequestBodyLBS body') = requestBody request
+        body = LBS.unpack body'
+        parameters = if body == "" then "{}" else decodeString body
 
 
 logResponse:: LBS.ByteString -> IO ()

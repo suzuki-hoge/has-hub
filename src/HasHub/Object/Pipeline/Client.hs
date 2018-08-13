@@ -6,10 +6,11 @@ module HasHub.Object.Pipeline.Client
 where
 
 
-import HasHub.Connection.Connector (getZenHub)
+import HasHub.Object.Pipeline.IOType
 import HasHub.Object.Pipeline.Type
+
+import HasHub.Connection.Connector (getZenHub)
 
 
 referAll :: IO [Pipeline]
-referAll = decodeJust <$> getZenHub "/board"
-
+referAll = asPipelines <$> getZenHub ReferInput

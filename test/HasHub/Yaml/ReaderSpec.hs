@@ -10,8 +10,10 @@ import Data.Aeson (FromJSON(..), Value(Object), (.:))
 
 import HasHub.Yaml.Reader
 
+import HasHub.FixMe (Validation(..), Error)
 
-data Foo = Foo String deriving (Eq, Show)
+
+newtype Foo = Foo String deriving (Eq, Show)
 instance FromJSON Foo where
   parseJSON (Object v) = Foo <$> (v .: "foo")
 
@@ -24,7 +26,7 @@ spec :: Spec
 spec = do
   describe "failure" $ do
     it "invalid yaml file" $ do
-      act <- sut "test/yaml/objects/success/full_parameter_epic.yaml"
+      act <- sut "test/yaml/objects//epic_and_issue.yaml"
 
       act `shouldBe` Failure ["invalid yaml file"]
 
