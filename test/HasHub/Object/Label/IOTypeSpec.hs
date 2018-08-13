@@ -16,7 +16,7 @@ import qualified Fixture as F
 spec :: Spec
 spec = do
   describe "input" $ do
-    it "refer" $ do
+    it "refer labels" $ do
       let act = toResource ReferInput
 
       act `shouldBe` "/labels"

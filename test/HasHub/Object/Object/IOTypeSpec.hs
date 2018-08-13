@@ -18,6 +18,16 @@ import qualified Fixture as F
 spec :: Spec
 spec = do
   describe "input" $ do
+    it "refer issues" $ do
+      let act = toResource ReferIssueInput
+
+      act `shouldBe` "/issues"
+
+    it "refer epics" $ do
+      let act = toResource ReferEpicInput
+
+      act `shouldBe` "/epics"
+
     it "title, body, labels, collaborators, milestone" $ do
       let sut = CreateIssueInput F.title1 F.body1 [F.label1, F.label2] [F.collaborator] (Just F.milestone1)
 
@@ -61,12 +71,17 @@ spec = do
       encode sut `shouldBe` "{}"
 
   describe "output" $ do
+    it "issue-outputs" $ do
+      let act = asIssueOutputs "[{\"number\": 2, \"title\": \"user registration api\"}]"
+
+      act `shouldBe` [F.referIssueOutput]
+
+    it "epic-numbers" $ do
+      let act = asEpicNumbers "{\"epic_issues\": [{\"issue_number\": 1}, {\"issue_number\": 2}]}"
+
+      act `shouldBe` [F.epicNumber1, F.epicNumber2]
+
     it "issue-number" $ do
       let act = asIssueNumber "{\"number\": 2}"
 
       act `shouldBe` F.issueNumber
-
-    it "epic-number" $ do
-      let act = asEpicNumbers "{\"epic_issues\": [{\"issue_number\": 1}, {\"issue_number\": 2}]}"
-
-      act `shouldBe` [F.epicNumber1, F.epicNumber2]

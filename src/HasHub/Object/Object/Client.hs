@@ -11,11 +11,15 @@ import HasHub.Object.Object.Parser
 import HasHub.Object.Object.IOType
 import HasHub.Object.Object.Type
 
-import HasHub.Connection.Connector (getZenHub, postGitHub, postZenHub_, postZenHub'_, putZenHub_)
+import HasHub.Connection.Connector (getGitHub, getZenHub, postGitHub, postZenHub_, postZenHub'_, putZenHub_)
 
 
-referAll :: IO [EpicNumber]
-referAll = asEpicNumbers <$> getZenHub ReferEpicResourcer
+referAll :: IO [Epic]
+referAll = do
+  outputs <- asIssueOutputs <$> getGitHub ReferIssueInput
+  epicNumbers <- asEpicNumbers <$> getZenHub ReferEpicInput
+
+  return . map _epic . filter (isEpic epicNumbers) $ outputs
 
 
 create :: YamlObject -> [Milestone] -> [Pipeline] -> [LinkedEpic] -> IO (Maybe LinkedEpic)

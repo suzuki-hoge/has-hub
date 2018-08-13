@@ -15,6 +15,9 @@ data ParentEpicNumber = SharpEpicNumber String
 data LinkedEpic = LinkedEpic EpicLinkNumber EpicNumber deriving Show
 
 
+data Epic = Epic EpicNumber Title deriving Show
+
+
 newtype IssueNumber = IssueNumber Int deriving (Eq, Show)
 
 
@@ -29,3 +32,7 @@ newtype Estimate = Estimate Double deriving (Eq, Show)
 
 _epicNumber :: IssueNumber -> EpicNumber
 _epicNumber (IssueNumber n) = EpicNumber n
+
+
+_number :: Epic -> EpicNumber
+_number (Epic number _) = number
