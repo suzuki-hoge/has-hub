@@ -9,6 +9,13 @@ import Data.Aeson (FromJSON(..), Value(Object), (.:), decode)
 
 import Data.Maybe (fromJust)
 
+import HasHub.Connection.Type (ToResource(..))
+
+
+data ReferInput = ReferInput
+instance ToResource ReferInput where
+  toResource _ = "/collaborators"
+
 
 newtype Collaborator = Collaborator String deriving (Eq, Show)
 instance FromJSON Collaborator where

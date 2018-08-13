@@ -10,6 +10,26 @@ import HasHub.Object.Label.Type
 import HasHub.Object.Pipeline.Type
 
 
+epicNumber1 = EpicNumber 1
+epicNumber2 = EpicNumber 2
+
+
+issueNumber = IssueNumber 2
+
+
+epicLinkNumber = EpicLinkNumber "?1"
+
+
+title1 = Title "registration module"
+title2 = Title "user registration api"
+
+
+body1 = Body "post user data and write record."
+body2 = Body "write record."
+
+emptyBody = Body ""
+
+
 pipelineId1 = PipelineId "5b02c59d2133e10681389873"
 pipelineName1 = PipelineName "backlog"
 pipeline1 = Pipeline pipelineId1 pipelineName1
@@ -32,7 +52,7 @@ milestoneTitle1 = MilestoneTitle "sprint 1"
 startOn1 = Just $ StartOn "2018-04-01T00:00:00Z"
 dueOn1 = Just $ DueOn "2018-04-30T23:59:59Z"
 
-referMilestoneOutput1 = ReferMilestoneOutput milestoneNumber1 milestoneTitle1 dueOn1
+referGitHubOutput1 = ReferGitHubOutput milestoneNumber1 milestoneTitle1 dueOn1
 
 --createMilestoneInput1 = CreateMilestoneInput milestoneTitle1 dueOn1
 
@@ -44,7 +64,7 @@ milestoneTitle2 = MilestoneTitle "sprint 2"
 startOn2 = Nothing
 dueOn2 = Nothing
 
-referMilestoneOutput2 = ReferMilestoneOutput milestoneNumber2 milestoneTitle2 dueOn2
+referGitHubOutput2 = ReferGitHubOutput milestoneNumber2 milestoneTitle2 dueOn2
 
 --createMilestoneInput2 = CreateMilestoneInput milestoneTitle2 dueOn2
 
@@ -57,26 +77,6 @@ estimate2 = Estimate 0.5
 
 sharpEpicNumber = SharpEpicNumber "#1"
 questionEpicNumber = QuestionEpicNumber "?1"
-
-
-issueNumber = IssueNumber 2
-
-
-epicNumber1 = EpicNumber 1
-epicNumber2 = EpicNumber 2
-
-
-epicLinkNumber = EpicLinkNumber "?1"
-
-
-title1 = Title "registration module"
-title2 = Title "user registration api"
-
-
-body1 = Body "post user data and write record."
-body2 = Body "write record."
-
-emptyBody = Body ""
 
 
 repositoryId = 131509978 :: RepositoryId

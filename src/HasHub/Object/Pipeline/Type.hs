@@ -10,6 +10,13 @@ import Data.Aeson.Types (parseMaybe)
 
 import Data.Maybe (fromJust)
 
+import HasHub.Connection.Type (ToResource(..))
+
+
+data ReferInput = ReferInput
+instance ToResource ReferInput where
+  toResource _ = "/board"
+
 
 newtype PipelineId = PipelineId String deriving (Eq, Show)
 

@@ -9,6 +9,13 @@ import Data.Aeson (FromJSON(..), Value(Object), (.:), (.:?), decode, ToJSON(..),
 
 import Data.Maybe (fromJust)
 
+import HasHub.Connection.Type (ToResource(..))
+
+
+data ReferGitHubInput = ReferGitHubInput
+instance ToResource ReferGitHubInput where
+  toResource _ = "/milestones"
+
 
 newtype MilestoneNumber = MilestoneNumber Int deriving (Eq, Show)
 instance FromJSON MilestoneNumber where
@@ -28,13 +35,18 @@ newtype DueOn = DueOn String deriving (Eq, Show)
 --    ] ++ maybe [] (\(DueOn d) -> ["due_on" .= d]) dueOn
 
 
-data ReferMilestoneOutput = ReferMilestoneOutput MilestoneNumber MilestoneTitle (Maybe DueOn) deriving (Eq, Show)
-instance FromJSON ReferMilestoneOutput where
-  parseJSON (Object v) = ReferMilestoneOutput <$> (MilestoneNumber <$> v .: "number") <*> (MilestoneTitle <$> v .: "title") <*> (fmap DueOn <$> v .:? "due_on")
+data ReferGitHubOutput = ReferGitHubOutput MilestoneNumber MilestoneTitle (Maybe DueOn) deriving (Eq, Show)
+instance FromJSON ReferGitHubOutput where
+  parseJSON (Object v) = ReferGitHubOutput <$> (MilestoneNumber <$> v .: "number") <*> (MilestoneTitle <$> v .: "title") <*> (fmap DueOn <$> v .:? "due_on")
 
 
-decodeJust :: LBS.ByteString -> [ReferMilestoneOutput]
+decodeJust :: LBS.ByteString -> [ReferGitHubOutput]
 decodeJust = fromJust . decode
+
+
+data ReferStartOnInput = ReferStartOnInput MilestoneNumber
+instance ToResource ReferStartOnInput where
+  toResource (ReferStartOnInput (MilestoneNumber n)) = "/milestones/" ++ show n ++ "/start_date"
 
 
 newtype StartOn = StartOn String deriving (Eq, Show)

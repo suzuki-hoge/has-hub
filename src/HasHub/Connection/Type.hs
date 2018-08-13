@@ -20,3 +20,12 @@ type Endpoint = String
 
 
 type Resource = String
+
+
+class ToResource a where
+  toResource :: a -> Resource
+
+
+data RepositoryIdInput = RepositoryIdInput
+instance ToResource RepositoryIdInput where
+  toResource _ = ""

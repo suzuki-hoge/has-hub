@@ -12,4 +12,4 @@ import HasHub.Connection.Connector (getGitHub)
 
 
 referAll :: IO [Collaborator]
-referAll = decodeJust <$> getGitHub "/collaborators"
+referAll = decodeJust <$> getGitHub ReferInput

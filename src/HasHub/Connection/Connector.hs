@@ -39,64 +39,64 @@ set g z = do
   LS.setOwner "suzuki-hoge"
   LS.setRepository "has-hub-workspace"
 
-  json <- getGitHub ""
+  json <- getGitHub RepositoryIdInput
   LS.setRepositoryId $ read . show . fromJust $ json ^? key "id" . _Integer
 
   return ()
 
 
-getGitHub :: Resource -> IO LBS.ByteString
+getGitHub :: (ToResource input) => input -> IO LBS.ByteString
 getGitHub = secureGet LS.getGitHubHeaders LS.getGitHubEndpoint
 
 
-getZenHub :: Resource -> IO LBS.ByteString
+getZenHub :: (ToResource input) => input -> IO LBS.ByteString
 getZenHub = secureGet LS.getZenHubHeaders LS.getZenHubEndpoint
 
 
-postGitHub :: (ToJSON body) => Resource -> body -> IO LBS.ByteString
+postGitHub :: (ToResource input, ToJSON input) => input -> IO LBS.ByteString
 postGitHub = secureUpdate "POST" LS.getGitHubHeaders LS.getGitHubEndpoint
 
 
-postZenHub_ :: (ToJSON body) => Resource -> body -> IO ()
+postZenHub_ :: (ToResource input, ToJSON input) => input -> IO ()
 postZenHub_ = secureUpdate_ "POST" LS.getZenHubHeaders LS.getZenHubEndpoint
 
 
-postZenHub'_ :: (ToJSON body) => Resource -> (RepositoryId -> body) -> IO ()
-postZenHub'_ resource bodyF = do
+postZenHub'_ :: (ToResource input, ToJSON input) => (RepositoryId -> input) -> IO ()
+postZenHub'_ inputF = do
   repositoryId <- LS.getRepositoryId
-  let body = bodyF repositoryId
-  secureUpdate_ "POST" LS.getZenHubHeaders LS.getZenHubEndpoint resource body
+  let input = inputF repositoryId
+  secureUpdate_ "POST" LS.getZenHubHeaders LS.getZenHubEndpoint input
 
 
-putZenHub_ :: (ToJSON body) => Resource -> body -> IO ()
+putZenHub_ :: (ToResource input, ToJSON input) => input -> IO ()
 putZenHub_ = secureUpdate_ "PUT" LS.getZenHubHeaders LS.getZenHubEndpoint
 
 
-secureGet :: IO RequestHeaders -> IO String -> Resource -> IO LBS.ByteString
-secureGet ioHeaders ioEndpoint resource = do
+secureGet :: (ToResource input) => IO RequestHeaders -> IO Endpoint -> input -> IO LBS.ByteString
+secureGet ioHeaders ioEndpoint input = do
   headers <- ioHeaders
   endpoint <- ioEndpoint
 
-  secureFetching (parseRequest_ $ endpoint ++ resource) {
+  secureFetching (parseRequest_ $ endpoint ++ toResource input) {
       method = "GET"
     , requestHeaders = headers
   }
 
 
-secureUpdate :: (ToJSON body) => Method -> IO RequestHeaders -> IO String -> Resource -> body -> IO LBS.ByteString
-secureUpdate m ioHeaders ioEndpoint resource body = do
+secureUpdate :: (ToResource input, ToJSON input) => Method -> IO RequestHeaders -> IO Endpoint -> input -> IO LBS.ByteString
+secureUpdate m ioHeaders ioEndpoint input = do
   headers <- ioHeaders
   endpoint <- ioEndpoint
 
-  secureFetching (parseRequest_ $ endpoint ++ resource) {
+  secureFetching (parseRequest_ $ endpoint ++ toResource input) {
       method = m
     , requestHeaders = headers
-    , requestBody = RequestBodyLBS $ encode body
+    , requestBody = RequestBodyLBS $ encode input
   }
 
 
-secureUpdate_ :: (ToJSON body) => Method -> IO RequestHeaders -> IO String -> Resource -> body -> IO ()
-secureUpdate_ m ioHeaders ioEndpoint resource body = secureUpdate m ioHeaders ioEndpoint resource body >>= \_ -> return ()
+secureUpdate_ :: (ToResource input, ToJSON input) => Method -> IO RequestHeaders -> IO Endpoint -> input -> IO ()
+secureUpdate_ m ioHeaders ioEndpoint input = secureUpdate m ioHeaders ioEndpoint input >>= \_ -> return ()
 
 
 secureFetching :: Request -> IO LBS.ByteString

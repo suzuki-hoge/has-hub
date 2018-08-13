@@ -28,6 +28,7 @@ setup g z = do
 oc :: IO ()
 oc = do
   os <- OC.referAll
+  print os
   print $ [SharpEpicNumber "#3", QuestionEpicNumber "?99"] `OV.areAllIn` os
   print $ [SharpEpicNumber "#1"] `OV.areAllIn` os
 
@@ -35,6 +36,7 @@ oc = do
 mc :: IO ()
 mc = do
   ms <- MC.referAll
+  print ms
   print $ [MilestoneTitle "sprint 1"] `MV.areAllIn` ms
   print $ [MilestoneTitle "unknown"] `MV.areAllIn` ms
 
@@ -42,6 +44,7 @@ mc = do
 lc :: IO ()
 lc = do
   ls <- LC.referAll
+  print ls
   print $ [Label "setup"] `LV.areAllIn` ls
   print $ [Label "unknown"] `LV.areAllIn` ls
 
@@ -49,6 +52,7 @@ lc = do
 cc :: IO ()
 cc = do
   cs <- CC.referAll
+  print cs
   print $ [Collaborator "suzuki-hoge"] `CV.areAllIn` cs
   print $ [Collaborator "unknown"] `CV.areAllIn` cs
 
@@ -56,6 +60,7 @@ cc = do
 pc :: IO ()
 pc = do
   ps <- PC.referAll
+  print ps
   print $ [PipelineName "sprint backlog"] `PV.areAllIn` ps
   print $ [PipelineName "unknown"] `PV.areAllIn` ps
 
