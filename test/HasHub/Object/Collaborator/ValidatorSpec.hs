@@ -1,6 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
-
 module HasHub.Object.Collaborator.ValidatorSpec where
 
 
@@ -15,11 +12,11 @@ spec :: Spec
 spec = do
   describe "are all in" $ do
     it "success" $ do
-      let act = [F.collaborator1] `areAllIn` [F.collaborator1]
+      let act = [F.collaborator] `areAllIn` [F.collaborator]
 
       act `shouldBe` Success ()
 
     it "failure" $ do
-      let act = [F.collaborator1] `areAllIn` []
+      let act = [F.collaborator] `areAllIn` []
 
-      act `shouldBe` Failure [show F.collaborator1]
+      act `shouldBe` Failure [show F.collaborator]

@@ -6,7 +6,7 @@ module HasHub.Object.Pipeline.Type where
 
 import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
 import Data.Aeson (FromJSON(..), Value(Object), (.:), decode)
-import Data.Aeson.Types (Parser, parseMaybe)
+import Data.Aeson.Types (parseMaybe)
 
 import Data.Maybe (fromJust)
 
@@ -28,3 +28,7 @@ decodeJust = fromJust . parseInObject
     parseInObject :: LBS.ByteString -> Maybe [Pipeline]
     parseInObject json = decode json >>= parseMaybe (\(Object v) -> v .: "pipelines")
     -- https://artyom.me/aeson#parsing-without-creating-extra-types
+
+
+_name :: Pipeline -> PipelineName
+_name (Pipeline _ name) = name

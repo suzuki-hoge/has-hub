@@ -1,6 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
-
 module HasHub.Object.Label.ValidatorSpec where
 
 

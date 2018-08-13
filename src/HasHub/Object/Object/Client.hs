@@ -7,8 +7,6 @@ module HasHub.Object.Object.Client
 where
 
 
-import HasHub.Connection.Connector (getZenHub, postGitHub, postZenHub_, postZenHub'_, putZenHub_)
-
 import HasHub.Object.Object.Parser
 import HasHub.Object.Object.Type
 import HasHub.Object.Pipeline.Type hiding (decodeJust)
@@ -16,22 +14,24 @@ import HasHub.Object.Label.Type hiding (decodeJust)
 import HasHub.Object.Collaborator.Type hiding (decodeJust)
 import HasHub.Object.Milestone.Type hiding (decodeJust)
 
+import HasHub.Connection.Connector (getZenHub, postGitHub, postZenHub_, postZenHub'_, putZenHub_)
+
 
 referAll :: IO [EpicNumber]
 referAll = decodeJust <$> getZenHub "/epics"
 
 
-create :: YamlObject -> [Milestone] -> [Pipeline] -> [LinkedEpic] -> IO [LinkedEpic]
+create :: YamlObject -> [Milestone] -> [Pipeline] -> [LinkedEpic] -> IO (Maybe LinkedEpic)
 create (EpicYamlObject epicLinkNumber title body pipelineName labels collaborators milestoneTitles estimate parentEpicNumbers) milestones pipelines linkedEpics = do
   let milestone = Nothing -- todo integration
   let pipeline = Nothing  -- todo integration
   let epicNumbers = []    -- todo integration
-  (\x -> [x]) <$> createEpic epicLinkNumber title body pipeline labels collaborators milestone estimate epicNumbers
+  Just <$> createEpic epicLinkNumber title body pipeline labels collaborators milestone estimate epicNumbers
 create (IssueYamlObject title body pipelineName labels collaborators milestoneTitles estimate parentEpicNumbers) milestones pipelines linkedEpics = do
   let milestone = Nothing -- todo integration
   let pipeline = Nothing  -- todo integration
   let epicNumbers = []    -- todo integration
-  (\_ -> []) <$> createIssue title body pipeline labels collaborators milestone estimate epicNumbers
+  (const Nothing) <$> createIssue title body pipeline labels collaborators milestone estimate epicNumbers
 
 
 createEpic :: EpicLinkNumber -> Title -> Body -> (Maybe Pipeline) -> [Label] -> [Collaborator] -> (Maybe Milestone) -> (Maybe Estimate) -> [EpicNumber] -> IO LinkedEpic
@@ -45,7 +45,7 @@ createEpic epicLinkNumber title body pipeline labels collaborators milestone est
 
 createIssue :: Title -> Body -> (Maybe Pipeline) -> [Label] -> [Collaborator] -> (Maybe Milestone) -> (Maybe Estimate) -> [EpicNumber] -> IO IssueNumber
 createIssue title body pipeline labels collaborators milestone estimate epicNumbers = do
-  number <- decodeJust' <$> (postGitHub "/issues" $ CreateIssueInput title body milestone collaborators labels) -- todo order
+  number <- decodeJust' <$> (postGitHub "/issues" $ CreateIssueInput title body labels collaborators milestone)
 
   mapM_ (setPipeline number) pipeline
   mapM_ (setEstimate number) estimate

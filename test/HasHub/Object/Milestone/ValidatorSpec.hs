@@ -1,6 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
-
 module HasHub.Object.Milestone.ValidatorSpec where
 
 

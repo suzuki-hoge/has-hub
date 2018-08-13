@@ -6,11 +6,9 @@ module HasHub.Object.Label.Client
 where
 
 
-import Data.Aeson (decode)
-import Data.Maybe (fromJust)
+import HasHub.Object.Label.Type
 
 import HasHub.Connection.Connector (getGitHub)
-import HasHub.Object.Label.Type
 
 
 referAll :: IO [Label]

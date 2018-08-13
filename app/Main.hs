@@ -1,6 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
-
 module Main where
 
 
@@ -26,13 +23,6 @@ import qualified HasHub.Object.Pipeline.Validator as PV
 setup :: String -> String -> IO ()
 setup g z = do
   set g z
-
-
-op :: IO ()
-op = do
-  OP.readObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/objects/success/full_parameter_epic.yaml" >>= print
-  OP.readObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/failure/invalid_yaml.yaml" >>= print
-  OP.readObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/failure/xxxxxxxxxxxx.yaml" >>= print
 
 
 oc :: IO ()
@@ -72,14 +62,14 @@ pc = do
 
 createObjects :: IO ()
 createObjects = do
-  parsed <- OP.readObjects "/Users/ryo/Dropbox/Developments/haskell/has-hub/test/yaml/objects/success/full_parameter_epic.yaml"
+  parsed <- OP.readObjects "test/yaml/objects//epic_and_issue.yaml"
   case parsed of
     Success(objs) -> do
       let obj = objs !! 0
       x <- create obj [] [] []
       print x
     Failure(errs) -> do
-      print "parse error"
+      print errs
 
 
 main = undefined

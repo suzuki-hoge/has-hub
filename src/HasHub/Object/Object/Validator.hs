@@ -8,10 +8,10 @@ where
 
 import Text.Regex.Posix ((=~))
 
+import HasHub.Object.Object.Type
+
 import HasHub.FixMe (Error, Validation(..))
 import qualified HasHub.FixMe as F (areAllIn)
-
-import HasHub.Object.Object.Type
 
 
 --type RowNum = Int

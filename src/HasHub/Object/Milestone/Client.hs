@@ -6,8 +6,9 @@ module HasHub.Object.Milestone.Client
 where
 
 
-import HasHub.Connection.Connector (getGitHub, getZenHub)
 import HasHub.Object.Milestone.Type
+
+import HasHub.Connection.Connector (getGitHub, getZenHub)
 
 
 referAll :: IO [Milestone]

@@ -16,7 +16,6 @@ where
 
 import Network.HTTP.Client (parseRequest_, Request(..), RequestBody(..), newManager, responseBody, httpLbs)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
-
 import Network.HTTP.Types (RequestHeaders, Method)
 
 import Control.Lens ((^?))
@@ -27,9 +26,7 @@ import Data.Maybe (fromJust)
 import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
 
 import qualified HasHub.Connection.LocalSession as LS
-
 import HasHub.Connection.Logger (logRequest, logResponse)
-import HasHub.Connection.LocalSession
 import HasHub.Connection.Type
 
 
@@ -66,7 +63,7 @@ postZenHub_ = secureUpdate_ "POST" LS.getZenHubHeaders LS.getZenHubEndpoint
 
 postZenHub'_ :: (ToJSON body) => Resource -> (RepositoryId -> body) -> IO ()
 postZenHub'_ resource bodyF = do
-  repositoryId <- getRepositoryId
+  repositoryId <- LS.getRepositoryId
   let body = bodyF repositoryId
   secureUpdate_ "POST" LS.getZenHubHeaders LS.getZenHubEndpoint resource body
 

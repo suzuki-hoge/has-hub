@@ -49,3 +49,7 @@ decodeJust'' = decode
 
 
 data Milestone = Milestone MilestoneNumber MilestoneTitle (Maybe StartOn) (Maybe DueOn) deriving (Eq, Show)
+
+
+_title :: Milestone -> MilestoneTitle
+_title (Milestone _ title _ _) = title

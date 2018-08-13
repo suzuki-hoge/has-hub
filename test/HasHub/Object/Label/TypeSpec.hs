@@ -15,6 +15,6 @@ spec :: Spec
 spec = do
   describe "decode" $ do
     it "name" $ do
-      let act = decodeJust "[{\"name\": \"setup\"}, {\"name\": \"\229\174\159\232\163\133\"}]"
+      let act = decodeJust "[{\"name\": \"\229\174\159\232\163\133\"}, {\"name\": \"dev\"}]"
 
       act `shouldBe` [F.label1, F.label2]

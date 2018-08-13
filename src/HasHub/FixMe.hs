@@ -24,4 +24,3 @@ areAllIn needles haystacks = case catMaybes $ map (contains haystacks) needles o
     contains haystacks needle = if needle `elem` haystacks
       then Nothing
       else Just $ show needle
-

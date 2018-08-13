@@ -4,16 +4,17 @@
 module HasHub.Connection.LocalSession where
 
 
-import System.Environment (setEnv, getEnv)
+import Network.HTTP.Types (RequestHeaders)
 
-import Data.List.Split (splitOn)
-import Data.List.Utils (replace)
-import Data.Time.Clock (getCurrentTime)
-import Data.Time.LocalTime (getCurrentTimeZone, utcToLocalTime)
+import System.Environment (setEnv, getEnv)
 
 import qualified Data.ByteString.Char8 as BS (pack)
 
-import Network.HTTP.Types (RequestHeaders)
+import Data.Time.Clock (getCurrentTime)
+import Data.Time.LocalTime (getCurrentTimeZone, utcToLocalTime)
+
+import Data.List.Split (splitOn)
+import Data.List.Utils (replace)
 
 import HasHub.Connection.Type
 
@@ -32,6 +33,14 @@ setLogPath :: FilePath -> IO ()
 setLogPath = setEnv "has-hub.local-session.log-path"
 
 
+setGitHubToken :: Token -> IO ()
+setGitHubToken = setEnv "has-hub.local-session.git-hub.token"
+
+
+setZenHubToken :: Token -> IO ()
+setZenHubToken = setEnv "has-hub.local-session.zen-hub.token"
+
+
 setOwner :: Owner -> IO ()
 setOwner = setEnv "has-hub.local-session.owner"
 
@@ -42,14 +51,6 @@ setRepository = setEnv "has-hub.local-session.repository"
 
 setRepositoryId :: RepositoryId -> IO ()
 setRepositoryId n = setEnv "has-hub.local-session.repository-id" (show n)
-
-
-setGitHubToken :: Token -> IO ()
-setGitHubToken = setEnv "has-hub.local-session.git-hub.token"
-
-
-setZenHubToken :: Token -> IO ()
-setZenHubToken = setEnv "has-hub.local-session.zen-hub.token"
 
 
 getRequestId :: IO RequestId
@@ -72,18 +73,18 @@ getGitHubEndpoint = do
   return $ "https://api.github.com/repos/" ++ owner ++ "/" ++ repository
 
 
-getGitHubHeaders :: IO RequestHeaders
-getGitHubHeaders = do
-  token <- getEnv "has-hub.local-session.git-hub.token"
-
-  return [("User-Agent", "curl"), ("Authorization", BS.pack $ "token " ++ token)]
-
-
 getZenHubEndpoint :: IO Endpoint
 getZenHubEndpoint = do
   rid <- getRepositoryId
 
   return $ "https://api.zenhub.io/p1/repositories/" ++ show rid
+
+
+getGitHubHeaders :: IO RequestHeaders
+getGitHubHeaders = do
+  token <- getEnv "has-hub.local-session.git-hub.token"
+
+  return [("User-Agent", "curl"), ("Authorization", BS.pack $ "token " ++ token)]
 
 
 getZenHubHeaders :: IO RequestHeaders

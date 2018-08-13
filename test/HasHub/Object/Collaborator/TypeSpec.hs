@@ -17,4 +17,4 @@ spec = do
     it "name" $ do
       let act = decodeJust "[{\"login\": \"suzuki-hoge\"}]"
 
-      act `shouldBe` [F.collaborator1]
+      act `shouldBe` [F.collaborator]

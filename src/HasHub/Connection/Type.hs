@@ -13,10 +13,10 @@ type Owner = String
 type Repository = String
 
 
-type Endpoint = String
-
-
 type RepositoryId = Int
+
+
+type Endpoint = String
 
 
 type Resource = String

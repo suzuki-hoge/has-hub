@@ -17,9 +17,9 @@ spec :: Spec
 spec = do
   describe "decode" $ do
     it "issue-number" $ do
-      let act = decodeJust' "{\"number\": 1}"
+      let act = decodeJust' "{\"number\": 2}"
 
-      act `shouldBe` F.issueNumber1
+      act `shouldBe` F.issueNumber
 
     it "epic-number" $ do
       let act = decodeJust "{\"epic_issues\": [{\"issue_number\": 1}, {\"issue_number\": 2}]}"
@@ -28,14 +28,14 @@ spec = do
 
   describe "encode" $ do
     it "title, body, labels, collaborators, milestone" $ do
-      let act = encode $ CreateIssueInput F.title1 F.body1 (Just F.milestone1) [F.collaborator1] [F.label1, F.label2]
+      let act = encode $ CreateIssueInput F.title1 F.body1 [F.label1, F.label2] [F.collaborator] (Just F.milestone1)
 
-      act `shouldBe` "{\"assignees\":[\"suzuki-hoge\"],\"body\":\"post user data and write record.\",\"milestone\":1,\"labels\":[\"setup\",\"\229\174\159\232\163\133\"],\"title\":\"post module\"}"
+      act `shouldBe` "{\"assignees\":[\"suzuki-hoge\"],\"body\":\"post user data and write record.\",\"milestone\":1,\"labels\":[\"\229\174\159\232\163\133\",\"dev\"],\"title\":\"registration module\"}"
 
     it "title, body, no labels, no collaborators, no milestone" $ do
-      let act = encode $ CreateIssueInput F.title1 F.body1 Nothing [] []
+      let act = encode $ CreateIssueInput F.title1 F.body1 [] [] Nothing
 
-      act `shouldBe` "{\"assignees\":[],\"body\":\"post user data and write record.\",\"labels\":[],\"title\":\"post module\"}"
+      act `shouldBe` "{\"assignees\":[],\"body\":\"post user data and write record.\",\"labels\":[],\"title\":\"registration module\"}"
 
     it "pipeline" $ do
       let act = encode $ SetPipelineInput F.pipeline1
@@ -53,6 +53,6 @@ spec = do
       act `shouldBe` "{\"estimate\":0.5}"
 
     it "epic" $ do
-      let act = encode $ SetEpicInput F.issueNumber1 F.repositoryId
+      let act = encode $ SetEpicInput F.issueNumber F.repositoryId
 
-      act `shouldBe` "{\"add_issues\":[{\"issue_number\":1,\"repo_id\":131509978}]}"
+      act `shouldBe` "{\"add_issues\":[{\"issue_number\":2,\"repo_id\":131509978}]}"
