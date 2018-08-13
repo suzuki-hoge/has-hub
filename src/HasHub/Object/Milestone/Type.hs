@@ -10,7 +10,7 @@ import Data.Aeson (FromJSON(..), Value(Object), (.:), (.:?), decode, ToJSON(..),
 import Data.Maybe (fromJust)
 
 
-data MilestoneNumber = MilestoneNumber Int deriving (Eq, Show)
+newtype MilestoneNumber = MilestoneNumber Int deriving (Eq, Show)
 instance FromJSON MilestoneNumber where
   parseJSON (Object v) = MilestoneNumber <$> (v .: "number")
 

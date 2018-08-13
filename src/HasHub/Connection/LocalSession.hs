@@ -24,7 +24,7 @@ allocateRequestId = do
   utc <- getCurrentTime
   tz <- getCurrentTimeZone
 
-  let allocated = (replace ":" "-") . (replace " " "-") . head . (splitOn ".") . show $ utcToLocalTime tz utc
+  let allocated = replace ":" "-" . replace " " "-" . head . splitOn "." . show $ utcToLocalTime tz utc
 
   setEnv "has-hub.local-session.request-id" allocated
 

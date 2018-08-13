@@ -11,7 +11,7 @@ import Data.Aeson (FromJSON(..), Value(Object), (.:))
 import HasHub.Yaml.Reader
 
 
-data Foo = Foo String deriving (Eq, Show)
+newtype Foo = Foo String deriving (Eq, Show)
 instance FromJSON Foo where
   parseJSON (Object v) = Foo <$> (v .: "foo")
 

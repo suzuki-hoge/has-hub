@@ -17,5 +17,5 @@ referAll = decodeJust <$> getGitHub "/milestones" >>= mapM withStartOn
     withStartOn :: ReferMilestoneOutput -> IO Milestone
     withStartOn (ReferMilestoneOutput number title dueOn) = do
       let (MilestoneNumber n) = number                                                  -- todo resource interface
-      startOn <- decodeJust'' <$> getZenHub ("/milestones/" ++ (show $ n) ++ "/start_date")
+      startOn <- decodeJust'' <$> getZenHub ("/milestones/" ++ show n ++ "/start_date")
       return $ Milestone number title startOn dueOn

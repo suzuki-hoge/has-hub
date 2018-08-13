@@ -18,7 +18,7 @@ import HasHub.Object.Milestone.Type
 import HasHub.Connection.Type (RepositoryId)
 
 
-data EpicNumber = EpicNumber Int deriving (Eq, Show)
+newtype EpicNumber = EpicNumber Int deriving (Eq, Show)
 instance FromJSON EpicNumber where
   parseJSON (Object v) = EpicNumber <$> (v .: "issue_number")
 
@@ -39,7 +39,7 @@ data ParentEpicNumber = SharpEpicNumber String | QuestionEpicNumber String deriv
 data LinkedEpic = LinkedEpic EpicLinkNumber EpicNumber deriving Show
 
 
-data IssueNumber = IssueNumber Int deriving (Eq, Show)
+newtype IssueNumber = IssueNumber Int deriving (Eq, Show)
 instance FromJSON IssueNumber where
   parseJSON (Object v) = IssueNumber <$> (v .: "number")
 
@@ -67,28 +67,28 @@ instance ToJSON CreateIssueInput where
     ] ++ maybe [] (\(Milestone (MilestoneNumber n) _ _ _) -> ["milestone" .= n]) milestone
 
 
-data SetPipelineInput = SetPipelineInput Pipeline
+newtype SetPipelineInput = SetPipelineInput Pipeline
 instance ToJSON SetPipelineInput where
-  toJSON (SetPipelineInput (Pipeline (PipelineId i) _)) = object $ [
+  toJSON (SetPipelineInput (Pipeline (PipelineId i) _)) = object [
       "pipeline_id" .= i
     , "position"    .= ("bottom" :: String)
     ]
 
 
-data SetEstimateInput = SetEstimateInput Estimate
+newtype SetEstimateInput = SetEstimateInput Estimate
 instance ToJSON SetEstimateInput where
-  toJSON (SetEstimateInput (Estimate e)) = object $ [
+  toJSON (SetEstimateInput (Estimate e)) = object [
       "estimate" .= e
     ]
 
 
 data SetEpicInput = SetEpicInput IssueNumber RepositoryId
 instance ToJSON SetEpicInput where
-  toJSON (SetEpicInput (IssueNumber n) rid) = object $ [
+  toJSON (SetEpicInput (IssueNumber n) rid) = object [
       "add_issues" .= [object ["repo_id" .= rid, "issue_number" .= n]]
     ]
 
 
 data ConvertToEpicInput = ConvertToEpicInput
 instance ToJSON ConvertToEpicInput where
-  toJSON _ = object $ []
+  toJSON _ = object []

@@ -29,7 +29,7 @@ logRequest request = logging (toString request)
 
       in case method of
         "GET" -> getRequest url
-        _ -> updateRequest method url request
+        _     -> updateRequest method url request
 
     getRequest :: String -> String
     getRequest url = "[GET] " ++ url

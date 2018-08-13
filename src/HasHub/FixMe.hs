@@ -7,7 +7,7 @@ module HasHub.FixMe
 where
 
 
-import Data.Maybe (catMaybes)
+import Data.Maybe (mapMaybe)
 import Data.Either.Validation (Validation(..))
 
 
@@ -15,7 +15,7 @@ type Error = String
 
 
 areAllIn :: (Eq a, Show a) => [a] -> [a] -> Validation [Error] ()
-areAllIn needles haystacks = case catMaybes $ map (contains haystacks) needles of
+areAllIn needles haystacks = case mapMaybe (contains haystacks) needles of
   [] -> Success ()
   xs -> Failure xs
 

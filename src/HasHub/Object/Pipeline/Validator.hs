@@ -13,4 +13,4 @@ import qualified HasHub.FixMe as F (areAllIn)
 
 
 areAllIn :: [PipelineName] -> [Pipeline] -> Validation [Error] ()
-areAllIn needles haystacks = needles `F.areAllIn` (map _name haystacks)
+areAllIn needles haystacks = needles `F.areAllIn` map _name haystacks

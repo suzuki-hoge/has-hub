@@ -62,7 +62,7 @@ import qualified HasHub.FixMe as F (areAllIn)
 
 
 areAllIn :: [ParentEpicNumber] -> [EpicNumber] -> Validation [Error] ()
-areAllIn needles haystacks = (concatMap toEpicNumberIfSharp needles) `F.areAllIn` haystacks
+areAllIn needles haystacks = concatMap toEpicNumberIfSharp needles `F.areAllIn` haystacks
   where
     toEpicNumberIfSharp :: ParentEpicNumber -> [EpicNumber]
     toEpicNumberIfSharp (SharpEpicNumber s) = [EpicNumber $ (read . tail) s]
