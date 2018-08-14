@@ -1,3 +1,6 @@
+{-# LANGUAGE FlexibleInstances #-}
+
+
 module HasHub.Object.Pipeline.Validator
 (
   areAllIn
@@ -8,9 +11,13 @@ where
 
 import HasHub.Object.Pipeline.Type
 
-import HasHub.FixMe (Error, Validation(..))
+import HasHub.FixMe (Validation(..), FixMe(..), NonExistentError(..))
 import qualified HasHub.FixMe as F (areAllIn)
 
 
-areAllIn :: [PipelineName] -> [Pipeline] -> Validation [Error] ()
+instance FixMe (NonExistentError PipelineName) where
+  toMessage (NonExistentError (PipelineName name)) = "no such pipeline: " ++ name
+
+
+areAllIn :: [PipelineName] -> [Pipeline] -> Validation [NonExistentError PipelineName] ()
 areAllIn needles haystacks = needles `F.areAllIn` map _name haystacks

@@ -19,7 +19,7 @@ where
 import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
 import Data.Aeson (FromJSON(..), Value(Object), (.:), (.:?))
 
-import HasHub.Yaml.Reader (readYaml)
+import HasHub.Yaml.Reader (readYaml, YamlReadingError(..))
 
 import HasHub.Object.Object.Type
 import HasHub.Object.Pipeline.Type
@@ -27,7 +27,7 @@ import HasHub.Object.Label.Type
 import HasHub.Object.Collaborator.Type
 import HasHub.Object.Milestone.Type
 
-import HasHub.FixMe (Validation(..), Error)
+import HasHub.FixMe (Validation(..))
 
 
 data YamlObject = EpicYamlObject
@@ -67,7 +67,7 @@ instance FromJSON YamlWrappedObject where
   parseJSON (Object v) = YamlWrappedObject <$> (v .:? "epic-link-number") <*> (v .: "title") <*> (v .:? "body") <*> (v .:? "pipeline") <*> (v .:? "labels") <*> (v .:? "assignees") <*> (v .:? "milestone") <*> (v .:? "estimate") <*> (v .:? "epics")
 
 
-readObjects :: FilePath -> IO (Validation [Error] [YamlObject])
+readObjects :: FilePath -> IO (Validation [YamlReadingError] [YamlObject])
 readObjects = readYaml mapping
   where
     mapping :: YamlWrappedObject -> YamlObject
