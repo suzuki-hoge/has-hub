@@ -36,3 +36,8 @@ _epicNumber (IssueNumber n) = EpicNumber n
 
 _number :: Epic -> EpicNumber
 _number (Epic number _) = number
+
+
+type LineNum = Int
+type Definition = (LineNum, EpicLinkNumber)
+type Parent = (LineNum, ParentEpicNumber)

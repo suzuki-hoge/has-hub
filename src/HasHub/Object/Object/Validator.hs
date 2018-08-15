@@ -85,13 +85,6 @@ isNumberedBy s c = \number -> if s =~ ("^\\" ++ [c] ++ "[0-9]+$")
   else Just $ FormatError number
 
 
--- local type synonyms
-
-type LineNum = Int
-type Definition = (LineNum, EpicLinkNumber)
-type Parent = (LineNum, ParentEpicNumber)
-
-
 data LinkError = DefineLineError Definition Parent | NotDefinedError Parent deriving (Eq, Show)
 
 instance FixMe LinkError where

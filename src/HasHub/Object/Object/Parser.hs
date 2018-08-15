@@ -6,6 +6,15 @@ module HasHub.Object.Object.Parser
   readObjects
 , YamlObject(..)
 , YamlWrappedObject(..)
+, _epicLinkNumbers
+, _epicLinkNumbersWithDuplication
+, _pipelineNames
+, _labels
+, _collaborators
+, _milestoneTitles
+, _parentEpicNumbers
+, _definitionEpicLinkNumbers
+, _parentEpicLinkNumbers
 , module HasHub.Object.Object.Type
 , module HasHub.Object.Pipeline.Type
 , module HasHub.Object.Label.Type
@@ -18,6 +27,9 @@ where
 
 import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
 import Data.Aeson (FromJSON(..), Value(Object), (.:), (.:?))
+
+import Data.List (nub)
+import Data.Maybe (mapMaybe)
 
 import HasHub.Yaml.Reader (readYaml, YamlReadingError(..))
 
@@ -87,3 +99,63 @@ readObjects = readYaml mapping
 
         toParent :: String -> ParentEpicNumber
         toParent s = if head s == '#' then SharpEpicNumber s else QuestionEpicNumber s
+
+
+_epicLinkNumbers :: [YamlObject] -> [EpicLinkNumber]
+_epicLinkNumbers = nub . _epicLinkNumbersWithDuplication
+
+
+_epicLinkNumbersWithDuplication :: [YamlObject] -> [EpicLinkNumber]
+_epicLinkNumbersWithDuplication = mapMaybe extract
+  where
+    extract (EpicYamlObject x _ _ _ _ _ _ _ _) = Just x
+    extract (IssueYamlObject  _ _ _ _ _ _ _ _) = Nothing
+
+
+_pipelineNames :: [YamlObject] -> [PipelineName]
+_pipelineNames = nub . mapMaybe extract
+  where
+    extract (EpicYamlObject _ _ _ x _ _ _ _ _) = x
+    extract (IssueYamlObject  _ _ x _ _ _ _ _) = x
+
+
+_labels :: [YamlObject] -> [Label]
+_labels = nub . concatMap extract
+  where
+    extract (EpicYamlObject _ _ _ _ x _ _ _ _) = x
+    extract (IssueYamlObject  _ _ _ x _ _ _ _) = x
+
+
+_collaborators :: [YamlObject] -> [Collaborator]
+_collaborators = nub . concatMap extract
+  where
+    extract (EpicYamlObject _ _ _ _ _ x _ _ _) = x
+    extract (IssueYamlObject  _ _ _ _ x _ _ _) = x
+
+
+_milestoneTitles :: [YamlObject] -> [MilestoneTitle]
+_milestoneTitles = nub . mapMaybe extract
+  where
+    extract (EpicYamlObject _ _ _ _ _ _ x _ _) = x
+    extract (IssueYamlObject  _ _ _ _ _ x _ _) = x
+
+
+_parentEpicNumbers :: [YamlObject] -> [ParentEpicNumber]
+_parentEpicNumbers = nub . concatMap extract
+  where
+    extract (EpicYamlObject _ _ _ _ _ _ _ _ x) = x
+    extract (IssueYamlObject  _ _ _ _ _ _ _ x) = x
+
+
+_definitionEpicLinkNumbers :: [YamlObject] -> [Definition]
+_definitionEpicLinkNumbers objects = mapMaybe extract (zip [1..] objects)
+  where
+    extract (n, EpicYamlObject x _ _ _ _ _ _ _ _) = Just (n, x)
+    extract (_, IssueYamlObject  _ _ _ _ _ _ _ _) = Nothing
+
+
+_parentEpicLinkNumbers :: [YamlObject] -> [Parent]
+_parentEpicLinkNumbers objects = concatMap extract (zip [1..] objects)
+  where
+    extract (n, EpicYamlObject _ _ _ _ _ _ _ _ xs) = map (\x -> (n, x)) xs
+    extract (n, IssueYamlObject  _ _ _ _ _ _ _ xs) = map (\x -> (n, x)) xs
