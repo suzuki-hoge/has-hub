@@ -1,26 +1,35 @@
 module HasHub.FixMe
 (
   areAllIn
-, Error
+, FixMe(..)
+, NonExistentError(..)
+, (??)
 , module Data.Either.Validation
 )
 where
 
 
-import Data.Maybe (mapMaybe)
+import Data.Maybe (mapMaybe, catMaybes)
 import Data.Either.Validation (Validation(..))
 
 
-type Error = String
+class FixMe a where
+  toMessage :: a -> String
 
 
-areAllIn :: (Eq a, Show a) => [a] -> [a] -> Validation [Error] ()
-areAllIn needles haystacks = case mapMaybe (contains haystacks) needles of
-  [] -> Success ()
-  xs -> Failure xs
+data NonExistentError a = NonExistentError a deriving (Eq, Show)
 
+
+areAllIn :: (Eq a) => [a] -> [a] -> Validation [NonExistentError a] ()
+areAllIn needles haystacks = map (contains haystacks) needles ?? ()
   where
-    contains :: (Eq a, Show a) => [a] -> a -> Maybe Error
+    contains :: (Eq a) => [a] -> a -> Maybe (NonExistentError a)
     contains haystacks needle = if needle `elem` haystacks
       then Nothing
-      else Just $ show needle
+      else Just $ NonExistentError needle
+
+
+(??) :: [Maybe a] -> b -> Validation [a] b
+(??) xs success = case catMaybes xs of
+  [] -> Success success
+  xs -> Failure xs

@@ -19,6 +19,8 @@ import qualified HasHub.Object.Label.Validator as LV
 import qualified HasHub.Object.Collaborator.Validator as CV
 import qualified HasHub.Object.Pipeline.Validator as PV
 
+import HasHub.FixMe
+
 
 setup :: String -> String -> IO ()
 setup g z = do
@@ -29,45 +31,50 @@ oc :: IO ()
 oc = do
   os <- OC.referAll
   print os
-  print $ [SharpEpicNumber "#3", QuestionEpicNumber "?99"] `OV.areAllIn` os
-  print $ [SharpEpicNumber "#1"] `OV.areAllIn` os
+  printVs $ [SharpEpicNumber "#58", QuestionEpicNumber "?99"] `OV.areAllIn` os
+  printVs $ [SharpEpicNumber "#1", SharpEpicNumber "#50"] `OV.areAllIn` os
+  printVs $ OV.noDuplication [EpicLinkNumber "?2", EpicLinkNumber "?1", EpicLinkNumber "?3", EpicLinkNumber "?1", EpicLinkNumber "?2"]
+  printVs $ OV.linkNumberFormat [EpicLinkNumber "?1", EpicLinkNumber "1", EpicLinkNumber "#1", EpicLinkNumber "?", EpicLinkNumber "? 1", EpicLinkNumber "??1"]
+  printVs $ OV.parentNumberFormat [SharpEpicNumber "#1", SharpEpicNumber "#", SharpEpicNumber "# 1", QuestionEpicNumber "1", QuestionEpicNumber "?#"]
+  printVs $ OV.linking [(2, EpicLinkNumber "?1")] [(1, QuestionEpicNumber "?1"), (2, QuestionEpicNumber "?1"), (2, SharpEpicNumber "#1"), (2, QuestionEpicNumber "?2"), (3, QuestionEpicNumber "?2")]
 
 
 mc :: IO ()
 mc = do
   ms <- MC.referAll
   print ms
-  print $ [MilestoneTitle "sprint 1"] `MV.areAllIn` ms
-  print $ [MilestoneTitle "unknown"] `MV.areAllIn` ms
+  printVs $ [MilestoneTitle "sprint 1"] `MV.areAllIn` ms
+  printVs $ [MilestoneTitle "unknown"] `MV.areAllIn` ms
+
 
 
 lc :: IO ()
 lc = do
   ls <- LC.referAll
   print ls
-  print $ [Label "setup"] `LV.areAllIn` ls
-  print $ [Label "unknown"] `LV.areAllIn` ls
+  printVs $ [Label "setup"] `LV.areAllIn` ls
+  printVs $ [Label "unknown1", Label "unknown2"] `LV.areAllIn` ls
 
 
 cc :: IO ()
 cc = do
   cs <- CC.referAll
   print cs
-  print $ [Collaborator "suzuki-hoge"] `CV.areAllIn` cs
-  print $ [Collaborator "unknown"] `CV.areAllIn` cs
+  printVs $ [Collaborator "suzuki-hoge"] `CV.areAllIn` cs
+  printVs $ [Collaborator "unknown"] `CV.areAllIn` cs
 
 
 pc :: IO ()
 pc = do
   ps <- PC.referAll
   print ps
-  print $ [PipelineName "sprint backlog"] `PV.areAllIn` ps
-  print $ [PipelineName "unknown"] `PV.areAllIn` ps
+  printVs $ [PipelineName "sprint backlog"] `PV.areAllIn` ps
+  printVs $ [PipelineName "unknown"] `PV.areAllIn` ps
 
 
 createObjects :: IO ()
 createObjects = do
-  parsed <- OP.readObjects "test/yaml/objects//epic_and_issue.yaml"
+  parsed <- OP.readObjects "test/yaml/objects/epic_and_issue.yaml"
   case parsed of
     Success(objs) -> do
       let obj = objs !! 0
@@ -75,6 +82,11 @@ createObjects = do
       print x
     Failure(errs) -> do
       print errs
+
+
+printVs :: (FixMe fm) => Validation [fm] () -> IO ()
+printVs (Success _)   = putStrLn "[]"
+printVs (Failure fms) = mapM_ (putStrLn . toMessage) fms
 
 
 main = undefined

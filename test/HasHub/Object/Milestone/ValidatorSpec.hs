@@ -19,4 +19,9 @@ spec = do
     it "failure" $ do
       let act = [F.milestoneTitle1] `areAllIn` []
 
-      act `shouldBe` Failure [show F.milestoneTitle1]
+      act `shouldBe` Failure [NonExistentError F.milestoneTitle1]
+
+    it "message" $ do
+      let act = toMessage $ NonExistentError F.milestoneTitle1
+
+      act `shouldBe` "no such milestone: sprint 1"

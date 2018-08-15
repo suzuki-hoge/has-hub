@@ -19,4 +19,9 @@ spec = do
     it "failure" $ do
       let act = [F.pipelineName1] `areAllIn` []
 
-      act `shouldBe` Failure [show F.pipelineName1]
+      act `shouldBe` Failure [NonExistentError F.pipelineName1]
+
+    it "message" $ do
+      let act = toMessage $ NonExistentError F.pipelineName1
+
+      act `shouldBe` "no such pipeline: backlog"

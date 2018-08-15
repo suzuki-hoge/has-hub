@@ -6,7 +6,7 @@ import Test.Hspec
 import HasHub.FixMe
 
 
-sut :: [Int] -> [Int] -> Validation [Error] () -- type annotation
+sut :: [Int] -> [Int] -> Validation [NonExistentError Int] ()
 sut = areAllIn
 
 
@@ -43,14 +43,14 @@ spec = do
       it "single in empty" $ do
         let act = [1] `sut` []
 
-        act `shouldBe` Failure ["1"]
+        act `shouldBe` Failure [NonExistentError 1]
 
       it "double in empty" $ do
         let act = [1, 2] `sut` []
 
-        act `shouldBe` Failure ["1", "2"]
+        act `shouldBe` Failure [NonExistentError 1, NonExistentError 2]
 
       it "single in single" $ do
         let act = [1] `sut` [2]
 
-        act `shouldBe` Failure ["1"]
+        act `shouldBe` Failure [NonExistentError 1]

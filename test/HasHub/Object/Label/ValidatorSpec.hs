@@ -19,4 +19,9 @@ spec = do
     it "failure" $ do
       let act = [F.label1] `areAllIn` []
 
-      act `shouldBe` Failure [show F.label1]
+      act `shouldBe` Failure [NonExistentError F.label1]
+
+    it "message" $ do
+      let act = toMessage $ NonExistentError F.label1
+
+      act `shouldBe` "no such label: 実装"

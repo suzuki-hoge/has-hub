@@ -19,4 +19,9 @@ spec = do
     it "failure" $ do
       let act = [F.collaborator] `areAllIn` []
 
-      act `shouldBe` Failure [show F.collaborator]
+      act `shouldBe` Failure [NonExistentError F.collaborator]
+
+    it "message" $ do
+      let act = toMessage $ NonExistentError F.collaborator
+
+      act `shouldBe` "no such assignee: suzuki-hoge"
