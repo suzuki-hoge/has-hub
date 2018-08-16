@@ -1,6 +1,8 @@
 module HasHub.FixMe
 (
   areAllIn
+, flat
+, _message
 , FixMe(..)
 , NonExistentError(..)
 , (??)
@@ -33,3 +35,18 @@ areAllIn needles haystacks = map (contains haystacks) needles ?? ()
 (??) xs success = case catMaybes xs of
   [] -> Success success
   xs -> Failure xs
+
+
+flat :: [Validation [String] ()] -> Validation [String] ()
+flat vs = case concatMap extract vs of
+  [] -> Success ()
+  xs -> Failure xs
+  where
+    extract :: Validation [String] () -> [String]
+    extract (Success ()) = []
+    extract (Failure xs) = xs
+
+
+_message :: (FixMe fm) => Validation [fm] () -> Validation [String] ()
+_message (Success ()) = Success ()
+_message (Failure xs) = Failure $ map toMessage xs

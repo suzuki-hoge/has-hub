@@ -35,11 +35,13 @@ areAllIn :: [ParentEpicNumber] -> [Epic] -> Validation [NonExistentError EpicNum
 areAllIn needles haystacks = mapMaybe toEpicNumberIfSharp needles `F.areAllIn` map _number haystacks
   where
     toEpicNumberIfSharp :: ParentEpicNumber -> Maybe EpicNumber
-    toEpicNumberIfSharp (SharpEpicNumber s) = Just $ EpicNumber $ (read . tail) s
     toEpicNumberIfSharp (QuestionEpicNumber _) = Nothing
+    toEpicNumberIfSharp (SharpEpicNumber s)
+      | s `_isNumberedBy` '#' = Just $ EpicNumber $ (read . tail) s
+      | otherwise             = Nothing
 
 
-data DuplicationError = DuplicationError EpicLinkNumber deriving (Eq, Show)
+newtype DuplicationError = DuplicationError EpicLinkNumber deriving (Eq, Show)
 
 instance FixMe DuplicationError where
   toMessage (DuplicationError (EpicLinkNumber s)) = "duplicate definition: " ++ s
@@ -53,7 +55,7 @@ noDuplication numbers = case dups of
     dups = sort numbers \\ (nub . sort) numbers
 
 
-data FormatError a = FormatError a deriving (Eq, Show) -- todo refactor for milestone creation.
+newtype FormatError a = FormatError a deriving (Eq, Show) -- todo refactor for milestone creation.
 
 instance FixMe (FormatError EpicLinkNumber) where
   toMessage (FormatError (EpicLinkNumber s)) = "not satisfied ^?\\d$ format: " ++ s
@@ -80,31 +82,40 @@ parentNumberFormat numbers = map validate numbers F.?? ()
 
 
 isNumberedBy :: String -> Char -> (a -> Maybe (FormatError a))
-isNumberedBy s c = \number -> if s =~ ("^\\" ++ [c] ++ "[0-9]+$")
+isNumberedBy s c number = if s `_isNumberedBy` c
   then Nothing
   else Just $ FormatError number
+
+
+_isNumberedBy :: String -> Char -> Bool
+_isNumberedBy s c = s =~ ("^\\" ++ [c] ++ "[0-9]+$")
+
+_isNotNumberedBy :: String -> Char -> Bool
+_isNotNumberedBy s c = not $ s `_isNumberedBy` c
 
 
 data LinkError = DefineLineError Definition Parent | NotDefinedError Parent deriving (Eq, Show)
 
 instance FixMe LinkError where
-  toMessage (DefineLineError (dn, _) (pn, (QuestionEpicNumber s))) = "can't resolve definition link: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is defined at line " ++ show dn ++ "."
-  toMessage (NotDefinedError         (pn, (QuestionEpicNumber s))) = "can't resolve definition link: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is not defined."
+  toMessage (DefineLineError (dn, _) (pn, QuestionEpicNumber s)) = "can't resolve definition link: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is defined at line " ++ show dn ++ "."
+  toMessage (NotDefinedError         (pn, QuestionEpicNumber s)) = "can't resolve definition link: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is not defined."
 
 
 linking :: [Definition] -> [Parent] -> Validation [LinkError] ()
 linking definitions parents = map (validate definitions) parents F.?? ()
   where
     validate :: [Definition] -> Parent -> Maybe LinkError
-    validate definitions (_, (SharpEpicNumber _)) = Nothing
-    validate definitions parent = case find (==? parent) definitions of
-      Just definition
-        | definition <? parent -> Nothing
-        | otherwise            -> Just $ DefineLineError definition parent
-      Nothing -> Just $ NotDefinedError parent
+    validate definitions        (_, SharpEpicNumber _) = Nothing
+    validate definitions parent@(_, QuestionEpicNumber qen)
+      | qen `_isNotNumberedBy` '?' = Nothing
+      | otherwise                  = case find (==? parent) definitions of
+        Just definition
+          | definition <? parent  -> Nothing
+          | otherwise             -> Just $ DefineLineError definition parent
+        Nothing                   -> Just $ NotDefinedError parent
       where
         (<?) :: Definition -> Parent -> Bool
         (<?) (dn, _) (pn, _) = dn < pn
 
         (==?) :: Definition -> Parent -> Bool
-        (==?) (_, EpicLinkNumber(eln)) (_, QuestionEpicNumber(qen)) = eln == qen
+        (==?) (_, EpicLinkNumber eln) (_, QuestionEpicNumber qen) = eln == qen

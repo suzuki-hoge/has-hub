@@ -147,14 +147,14 @@ _parentEpicNumbers = nub . concatMap extract
     extract (IssueYamlObject  _ _ _ _ _ _ _ x) = x
 
 
-_definitionEpicLinkNumbers :: [YamlObject] -> [Definition]
+_definitionEpicLinkNumbers :: [YamlObject] -> [Definition] -- todo linked
 _definitionEpicLinkNumbers objects = mapMaybe extract (zip [1..] objects)
   where
     extract (n, EpicYamlObject x _ _ _ _ _ _ _ _) = Just (n, x)
     extract (_, IssueYamlObject  _ _ _ _ _ _ _ _) = Nothing
 
 
-_parentEpicLinkNumbers :: [YamlObject] -> [Parent]
+_parentEpicLinkNumbers :: [YamlObject] -> [Parent] -- todo linking
 _parentEpicLinkNumbers objects = concatMap extract (zip [1..] objects)
   where
     extract (n, EpicYamlObject _ _ _ _ _ _ _ _ xs) = map (\x -> (n, x)) xs

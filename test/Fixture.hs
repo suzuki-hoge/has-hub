@@ -54,7 +54,7 @@ label1 = Label "実装"
 label2 = Label "dev"
 
 
-collaborator = Collaborator "suzuki-hoge"
+collaborator = Collaborator "John"
 
 
 milestoneNumber1 = MilestoneNumber 1

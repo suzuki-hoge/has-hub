@@ -1,6 +1,8 @@
 module Main where
 
 
+import qualified HasHub.Command.CreateObjects as CO
+
 import Data.Either.Validation (Validation(..))
 
 import HasHub.Connection.Connector (set) -- todo
@@ -89,4 +91,4 @@ printVs (Success _)   = putStrLn "[]"
 printVs (Failure fms) = mapM_ (putStrLn . toMessage) fms
 
 
-main = undefined
+main = CO.execute

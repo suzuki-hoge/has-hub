@@ -24,4 +24,4 @@ spec = do
     it "message" $ do
       let act = toMessage $ NonExistentError F.collaborator
 
-      act `shouldBe` "no such assignee: suzuki-hoge"
+      act `shouldBe` "no such assignee: John"

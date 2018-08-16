@@ -12,7 +12,7 @@
   body             : write record.
   pipeline         : sprint backlog
   labels           : [dev]
-  assignees        : [John]
-  milestone        : sprint 2
+  assignees        : [suzuki-hoge]
+  milestone        : sprint 1
   estimate         : 0.5
-  epics            : ["?1", "#1"]
+  epics            : ["?1", "#3"]
