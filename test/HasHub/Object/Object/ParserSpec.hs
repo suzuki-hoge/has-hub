@@ -3,7 +3,15 @@ module HasHub.Object.Object.ParserSpec where
 
 import Test.Hspec
 
+import Data.Either.Validation
+
 import HasHub.Object.Object.Parser
+
+import HasHub.Object.Object.Type
+import HasHub.Object.Pipeline.Type
+import HasHub.Object.Label.Type
+import HasHub.Object.Collaborator.Type
+import HasHub.Object.Milestone.Type
 
 import qualified Fixture as F
 

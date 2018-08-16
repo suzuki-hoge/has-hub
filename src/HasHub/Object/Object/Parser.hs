@@ -1,28 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 
-module HasHub.Object.Object.Parser
-(
-  readObjects
-, YamlObject(..)
-, YamlWrappedObject(..)
-, _epicLinkNumbers
-, _epicLinkNumbersWithDuplication
-, _pipelineNames
-, _labels
-, _collaborators
-, _milestoneTitles
-, _parentEpicNumbers
-, _definitionEpicLinkNumbers
-, _parentEpicLinkNumbers
-, module HasHub.Object.Object.Type
-, module HasHub.Object.Pipeline.Type
-, module HasHub.Object.Label.Type
-, module HasHub.Object.Collaborator.Type
-, module HasHub.Object.Milestone.Type
-, module HasHub.FixMe
-)
-where
+module HasHub.Object.Object.Parser where
 
 
 import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
@@ -113,49 +92,56 @@ _epicLinkNumbersWithDuplication = mapMaybe extract
 
 
 _pipelineNames :: [YamlObject] -> [PipelineName]
-_pipelineNames = nub . mapMaybe extract
-  where
-    extract (EpicYamlObject _ _ _ x _ _ _ _ _) = x
-    extract (IssueYamlObject  _ _ x _ _ _ _ _) = x
+_pipelineNames = nub . mapMaybe _pipelineName
+
+_pipelineName :: YamlObject -> Maybe PipelineName
+_pipelineName (EpicYamlObject _ _ _ x _ _ _ _ _) = x
+_pipelineName (IssueYamlObject  _ _ x _ _ _ _ _) = x
 
 
 _labels :: [YamlObject] -> [Label]
-_labels = nub . concatMap extract
-  where
-    extract (EpicYamlObject _ _ _ _ x _ _ _ _) = x
-    extract (IssueYamlObject  _ _ _ x _ _ _ _) = x
+_labels = nub . concatMap _label
+
+_label :: YamlObject -> [Label]
+_label (EpicYamlObject _ _ _ _ x _ _ _ _) = x
+_label (IssueYamlObject  _ _ _ x _ _ _ _) = x
 
 
 _collaborators :: [YamlObject] -> [Collaborator]
-_collaborators = nub . concatMap extract
-  where
-    extract (EpicYamlObject _ _ _ _ _ x _ _ _) = x
-    extract (IssueYamlObject  _ _ _ _ x _ _ _) = x
+_collaborators = nub . concatMap _collaborator
+
+_collaborator :: YamlObject -> [Collaborator]
+_collaborator (EpicYamlObject _ _ _ _ _ x _ _ _) = x
+_collaborator (IssueYamlObject  _ _ _ _ x _ _ _) = x
 
 
 _milestoneTitles :: [YamlObject] -> [MilestoneTitle]
-_milestoneTitles = nub . mapMaybe extract
-  where
-    extract (EpicYamlObject _ _ _ _ _ _ x _ _) = x
-    extract (IssueYamlObject  _ _ _ _ _ x _ _) = x
+_milestoneTitles = nub . mapMaybe _milestoneTitle
+
+_milestoneTitle :: YamlObject -> Maybe MilestoneTitle
+_milestoneTitle (EpicYamlObject _ _ _ _ _ _ x _ _) = x
+_milestoneTitle (IssueYamlObject  _ _ _ _ _ x _ _) = x
 
 
 _parentEpicNumbers :: [YamlObject] -> [ParentEpicNumber]
-_parentEpicNumbers = nub . concatMap extract
-  where
-    extract (EpicYamlObject _ _ _ _ _ _ _ _ x) = x
-    extract (IssueYamlObject  _ _ _ _ _ _ _ x) = x
+_parentEpicNumbers = nub . concatMap _parentEpicNumber
+
+_parentEpicNumber :: YamlObject -> [ParentEpicNumber]
+_parentEpicNumber (EpicYamlObject _ _ _ _ _ _ _ _ x) = x
+_parentEpicNumber (IssueYamlObject  _ _ _ _ _ _ _ x) = x
 
 
 _definitionEpicLinkNumbers :: [YamlObject] -> [Definition] -- todo linked
-_definitionEpicLinkNumbers objects = mapMaybe extract (zip [1..] objects)
-  where
-    extract (n, EpicYamlObject x _ _ _ _ _ _ _ _) = Just (n, x)
-    extract (_, IssueYamlObject  _ _ _ _ _ _ _ _) = Nothing
+_definitionEpicLinkNumbers objects = mapMaybe _definitionEpicLinkNumber (zip [1..] objects)
+
+_definitionEpicLinkNumber :: (LineNum, YamlObject) -> Maybe Definition
+_definitionEpicLinkNumber (n, EpicYamlObject x _ _ _ _ _ _ _ _) = Just (n, x)
+_definitionEpicLinkNumber (_, IssueYamlObject  _ _ _ _ _ _ _ _) = Nothing
 
 
 _parentEpicLinkNumbers :: [YamlObject] -> [Parent] -- todo linking
-_parentEpicLinkNumbers objects = concatMap extract (zip [1..] objects)
-  where
-    extract (n, EpicYamlObject _ _ _ _ _ _ _ _ xs) = map (\x -> (n, x)) xs
-    extract (n, IssueYamlObject  _ _ _ _ _ _ _ xs) = map (\x -> (n, x)) xs
+_parentEpicLinkNumbers objects = concatMap _parentEpicLinkNumber (zip [1..] objects)
+
+_parentEpicLinkNumber :: (LineNum, YamlObject) -> [Parent]
+_parentEpicLinkNumber (n, EpicYamlObject _ _ _ _ _ _ _ _ xs) = map (\x -> (n, x)) xs
+_parentEpicLinkNumber (n, IssueYamlObject  _ _ _ _ _ _ _ xs) = map (\x -> (n, x)) xs

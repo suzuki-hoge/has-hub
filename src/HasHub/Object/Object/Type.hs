@@ -41,3 +41,22 @@ _number (Epic number _) = number
 type LineNum = Int
 type Definition = (LineNum, EpicLinkNumber)
 type Parent = (LineNum, ParentEpicNumber)
+
+
+findIn :: [LinkedEpic] -> ParentEpicNumber -> [EpicNumber]
+findIn linkedEpics (SharpEpicNumber s) = [_toEpicNumber s]
+findIn linkedEpics questionEpicNumber  = map _number filtered
+  where
+    filtered :: [LinkedEpic]
+    filtered = filter (\(LinkedEpic epicLinkNumber _) -> epicLinkNumber ==? questionEpicNumber) linkedEpics
+
+    _number :: LinkedEpic -> EpicNumber
+    _number (LinkedEpic _ number) = number
+
+
+_toEpicNumber :: String -> EpicNumber
+_toEpicNumber s = EpicNumber $ (read . tail) s
+
+
+(==?) :: EpicLinkNumber -> ParentEpicNumber -> Bool
+(==?) (EpicLinkNumber eln) (QuestionEpicNumber qen) = eln == qen

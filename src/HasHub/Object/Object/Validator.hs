@@ -22,6 +22,7 @@ import Data.List (nub, sort, (\\), find)
 import Data.Maybe (mapMaybe)
 
 import HasHub.Object.Object.Type
+import qualified HasHub.Object.Object.Type as T ((==?))
 
 import HasHub.FixMe (Validation(..), FixMe(..), NonExistentError(..))
 import qualified HasHub.FixMe as F (areAllIn, (??))
@@ -37,7 +38,7 @@ areAllIn needles haystacks = mapMaybe toEpicNumberIfSharp needles `F.areAllIn` m
     toEpicNumberIfSharp :: ParentEpicNumber -> Maybe EpicNumber
     toEpicNumberIfSharp (QuestionEpicNumber _) = Nothing
     toEpicNumberIfSharp (SharpEpicNumber s)
-      | s `_isNumberedBy` '#' = Just $ EpicNumber $ (read . tail) s
+      | s `_isNumberedBy` '#' = Just $ _toEpicNumber s
       | otherwise             = Nothing
 
 
@@ -118,4 +119,4 @@ linking definitions parents = map (validate definitions) parents F.?? ()
         (<?) (dn, _) (pn, _) = dn < pn
 
         (==?) :: Definition -> Parent -> Bool
-        (==?) (_, EpicLinkNumber eln) (_, QuestionEpicNumber qen) = eln == qen
+        (==?) (_, epicLinkNumber) (_, questionEpicNumber) = epicLinkNumber T.==? questionEpicNumber

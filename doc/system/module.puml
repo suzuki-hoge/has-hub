@@ -37,7 +37,6 @@ namespace HasHub {
       Client -r-> IOType
       Client --> Type
       IOType --> Type
-      Client -l-> Parser
       Parser -d-> Type
     }
     namespace Pipeline {
@@ -104,7 +103,6 @@ namespace HasHub {
       Client -r-> IOType
       Client --> Type
       IOType --> Type
-      Client -l-> Parser
       Parser -d-> Type
     }
   }

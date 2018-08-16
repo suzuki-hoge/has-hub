@@ -1,15 +1,20 @@
 module HasHub.Object.Object.Client
 (
   referAll
-, create
+, createEpic
+, createIssue
 , module HasHub.Object.Object.Type
 )
 where
 
 
-import HasHub.Object.Object.Parser
 import HasHub.Object.Object.IOType
 import HasHub.Object.Object.Type
+
+import HasHub.Object.Pipeline.Type
+import HasHub.Object.Label.Type
+import HasHub.Object.Collaborator.Type
+import HasHub.Object.Milestone.Type
 
 import HasHub.Connection.Connector (getGitHub, getZenHub, postGitHub, postZenHub_, postZenHub'_, putZenHub_)
 
@@ -20,19 +25,6 @@ referAll = do
   epicNumbers <- asEpicNumbers <$> getZenHub ReferEpicInput
 
   return . map _epic . filter (isEpic epicNumbers) $ outputs
-
-
-create :: YamlObject -> [Milestone] -> [Pipeline] -> [LinkedEpic] -> IO (Maybe LinkedEpic)
-create (EpicYamlObject epicLinkNumber title body pipelineName labels collaborators milestoneTitles estimate parentEpicNumbers) milestones pipelines linkedEpics = do
-  let milestone = Nothing -- todo integration
-  let pipeline = Nothing  -- todo integration
-  let epicNumbers = []    -- todo integration
-  Just <$> createEpic epicLinkNumber title body pipeline labels collaborators milestone estimate epicNumbers
-create (IssueYamlObject title body pipelineName labels collaborators milestoneTitles estimate parentEpicNumbers) milestones pipelines linkedEpics = do
-  let milestone = Nothing -- todo integration
-  let pipeline = Nothing  -- todo integration
-  let epicNumbers = []    -- todo integration
-  const Nothing <$> createIssue title body pipeline labels collaborators milestone estimate epicNumbers
 
 
 createEpic :: EpicLinkNumber -> Title -> Body -> Maybe Pipeline -> [Label] -> [Collaborator] -> Maybe Milestone -> Maybe Estimate -> [EpicNumber] -> IO LinkedEpic

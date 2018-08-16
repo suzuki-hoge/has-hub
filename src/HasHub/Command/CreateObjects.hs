@@ -1,6 +1,7 @@
 module HasHub.Command.CreateObjects where
 
 
+import Text.Printf (printf)
 import HasHub.Object.Object.Parser as Parser
 
 import HasHub.Object.Object.Client as OC
@@ -18,9 +19,25 @@ import qualified HasHub.Object.Milestone.Validator as MV
 import HasHub.FixMe (flat, _message, FixMe(..), Validation(..))
 
 
-createAll :: [YamlObject] -> IO ()
-createAll objects = do -- todo next: linked and pick up number by title
-  print objects
+createAll :: [YamlObject] -> [Pipeline] -> [Milestone] -> IO ()
+createAll objects = createAll' (length objects) [] objects
+  where
+    createAll' :: Int -> [LinkedEpic] -> [YamlObject] -> [Pipeline] -> [Milestone] -> IO ()
+    createAll' n _           []               _         _          = printf "%d objects created.\n" n
+    createAll' n linkedEpics (object:objects) pipelines milestones = do
+      printf "create object (%d / %d)\n" (n - length objects) n
+
+      let pipeline = _pipelineName object >>= PC.findIn pipelines
+      let milestone = _milestoneTitle object >>= MC.findIn milestones
+      let epicNumbers = _parentEpicNumber object >>= OC.findIn linkedEpics
+
+      linkedEpic <- create object pipeline milestone epicNumbers
+
+      createAll' n (linkedEpic ++ linkedEpics) objects pipelines milestones
+      where
+        create :: YamlObject -> Maybe Pipeline -> Maybe Milestone -> [EpicNumber] -> IO [LinkedEpic]
+        create (EpicYamlObject epicLinkNumber title body _ labels collaborators _ estimate _) pipeline milestone epicNumbers = (:[])    <$> OC.createEpic epicLinkNumber title body pipeline labels collaborators milestone estimate epicNumbers
+        create (IssueYamlObject               title body _ labels collaborators _ estimate _) pipeline milestone epicNumbers = const [] <$> OC.createIssue               title body pipeline labels collaborators milestone estimate epicNumbers
 
 
 printErrors :: [String] -> IO ()
@@ -53,7 +70,7 @@ execute = do
         , _message $ OV.parentNumberFormat $ _parentEpicNumbers objects
         , _message $ OV.linking (_definitionEpicLinkNumbers objects) (_parentEpicLinkNumbers objects) -- todo operator
         ] of
-        Success () -> createAll objects
+        Success ()     -> createAll objects pipelines milestones
         Failure errors -> printErrors errors
 
     Failure fms -> printErrors $ map toMessage fms
