@@ -13,4 +13,7 @@ import HasHub.Connection.Connector (getZenHub)
 
 
 referAll :: IO [Pipeline]
-referAll = asPipelines <$> getZenHub ReferInput
+referAll = do
+  putStrLn "  refer all Pipelines"
+
+  asPipelines <$> getZenHub ReferInput

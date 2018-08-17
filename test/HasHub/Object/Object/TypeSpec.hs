@@ -12,39 +12,34 @@ import HasHub.Object.Object.Type
 spec :: Spec
 spec = do
   describe "find in" $ do
-    let s1 = SharpEpicNumber "#1"
-    let s2 = SharpEpicNumber "#2"
-    let s3 = SharpEpicNumber "#3"
-    let q1 = QuestionEpicNumber "?1"
-    let q2 = QuestionEpicNumber "?2"
-    let e1 = EpicNumber 1
-    let e2 = EpicNumber 2
-    let e3 = EpicNumber 3
     let l1 = EpicLinkNumber "?1"
     let l2 = EpicLinkNumber "?2"
 
-    describe "found" $ do
-      it "return own at sharp number" $ do
-        let act = findIn [] s1
+    let q1 = QuestionEpicNumber "?1"
+    let q2 = QuestionEpicNumber "?2"
 
-        act `shouldBe` [e1]
+    let s3 = SharpEpicNumber "#3"
+    let s4 = SharpEpicNumber "#4"
 
-      it "return own at sharp number" $ do
-        let act = findIn [LinkedEpic l1 e2] s1
+    let e1 = Epic (EpicNumber 1) (Title "title 1")
+    let e2 = Epic (EpicNumber 2) (Title "title 2")
+    let e3 = Epic (EpicNumber 3) (Title "title 3")
+    let e4 = Epic (EpicNumber 4) (Title "title 4")
 
-        act `shouldBe` [e1]
+    let le1 = LinkedEpic l1 e1
+    let le2 = LinkedEpic l2 e2
 
-      it "return linking number at question number" $ do
-        let act = findIn [LinkedEpic l1 e2] q1
+    it "found in linked-epics" $ do
+      let act = [q1, q2] >>= findIn [le1, le2] [e3, e4]
 
-        act `shouldBe` [e2]
+      act `shouldBe` [e1, e2]
 
-      it "flat mapping" $ do
-        let act = [q1, s3] >>= findIn [LinkedEpic l1 e1, LinkedEpic l2 e2]
+    it "found in referred epics" $ do
+      let act = [s3, s4] >>= findIn [le1, le2] [e3, e4]
 
-        act `shouldBe` [e1, e3]
+      act `shouldBe` [e3, e4]
 
-      it "empty be empty" $ do
-        let act = [] >>= findIn [LinkedEpic l1 e1, LinkedEpic l2 e2]
+    it "found in both" $ do
+      let act = [q1, q2, s3, s4] >>= findIn [le1, le2] [e3, e4]
 
-        act `shouldBe` []
+      act `shouldBe` [e1, e2, e3, e4]

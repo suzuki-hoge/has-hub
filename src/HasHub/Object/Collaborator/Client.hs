@@ -13,4 +13,7 @@ import HasHub.Connection.Connector (getGitHub)
 
 
 referAll :: IO [Collaborator]
-referAll = asCollaborators <$> getGitHub ReferInput
+referAll = do
+  putStrLn "  refer all Collaborators"
+
+  asCollaborators <$> getGitHub ReferInput

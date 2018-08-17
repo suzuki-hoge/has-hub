@@ -39,6 +39,7 @@ set g z = do
   LS.setOwner "suzuki-hoge"
   LS.setRepository "has-hub-workspace"
 
+  putStrLn "fetch RepositoryId"
   json <- getGitHub RepositoryIdInput
   LS.setRepositoryId $ read . show . fromJust $ json ^? key "id" . _Integer
 

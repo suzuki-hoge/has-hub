@@ -13,4 +13,7 @@ import HasHub.Connection.Connector (getGitHub)
 
 
 referAll :: IO [Label]
-referAll = asLabels <$> getGitHub ReferInput
+referAll = do
+  putStrLn "  refer all Labels"
+
+  asLabels <$> getGitHub ReferInput
