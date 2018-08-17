@@ -13,7 +13,10 @@ import HasHub.Connection.Connector (getGitHub, getZenHub)
 
 
 referAll :: IO [Milestone]
-referAll = asGitHubOutputs <$> getGitHub ReferGitHubInput >>= mapM withStartOn
+referAll = do
+  putStrLn "  refer all Milestones"
+
+  asGitHubOutputs <$> getGitHub ReferGitHubInput >>= mapM withStartOn
   where
     withStartOn :: ReferGitHubOutput -> IO Milestone
     withStartOn (ReferGitHubOutput number title dueOn) = do

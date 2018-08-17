@@ -23,6 +23,11 @@ spec = do
 
         act `shouldBe` Success ()
 
+      it "format error is ignored" $ do
+        let act = [QuestionEpicNumber "?", QuestionEpicNumber "1"] `areAllIn` []
+
+        act `shouldBe` Success ()
+
     describe "failure" $ do
       it "single in empty" $ do
         let act = [F.sharpEpicNumber] `areAllIn` []
@@ -156,6 +161,16 @@ spec = do
 
       it "empty" $ do
         let act = linking [] []
+
+        act `shouldBe` Success ()
+
+      it "define error is ignore format error" $ do
+        let act = linking [(1, EpicLinkNumber "?")] [(1, QuestionEpicNumber "?")]
+
+        act `shouldBe` Success ()
+
+      it "not defined error is ignore format error" $ do
+        let act = linking [] [(1, QuestionEpicNumber "?")]
 
         act `shouldBe` Success ()
 

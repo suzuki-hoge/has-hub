@@ -1,0 +1,27 @@
+- epic-link-number : ?1
+  title            : 登録をできるようにする
+  body             : 画面から飛んできたユーザ情報を永続化する。
+  pipeline         : backlog
+  labels           : []
+  assignees        : []
+  milestone        :
+  estimate         :
+  epics            : ["#74"]
+
+- title            : 登録 API を作る
+  body             : インパラをユーザテーブルに永続化する。
+  pipeline         : sprint backlog
+  labels           : [dev]
+  assignees        : [suzuki-hoge]
+  milestone        : sprint 1
+  estimate         : 0.5
+  epics            : ["?1"]
+
+- title            : ユーザ登録画面を作る
+  body             : 入力フォームと登録ボタンを設置する。
+  pipeline         : sprint backlog
+  labels           : [dev]
+  assignees        : [suzuki-hoge]
+  milestone        : sprint 1
+  estimate         : 1
+  epics            : ["?1"]

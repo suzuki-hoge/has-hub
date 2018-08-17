@@ -32,7 +32,7 @@ spec = do
       let sut = CreateIssueInput F.title1 F.body1 [F.label1, F.label2] [F.collaborator] (Just F.milestone1)
 
       toResource sut `shouldBe` "/issues"
-      encode sut `shouldBe` "{\"assignees\":[\"suzuki-hoge\"],\"body\":\"post user data and write record.\",\"milestone\":1,\"labels\":[\"\229\174\159\232\163\133\",\"dev\"],\"title\":\"registration module\"}"
+      encode sut `shouldBe` "{\"assignees\":[\"John\"],\"body\":\"post user data and write record.\",\"milestone\":1,\"labels\":[\"\229\174\159\232\163\133\",\"dev\"],\"title\":\"registration module\"}"
 
     it "title, body, no labels, no collaborators, no milestone" $ do
       let sut = CreateIssueInput F.title1 F.body1 [] [] Nothing

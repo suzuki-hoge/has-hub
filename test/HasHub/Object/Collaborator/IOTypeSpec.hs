@@ -23,6 +23,6 @@ spec = do
 
   describe "output" $ do
     it "name" $ do
-      let act = asCollaborators "[{\"login\": \"suzuki-hoge\"}]"
+      let act = asCollaborators "[{\"login\": \"John\"}]"
 
       act `shouldBe` [F.collaborator]
