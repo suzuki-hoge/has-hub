@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6dfbfbe476e1a7a769ca25e371a8205e216b639d6ee03a678d984ab149c9fc16
+-- hash: 30d0ba8e3b69fba206b246b1c0b9815442b0d40df0a70ae946e72fe53aadec6d
 
 name:           has-hub
 version:        0.1.0.0
@@ -33,6 +33,7 @@ library
     , aeson
     , base >=4.7 && <5
     , bytestring
+    , directory
     , either
     , http-client
     , http-client-tls
@@ -46,11 +47,13 @@ library
     , utf8-string
     , yaml
   exposed-modules:
+      HasHub.Command.Configure
       HasHub.Command.CreateObjects
+      HasHub.Connection.Config.Detector
+      HasHub.Connection.Config.LocalConfig
+      HasHub.Connection.Config.Type
       HasHub.Connection.Connector
-      HasHub.Connection.LocalSession
       HasHub.Connection.Logger
-      HasHub.Connection.Type
       HasHub.FixMe
       HasHub.Object.Collaborator.Client
       HasHub.Object.Collaborator.IOType
@@ -88,6 +91,7 @@ executable has-hub-exe
     , aeson
     , base >=4.7 && <5
     , bytestring
+    , directory
     , either
     , has-hub
     , http-client
@@ -116,6 +120,7 @@ test-suite has-hub-test
     , aeson
     , base >=4.7 && <5
     , bytestring
+    , directory
     , either
     , has-hub
     , hspec
@@ -132,6 +137,7 @@ test-suite has-hub-test
     , yaml
   other-modules:
       Fixture
+      HasHub.Connection.Config.DetectorSpec
       HasHub.FixMeSpec
       HasHub.Object.Collaborator.IOTypeSpec
       HasHub.Object.Collaborator.ValidatorSpec

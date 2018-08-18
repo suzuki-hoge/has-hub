@@ -10,7 +10,7 @@ import Data.Aeson (encode)
 
 import HasHub.Object.Object.IOType
 
-import HasHub.Connection.Type (toResource)
+import HasHub.Connection.Config.Type (toResource)
 
 import qualified Fixture as F
 

@@ -16,7 +16,7 @@ import qualified HasHub.Object.Label.Validator as LV
 import qualified HasHub.Object.Collaborator.Validator as CV
 import qualified HasHub.Object.Milestone.Validator as MV
 
-import HasHub.FixMe (flat, _message, FixMe(..), Validation(..))
+import HasHub.FixMe (flat, _message, printMessages, printFixMes, FixMe(..), Validation(..))
 
 
 type Current = Int
@@ -27,7 +27,6 @@ type ParentEpic = Epic
 
 createAll :: [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] ->IO ()
 createAll objects = createAll' (length objects) [] objects
-
   where
     createAll' :: Int -> [LinkedEpic] -> [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] -> IO ()
     createAll' total _           []               _         _          _     = printf "\n%d objects created.\n\n" total
@@ -39,7 +38,6 @@ createAll objects = createAll' (length objects) [] objects
       linkedEpic <- create object pipeline milestone parentEpics (total - length objects) total
 
       createAll' total (linkedEpic ++ linkedEpics) objects pipelines milestones epics
-
       where
         create :: YamlObject -> Maybe Pipeline -> Maybe Milestone -> [ParentEpic] -> Current -> Total -> IO [LinkedEpic]
         create (EpicYamlObject epicLinkNumber title body _ labels collaborators _ estimate _) pipeline milestone epics current total = do
@@ -53,21 +51,13 @@ createAll objects = createAll' (length objects) [] objects
           const [] <$> OC.createIssue title body pipeline labels collaborators milestone estimate epics
 
 
-printErrors :: [String] -> IO ()
-printErrors errors = do
-  putStrLn "\nthere are several validation errors. please fix following errors."
-  mapM_ (\error -> putStrLn $ "  " ++ error) errors
-  putStrLn "\nhas-hub is aborted.\n"
-
-
 execute :: IO ()
 execute = do
   putStrLn "\nparse yaml file."
---  parsed <- Parser.readObjects "sample/objects/validation_errors.yaml"
-  parsed <- Parser.readObjects "sample/objects/epic_and_issue.yaml"
+  parsed <- Parser.readObjects "sample/objects/validation_errors.yaml"
+--  parsed <- Parser.readObjects "sample/objects/epic_and_issue.yaml"
   case parsed of
     Success(objects) -> do
-      putStrLn "  succeeded."
       putStrLn "\nrefer all for yaml data validation."
 
       epics         <- OC.referAll
@@ -87,9 +77,7 @@ execute = do
         , _message $ OV.parentNumberFormat $ _parentEpicNumbers objects
         , _message $ OV.linking (_definitionEpicLinkNumbers objects) (_parentEpicLinkNumbers objects) -- todo operator
         ] of
-        Success () -> do
-          putStrLn "  succeeded."
-          createAll objects pipelines milestones epics
-        Failure errors -> printErrors errors
+        Success ()     -> createAll objects pipelines milestones epics
+        Failure errors -> printMessages errors
 
-    Failure fms -> printErrors $ map toMessage fms
+    Failure fms -> printFixMes fms

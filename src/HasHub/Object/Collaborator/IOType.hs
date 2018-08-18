@@ -11,7 +11,7 @@ import Data.Maybe (fromJust)
 
 import HasHub.Object.Collaborator.Type
 
-import HasHub.Connection.Type (ToResource(..))
+import HasHub.Connection.Config.Type (ToResource(..))
 
 
 -- input

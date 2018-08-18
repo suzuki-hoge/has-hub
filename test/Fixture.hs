@@ -1,7 +1,7 @@
 module Fixture where
 
 
-import HasHub.Connection.Type (RepositoryId)
+import HasHub.Connection.Config.Type (RepositoryId)
 
 import HasHub.Object.Object.Type
 import HasHub.Object.Object.IOType
