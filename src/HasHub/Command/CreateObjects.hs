@@ -1,7 +1,12 @@
-module HasHub.Command.CreateObjects where
+module HasHub.Command.CreateObjects
+(
+  execute
+)
+where
 
 
 import Text.Printf (printf)
+
 import HasHub.Object.Object.Parser as Parser
 
 import HasHub.Object.Object.Client as OC
@@ -17,6 +22,37 @@ import qualified HasHub.Object.Collaborator.Validator as CV
 import qualified HasHub.Object.Milestone.Validator as MV
 
 import HasHub.FixMe (flat, _message, printMessages, printFixMes, FixMe(..), Validation(..))
+
+
+execute :: FilePath -> IO ()
+execute yaml = do
+  putStrLn "\nparse yaml file."
+  parsed <- Parser.readObjects yaml
+  case parsed of
+    Success(objects) -> do
+      putStrLn "\nrefer all for yaml data validation."
+
+      epics         <- OC.referAll
+      pipelines     <- PC.referAll
+      labels        <- LC.referAll
+      collaborators <- CC.referAll
+      milestones    <- MC.referAll
+
+      case flat [
+          _message $ _parentEpicNumbers objects `OV.areAllIn` epics
+        , _message $ _pipelineNames objects `PV.areAllIn` pipelines
+        , _message $ _labels objects `LV.areAllIn` labels
+        , _message $ _collaborators objects `CV.areAllIn` collaborators
+        , _message $ _milestoneTitles objects `MV.areAllIn` milestones
+        , _message $ OV.noDuplication $ _epicLinkNumbersWithDuplication objects
+        , _message $ OV.linkNumberFormat $ _epicLinkNumbers objects
+        , _message $ OV.parentNumberFormat $ _parentEpicNumbers objects
+        , _message $ OV.linking (_definitionEpicLinkNumbers objects) (_parentEpicLinkNumbers objects) -- todo operator
+        ] of
+        Success ()     -> createAll objects pipelines milestones epics
+        Failure errors -> printMessages errors
+
+    Failure fms -> printFixMes fms
 
 
 type Current = Int
@@ -49,35 +85,3 @@ createAll objects = createAll' (length objects) [] objects
           printf "\ncreate Issue. (%d / %d)\n" current total
 
           const [] <$> OC.createIssue title body pipeline labels collaborators milestone estimate epics
-
-
-execute :: IO ()
-execute = do
-  putStrLn "\nparse yaml file."
-  parsed <- Parser.readObjects "sample/objects/validation_errors.yaml"
---  parsed <- Parser.readObjects "sample/objects/epic_and_issue.yaml"
-  case parsed of
-    Success(objects) -> do
-      putStrLn "\nrefer all for yaml data validation."
-
-      epics         <- OC.referAll
-      pipelines     <- PC.referAll
-      labels        <- LC.referAll
-      collaborators <- CC.referAll
-      milestones    <- MC.referAll
-
-      case flat [
-          _message $ _parentEpicNumbers objects `OV.areAllIn` epics
-        , _message $ _pipelineNames objects `PV.areAllIn` pipelines
-        , _message $ _labels objects `LV.areAllIn` labels
-        , _message $ _collaborators objects `CV.areAllIn` collaborators
-        , _message $ _milestoneTitles objects `MV.areAllIn` milestones
-        , _message $ OV.noDuplication $ _epicLinkNumbersWithDuplication objects
-        , _message $ OV.linkNumberFormat $ _epicLinkNumbers objects
-        , _message $ OV.parentNumberFormat $ _parentEpicNumbers objects
-        , _message $ OV.linking (_definitionEpicLinkNumbers objects) (_parentEpicLinkNumbers objects) -- todo operator
-        ] of
-        Success ()     -> createAll objects pipelines milestones epics
-        Failure errors -> printMessages errors
-
-    Failure fms -> printFixMes fms
