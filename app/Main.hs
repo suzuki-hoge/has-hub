@@ -4,16 +4,21 @@ module Main where
 import Data.Monoid
 import Data.Char
 import Text.Read
-import Options.Applicative
+import Options.Applicative hiding (Success, Failure)
 
-import Control.Monad
+import qualified HasHub.Command.CreateObjects as CO
+import qualified HasHub.Command.Configure as C
 
 import HasHub.Connection.Config.Type
 
+import HasHub.FixMe (printFixMes, Validation(..))
 
-data Options = CreateOptions FilePath Owner Repository Token Token FilePath Proxy
-             | ReferOptions Owner Repository Token Token FilePath Proxy
-             | GenerateOptions FilePath
+
+data Options = ReferOptions                             Owner Repository Token Token FilePath Proxy
+             | CreateObjectsOptions            FilePath Owner Repository Token Token FilePath Proxy
+             | CreateMilestonesOptions         FilePath Owner Repository Token Token FilePath Proxy
+             | GenerateObjectsSampleOptions    FilePath
+             | GenerateMilestonesSampleOptions FilePath
              deriving Show
 
 
@@ -105,23 +110,45 @@ referOptionsInfo = info referOptionsP $ mconcat [
   ]
 
 
-createOptionsP :: Parser Options
-createOptionsP = (<*>) helper $ CreateOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP <*> proxyP
+createObjectsOptionsP :: Parser Options
+createObjectsOptionsP = (<*>) helper $ CreateObjectsOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP <*> proxyP
 
 
-createOptionsInfo :: ParserInfo Options
-createOptionsInfo = info createOptionsP $ mconcat [
+createObjectsOptionsInfo :: ParserInfo Options
+createObjectsOptionsInfo = info createObjectsOptionsP $ mconcat [
     header "create epics and issues"
   , failureCode 1
   ]
 
 
-generateOptionsP :: Parser Options
-generateOptionsP = (<*>) helper $ GenerateOptions <$> outP
+createMilestonesOptionsP :: Parser Options
+createMilestonesOptionsP = (<*>) helper $ CreateMilestonesOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP <*> proxyP
 
 
-generateOptionsInfo :: ParserInfo Options
-generateOptionsInfo = info generateOptionsP $ mconcat [
+createMilestonesOptionsInfo :: ParserInfo Options
+createMilestonesOptionsInfo = info createMilestonesOptionsP $ mconcat [
+    header "create milestones"
+  , failureCode 1
+  ]
+
+
+generateObjectsSampleOptionsP :: Parser Options
+generateObjectsSampleOptionsP = (<*>) helper $ GenerateObjectsSampleOptions <$> outP
+
+
+generateObjectsSampleOptionsInfo :: ParserInfo Options
+generateObjectsSampleOptionsInfo = info generateObjectsSampleOptionsP $ mconcat [
+    header "generate sample yaml"
+  , failureCode 1
+  ]
+
+
+generateMilestonesSampleOptionsP :: Parser Options
+generateMilestonesSampleOptionsP = (<*>) helper $ GenerateMilestonesSampleOptions <$> outP
+
+
+generateMilestonesSampleOptionsInfo :: ParserInfo Options
+generateMilestonesSampleOptionsInfo = info generateMilestonesSampleOptionsP $ mconcat [
     header "generate sample yaml"
   , failureCode 1
   ]
@@ -130,10 +157,10 @@ generateOptionsInfo = info generateOptionsP $ mconcat [
 optionsP :: Parser Options
 optionsP = (<*>) helper $ subparser $ mconcat [
     command "refer-all"                  referOptionsInfo
-  , command "create-objects"             createOptionsInfo
-  , command "create-milestones"          createOptionsInfo
-  , command "generate-objects-sample"    generateOptionsInfo
-  , command "generate-milestones-sample" generateOptionsInfo
+  , command "create-objects"             createObjectsOptionsInfo
+  , command "create-milestones"          createMilestonesOptionsInfo
+  , command "generate-objects-sample"    generateObjectsSampleOptionsInfo
+  , command "generate-milestones-sample" generateMilestonesSampleOptionsInfo
   ]
 
 
@@ -145,7 +172,20 @@ optionsInfo = info optionsP $ mconcat [
 
 
 main :: IO ()
-main = do
-  options <- customExecParser (prefs showHelpOnError) optionsInfo
+main = customExecParser (prefs showHelpOnError) optionsInfo >>= execute
 
-  print options
+
+execute :: Options -> IO ()
+execute (CreateObjectsOptions yaml owner repository gitHubToken zenHubToken fp proxy) = do
+  initialized <- initialize owner repository gitHubToken zenHubToken fp proxy
+  case initialized of
+    Success ()  -> CO.execute yaml
+    Failure fms -> printFixMes fms
+
+
+initialize :: Owner -> Repository -> Token -> Token -> FilePath -> Proxy -> IO (Validation [C.ConfigurationError] ())
+initialize owner repository gitHubToken zenHubToken fp proxy = C.initialize (mb owner) (mb repository) (mb gitHubToken) (mb zenHubToken) (mb fp) (mb proxy)
+  where
+    mb :: String -> Maybe String
+    mb "" = Nothing
+    mb s  = Just s

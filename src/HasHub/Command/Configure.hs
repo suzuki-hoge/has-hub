@@ -5,6 +5,7 @@ module HasHub.Command.Configure
 (
   initialize
 , deinitialize
+, ConfigurationError(..)
 )
 where
 
