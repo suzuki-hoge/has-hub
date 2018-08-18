@@ -37,12 +37,13 @@ dependencies:
 - yaml
 - regex-posix
 - directory
+- optparse-applicative
 
 library:
   source-dirs: src
 
 executables:
-  has-hub-exe:
+  has-hub:
     main:                Main.hs
     source-dirs:         app
     ghc-options:

@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 30d0ba8e3b69fba206b246b1c0b9815442b0d40df0a70ae946e72fe53aadec6d
+-- hash: b669a2067f58a69dad1ca3dd328c8c92aba8514486169e1542292cebda90a91d
 
 name:           has-hub
 version:        0.1.0.0
@@ -40,6 +40,7 @@ library
     , http-types
     , lens
     , lens-aeson
+    , optparse-applicative
     , regex-posix
     , split
     , time
@@ -81,7 +82,7 @@ library
       Paths_has_hub
   default-language: Haskell2010
 
-executable has-hub-exe
+executable has-hub
   main-is: Main.hs
   hs-source-dirs:
       app
@@ -99,6 +100,7 @@ executable has-hub-exe
     , http-types
     , lens
     , lens-aeson
+    , optparse-applicative
     , regex-posix
     , split
     , time
@@ -129,6 +131,7 @@ test-suite has-hub-test
     , http-types
     , lens
     , lens-aeson
+    , optparse-applicative
     , regex-posix
     , split
     , time
