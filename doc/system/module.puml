@@ -2,7 +2,7 @@
 
 namespace HasHub {
   namespace Command {
-    class InitConfig {
+    class Configure {
       Detector
       LocalConfig
       Connector

@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 
-module HasHub.Command.InitConfig
+module HasHub.Command.Configure
 (
   initialize
+, deinitialize
 )
 where
 
@@ -66,3 +67,7 @@ vString (Failure [_]) = ""
 
 mask :: String -> String
 mask s = replicate (length s) '*'
+
+
+deinitialize :: IO ()
+deinitialize = unsetAll

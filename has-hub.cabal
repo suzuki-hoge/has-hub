@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 70ec260d195e136e7f6a20125a3081309e7343a3887c67623e403a48c26a0116
+-- hash: 30d0ba8e3b69fba206b246b1c0b9815442b0d40df0a70ae946e72fe53aadec6d
 
 name:           has-hub
 version:        0.1.0.0
@@ -47,8 +47,8 @@ library
     , utf8-string
     , yaml
   exposed-modules:
+      HasHub.Command.Configure
       HasHub.Command.CreateObjects
-      HasHub.Command.InitConfig
       HasHub.Connection.Config.Detector
       HasHub.Connection.Config.LocalConfig
       HasHub.Connection.Config.Type

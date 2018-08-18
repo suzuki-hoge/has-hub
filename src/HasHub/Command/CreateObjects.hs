@@ -54,8 +54,8 @@ createAll objects = createAll' (length objects) [] objects
 execute :: IO ()
 execute = do
   putStrLn "\nparse yaml file."
---  parsed <- Parser.readObjects "sample/objects/validation_errors.yaml"
-  parsed <- Parser.readObjects "sample/objects/epic_and_issue.yaml"
+  parsed <- Parser.readObjects "sample/objects/validation_errors.yaml"
+--  parsed <- Parser.readObjects "sample/objects/epic_and_issue.yaml"
   case parsed of
     Success(objects) -> do
       putStrLn "\nrefer all for yaml data validation."

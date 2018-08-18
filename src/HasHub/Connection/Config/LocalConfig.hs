@@ -6,7 +6,7 @@ module HasHub.Connection.Config.LocalConfig where
 
 import Network.HTTP.Types (RequestHeaders)
 
-import System.Environment (setEnv, getEnv, lookupEnv)
+import System.Environment (setEnv, getEnv, lookupEnv, unsetEnv)
 
 import qualified Data.ByteString.Char8 as BS (pack)
 
@@ -23,8 +23,8 @@ setConfigs :: Configs -> IO ()
 setConfigs (Configs owner repository gitHubToken zenHubToken logPath proxy) = do
   setEnv "has-hub.local-config.owner"         owner
   setEnv "has-hub.local-config.repository"    repository
-  setEnv "has-hub.local-config.git-hub.token" gitHubToken
-  setEnv "has-hub.local-config.zen-hub.token" zenHubToken
+  setEnv "has-hub.local-config.git-hub-token" gitHubToken
+  setEnv "has-hub.local-config.zen-hub-token" zenHubToken
   setEnv "has-hub.local-config.log-path"      logPath
   case proxy of
     Just p -> setEnv "has-hub.local-config.proxy" p
@@ -67,14 +67,14 @@ getZenHubEndpoint = do
 
 getGitHubHeaders :: IO RequestHeaders
 getGitHubHeaders = do
-  token <- getEnv "has-hub.local-config.git-hub.token"
+  token <- getEnv "has-hub.local-config.git-hub-token"
 
   return [("User-Agent", "curl"), ("Authorization", BS.pack $ "token " ++ token)]
 
 
 getZenHubHeaders :: IO RequestHeaders
 getZenHubHeaders = do
-  token <- getEnv "has-hub.local-config.zen-hub.token"
+  token <- getEnv "has-hub.local-config.zen-hub-token"
 
   return [("content-type", "application/json"), ("User-Agent", "curl"), ("X-Authentication-Token", BS.pack token)]
 
@@ -85,3 +85,14 @@ getLogPath = getEnv "has-hub.local-config.log-path"
 
 getProxy :: IO (Maybe Proxy)
 getProxy = lookupEnv "has-hub.local-config.proxy"
+
+
+unsetAll :: IO ()
+unsetAll = do
+  unsetEnv "has-hub.local-config.owner"
+  unsetEnv "has-hub.local-config.repository"
+  unsetEnv "has-hub.local-config.git-hub-token"
+  unsetEnv "has-hub.local-config.zen-hub-token"
+  unsetEnv "has-hub.local-config.log-path"
+  unsetEnv "has-hub.local-config.proxy"
+  unsetEnv "has-hub.local-config.request-id"
