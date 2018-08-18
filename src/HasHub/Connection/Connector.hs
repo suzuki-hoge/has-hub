@@ -3,8 +3,7 @@
 
 module HasHub.Connection.Connector
 (
-  set
-, getGitHub
+  getGitHub
 , getZenHub
 , postGitHub
 , postZenHub_
@@ -18,59 +17,40 @@ import Network.HTTP.Client (parseRequest_, Request(..), RequestBody(..), newMana
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.HTTP.Types (RequestHeaders, Method)
 
-import Control.Lens ((^?))
-import Data.Aeson.Lens (key, _Integer)
 import Data.Aeson (ToJSON, encode)
-import Data.Maybe (fromJust)
 
 import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
 
-import qualified HasHub.Connection.LocalSession as LS
+import qualified HasHub.Connection.Config.LocalConfig as LC
 import HasHub.Connection.Logger (logRequest, logResponse)
-import HasHub.Connection.Type
-
-
-set :: String -> String -> IO ()
-set g z = do
-  LS.allocateRequestId
-  LS.setLogPath "has-hub.log"
-  LS.setGitHubToken g
-  LS.setZenHubToken z
-  LS.setOwner "suzuki-hoge"
-  LS.setRepository "has-hub-workspace"
-
-  putStrLn "fetch RepositoryId"
-  json <- getGitHub RepositoryIdInput
-  LS.setRepositoryId $ read . show . fromJust $ json ^? key "id" . _Integer
-
-  return ()
+import HasHub.Connection.Config.Type
 
 
 getGitHub :: (ToResource input) => input -> IO LBS.ByteString
-getGitHub = secureGet LS.getGitHubHeaders LS.getGitHubEndpoint
+getGitHub = secureGet LC.getGitHubHeaders LC.getGitHubEndpoint
 
 
 getZenHub :: (ToResource input) => input -> IO LBS.ByteString
-getZenHub = secureGet LS.getZenHubHeaders LS.getZenHubEndpoint
+getZenHub = secureGet LC.getZenHubHeaders LC.getZenHubEndpoint
 
 
 postGitHub :: (ToResource input, ToJSON input) => input -> IO LBS.ByteString
-postGitHub = secureUpdate "POST" LS.getGitHubHeaders LS.getGitHubEndpoint
+postGitHub = secureUpdate "POST" LC.getGitHubHeaders LC.getGitHubEndpoint
 
 
 postZenHub_ :: (ToResource input, ToJSON input) => input -> IO ()
-postZenHub_ = secureUpdate_ "POST" LS.getZenHubHeaders LS.getZenHubEndpoint
+postZenHub_ = secureUpdate_ "POST" LC.getZenHubHeaders LC.getZenHubEndpoint
 
 
 postZenHub'_ :: (ToResource input, ToJSON input) => (RepositoryId -> input) -> IO ()
 postZenHub'_ inputF = do
-  repositoryId <- LS.getRepositoryId
+  repositoryId <- LC.getRepositoryId
   let input = inputF repositoryId
-  secureUpdate_ "POST" LS.getZenHubHeaders LS.getZenHubEndpoint input
+  secureUpdate_ "POST" LC.getZenHubHeaders LC.getZenHubEndpoint input
 
 
 putZenHub_ :: (ToResource input, ToJSON input) => input -> IO ()
-putZenHub_ = secureUpdate_ "PUT" LS.getZenHubHeaders LS.getZenHubEndpoint
+putZenHub_ = secureUpdate_ "PUT" LC.getZenHubHeaders LC.getZenHubEndpoint
 
 
 secureGet :: (ToResource input) => IO RequestHeaders -> IO Endpoint -> input -> IO LBS.ByteString

@@ -12,7 +12,7 @@ import Data.Maybe (fromJust)
 
 import HasHub.Object.Pipeline.Type
 
-import HasHub.Connection.Type (ToResource(..))
+import HasHub.Connection.Config.Type (ToResource(..))
 
 
 data ReferInput = ReferInput

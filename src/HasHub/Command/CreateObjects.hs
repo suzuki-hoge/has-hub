@@ -27,7 +27,6 @@ type ParentEpic = Epic
 
 createAll :: [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] ->IO ()
 createAll objects = createAll' (length objects) [] objects
-
   where
     createAll' :: Int -> [LinkedEpic] -> [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] -> IO ()
     createAll' total _           []               _         _          _     = printf "\n%d objects created.\n\n" total
@@ -39,7 +38,6 @@ createAll objects = createAll' (length objects) [] objects
       linkedEpic <- create object pipeline milestone parentEpics (total - length objects) total
 
       createAll' total (linkedEpic ++ linkedEpics) objects pipelines milestones epics
-
       where
         create :: YamlObject -> Maybe Pipeline -> Maybe Milestone -> [ParentEpic] -> Current -> Total -> IO [LinkedEpic]
         create (EpicYamlObject epicLinkNumber title body _ labels collaborators _ estimate _) pipeline milestone epics current total = do
@@ -60,7 +58,6 @@ execute = do
   parsed <- Parser.readObjects "sample/objects/epic_and_issue.yaml"
   case parsed of
     Success(objects) -> do
-      putStrLn "  succeeded."
       putStrLn "\nrefer all for yaml data validation."
 
       epics         <- OC.referAll
@@ -80,9 +77,7 @@ execute = do
         , _message $ OV.parentNumberFormat $ _parentEpicNumbers objects
         , _message $ OV.linking (_definitionEpicLinkNumbers objects) (_parentEpicLinkNumbers objects) -- todo operator
         ] of
-        Success () -> do
-          putStrLn "  succeeded."
-          createAll objects pipelines milestones epics
+        Success ()     -> createAll objects pipelines milestones epics
         Failure errors -> printMessages errors
 
     Failure fms -> printFixMes fms

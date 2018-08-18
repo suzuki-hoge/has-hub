@@ -11,7 +11,7 @@ import Data.Maybe (fromJust)
 
 import HasHub.Object.Milestone.Type
 
-import HasHub.Connection.Type (ToResource(..))
+import HasHub.Connection.Config.Type (ToResource(..))
 
 
 -- input

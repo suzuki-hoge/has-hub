@@ -98,8 +98,8 @@ _isNotNumberedBy s c = not $ s `_isNumberedBy` c
 data LinkError = DefineLineError Definition Parent | NotDefinedError Parent deriving (Eq, Show)
 
 instance FixMe LinkError where
-  toMessage (DefineLineError (dn, _) (pn, QuestionEpicNumber s)) = "can't resolve definition link: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is defined at line " ++ show dn ++ "."
-  toMessage (NotDefinedError         (pn, QuestionEpicNumber s)) = "can't resolve definition link: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is not defined."
+  toMessage (DefineLineError (dn, _) (pn, QuestionEpicNumber s)) = "can't resolve definition link: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is defined at line " ++ show dn
+  toMessage (NotDefinedError         (pn, QuestionEpicNumber s)) = "can't resolve definition link: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is not defined"
 
 
 linking :: [Definition] -> [Parent] -> Validation [LinkError] ()

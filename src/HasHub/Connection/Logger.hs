@@ -14,7 +14,7 @@ import Data.List (intersperse)
 import Data.String.Utils (strip)
 import Codec.Binary.UTF8.String (decodeString)
 
-import HasHub.Connection.LocalSession as LS
+import qualified HasHub.Connection.Config.LocalConfig as LC
 
 
 logRequest :: Request -> IO ()
@@ -55,7 +55,7 @@ logResponse response = logging (toString response)
 
 logging :: String -> IO ()
 logging s = do
-  rid <- getRequestId
-  lp <- getLogPath
+  rid <- LC.getRequestId
+  lp <- LC.getLogPath
 
   appendFile lp (rid ++ ": " ++ s ++ "\n")

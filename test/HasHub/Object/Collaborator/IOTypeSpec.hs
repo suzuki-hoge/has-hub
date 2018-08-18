@@ -8,7 +8,7 @@ import Test.Hspec
 
 import HasHub.Object.Collaborator.IOType
 
-import HasHub.Connection.Type (toResource)
+import HasHub.Connection.Config.Type (toResource)
 
 import qualified Fixture as F
 

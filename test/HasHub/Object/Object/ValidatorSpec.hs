@@ -228,7 +228,7 @@ spec = do
 
         let act = toMessage $ DefineLineError definition parent
 
-        act `shouldBe` "can't resolve definition link: use ?1 on line 2, but ?1 is defined at line 3."
+        act `shouldBe` "can't resolve definition link: use ?1 on line 2, but ?1 is defined at line 3"
 
     describe "message" $ do
       it "not defined error" $ do
@@ -236,4 +236,4 @@ spec = do
 
         let act = toMessage $ NotDefinedError $ (3, QuestionEpicNumber "?2")
 
-        act `shouldBe` "can't resolve definition link: use ?2 on line 3, but ?2 is not defined."
+        act `shouldBe` "can't resolve definition link: use ?2 on line 3, but ?2 is not defined"

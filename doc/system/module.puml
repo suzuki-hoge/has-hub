@@ -2,6 +2,11 @@
 
 namespace HasHub {
   namespace Command {
+    class InitConfig {
+      Detector
+      LocalConfig
+      Connector
+    }
     class CreateObjects {
       Parser
       Client...
@@ -108,14 +113,18 @@ namespace HasHub {
   }
   namespace Connection {
     class Connector
-    class LocalSession
-    class Type
     class Logger
-    Connector --> Type
-    Connector -l-> Logger
-    Logger --> LocalSession
-    Connector --> LocalSession
-    LocalSession -r-> Type
+    namespace Config {
+      class LocalConfig
+      class Detector
+      class Type
+      LocalConfig -l-> Type
+      Detector -u-> Type
+    }
+    HasHub.Connection.Connector -r-> HasHub.Connection.Logger
+    HasHub.Connection.Connector --> HasHub.Connection.Config.Type
+    HasHub.Connection.Connector --> HasHub.Connection.Config.LocalConfig
+    HasHub.Connection.Logger --> HasHub.Connection.Config.LocalConfig
   }
   class FixMe
   namespace Yaml {

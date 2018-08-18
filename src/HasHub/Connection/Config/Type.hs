@@ -1,10 +1,7 @@
-module HasHub.Connection.Type where
+module HasHub.Connection.Config.Type where
 
 
 type RequestId = String
-
-
-type Token = String
 
 
 type Owner = String
@@ -13,13 +10,22 @@ type Owner = String
 type Repository = String
 
 
-type RepositoryId = Int
+type Token = String
 
 
 type Endpoint = String
 
 
+type RepositoryId = Int
+
+
+type Proxy = String
+
+
 type Resource = String
+
+
+data Configs = Configs Owner Repository Token Token FilePath (Maybe Proxy) deriving (Show)
 
 
 class ToResource a where

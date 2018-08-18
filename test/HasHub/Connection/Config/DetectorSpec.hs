@@ -1,11 +1,11 @@
-module HasHub.Command.EnvSpec where
+module HasHub.Connection.Config.DetectorSpec where
 
 
 import Test.Hspec
 
 import System.Environment (setEnv)
 
-import HasHub.Command.Env
+import HasHub.Connection.Config.Detector
 
 import HasHub.FixMe (FixMe(..), Validation(..))
 
@@ -138,30 +138,30 @@ spec = do
       it "default" $ do
         let act = fixLogPath Nothing
 
-        act `shouldBe` "~/has-hub.log"
+        act `shouldBe` Success "~/has-hub.log"
 
       it "specified" $ do
         let act = fixLogPath (Just "./out")
 
-        act `shouldBe` "./out"
+        act `shouldBe` Success "./out"
 
   describe "proxy" $ do
       it "no env" $ do
         let act = fixProxy Nothing
 
-        act `shouldReturn` Nothing
+        act `shouldReturn` Success Nothing
 
       it "from env" $ do
         setEnv "https_proxy" "xxx.xxx.xxx.xxx:xxxx"
 
         let act = fixProxy Nothing
 
-        act `shouldReturn` (Just "xxx.xxx.xxx.xxx:xxxx")
+        act `shouldReturn` Success (Just "xxx.xxx.xxx.xxx:xxxx")
 
       it "specified" $ do
         let act = fixProxy (Just "xxx.xxx.xxx.xxx:xxxx")
 
-        act `shouldReturn` (Just "xxx.xxx.xxx.xxx:xxxx")
+        act `shouldReturn` Success (Just "xxx.xxx.xxx.xxx:xxxx")
 
   describe "message" $ do
     it "message" $ do

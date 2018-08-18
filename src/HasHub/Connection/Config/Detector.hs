@@ -1,4 +1,19 @@
-module HasHub.Command.Env where
+module HasHub.Connection.Config.Detector
+(
+  detectOwner
+, fixOwner
+, detectRepository
+, fixRepository
+, detectGitHubToken
+, detectZenHubToken
+, fixToken
+, fixLogPath
+, fixProxy
+, ConfigurationError(..)
+, module HasHub.Connection.Config.Type
+, module HasHub.FixMe
+)
+where
 
 
 import System.Directory (doesFileExist, getCurrentDirectory, getHomeDirectory)
@@ -8,7 +23,7 @@ import Data.List.Split (splitOn)
 import Data.Maybe (fromMaybe)
 import Data.String.Utils (startswith)
 
-import HasHub.Connection.Type
+import HasHub.Connection.Config.Type
 
 import HasHub.FixMe (FixMe(..), Validation(..))
 
@@ -108,12 +123,11 @@ readLines fp = do
 (>>>) (Failure error) f = Failure error
 
 
-fixLogPath :: Maybe FilePath -> FilePath
-fixLogPath = fromMaybe "~/has-hub.log"
+fixLogPath :: Maybe FilePath -> Validation [ConfigurationError] FilePath
+fixLogPath (Just x) = Success x
+fixLogPath Nothing  = Success "~/has-hub.log"
 
 
-type Proxy = String
-
-fixProxy :: Maybe Proxy -> IO (Maybe Proxy)
-fixProxy Nothing = lookupEnv "https_proxy"
-fixProxy input   = return input
+fixProxy :: Maybe Proxy -> IO (Validation [ConfigurationError] (Maybe Proxy))
+fixProxy Nothing = Success <$> lookupEnv "https_proxy"
+fixProxy input   = return $ Success input

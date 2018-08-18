@@ -16,7 +16,7 @@ import HasHub.Object.Label.Type
 import HasHub.Object.Collaborator.Type
 import HasHub.Object.Milestone.Type
 
-import HasHub.Connection.Type (ToResource(..), RepositoryId)
+import HasHub.Connection.Config.Type (ToResource(..), RepositoryId)
 
 
 -- input
