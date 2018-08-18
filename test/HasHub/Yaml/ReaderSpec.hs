@@ -24,7 +24,7 @@ spec :: Spec
 spec = do
   describe "failure" $ do
     it "invalid yaml file" $ do
-      act <- sut "test/yaml/objects//epic_and_issue.yaml"
+      act <- sut "test/dummies/yaml/objects//epic_and_issue.yaml"
 
       act `shouldBe` Failure [YamlParseError]
 

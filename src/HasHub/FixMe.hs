@@ -3,6 +3,8 @@ module HasHub.FixMe
   areAllIn
 , flat
 , _message
+, printMessages
+, printFixMes
 , FixMe(..)
 , NonExistentError(..)
 , (??)
@@ -37,16 +39,27 @@ areAllIn needles haystacks = map (contains haystacks) needles ?? ()
   xs -> Failure xs
 
 
-flat :: [Validation [String] ()] -> Validation [String] ()
+flat :: [Validation [a] b] -> Validation [a] ()
 flat vs = case concatMap extract vs of
   [] -> Success ()
   xs -> Failure xs
   where
-    extract :: Validation [String] () -> [String]
-    extract (Success ()) = []
+    extract :: Validation [a] b -> [a]
+    extract (Success _ ) = []
     extract (Failure xs) = xs
 
 
 _message :: (FixMe fm) => Validation [fm] () -> Validation [String] ()
 _message (Success ()) = Success ()
 _message (Failure xs) = Failure $ map toMessage xs
+
+
+printMessages :: [String] -> IO ()
+printMessages messages = do
+  putStrLn "\nthere are several validation errors. please fix following errors."
+  mapM_ (\error -> putStrLn $ "  " ++ error) messages
+  putStrLn "\nhas-hub is aborted.\n"
+
+
+printFixMes :: (FixMe fm) => [fm] -> IO ()
+printFixMes = printMessages . map toMessage

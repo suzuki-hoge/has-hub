@@ -16,7 +16,7 @@ import qualified HasHub.Object.Label.Validator as LV
 import qualified HasHub.Object.Collaborator.Validator as CV
 import qualified HasHub.Object.Milestone.Validator as MV
 
-import HasHub.FixMe (flat, _message, FixMe(..), Validation(..))
+import HasHub.FixMe (flat, _message, printMessages, printFixMes, FixMe(..), Validation(..))
 
 
 type Current = Int
@@ -53,13 +53,6 @@ createAll objects = createAll' (length objects) [] objects
           const [] <$> OC.createIssue title body pipeline labels collaborators milestone estimate epics
 
 
-printErrors :: [String] -> IO ()
-printErrors errors = do
-  putStrLn "\nthere are several validation errors. please fix following errors."
-  mapM_ (\error -> putStrLn $ "  " ++ error) errors
-  putStrLn "\nhas-hub is aborted.\n"
-
-
 execute :: IO ()
 execute = do
   putStrLn "\nparse yaml file."
@@ -90,6 +83,6 @@ execute = do
         Success () -> do
           putStrLn "  succeeded."
           createAll objects pipelines milestones epics
-        Failure errors -> printErrors errors
+        Failure errors -> printMessages errors
 
-    Failure fms -> printErrors $ map toMessage fms
+    Failure fms -> printFixMes fms

@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6dfbfbe476e1a7a769ca25e371a8205e216b639d6ee03a678d984ab149c9fc16
+-- hash: dcc115421588b737a4e4250895378457ec57aa6bd47428ee1e7a7256faf92521
 
 name:           has-hub
 version:        0.1.0.0
@@ -33,6 +33,7 @@ library
     , aeson
     , base >=4.7 && <5
     , bytestring
+    , directory
     , either
     , http-client
     , http-client-tls
@@ -47,6 +48,8 @@ library
     , yaml
   exposed-modules:
       HasHub.Command.CreateObjects
+      HasHub.Command.Env
+      HasHub.Command.EnvChecker
       HasHub.Connection.Connector
       HasHub.Connection.LocalSession
       HasHub.Connection.Logger
@@ -88,6 +91,7 @@ executable has-hub-exe
     , aeson
     , base >=4.7 && <5
     , bytestring
+    , directory
     , either
     , has-hub
     , http-client
@@ -116,6 +120,7 @@ test-suite has-hub-test
     , aeson
     , base >=4.7 && <5
     , bytestring
+    , directory
     , either
     , has-hub
     , hspec
@@ -132,6 +137,7 @@ test-suite has-hub-test
     , yaml
   other-modules:
       Fixture
+      HasHub.Command.EnvSpec
       HasHub.FixMeSpec
       HasHub.Object.Collaborator.IOTypeSpec
       HasHub.Object.Collaborator.ValidatorSpec

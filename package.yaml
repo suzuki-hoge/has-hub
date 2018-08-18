@@ -36,6 +36,7 @@ dependencies:
 - time
 - yaml
 - regex-posix
+- directory
 
 library:
   source-dirs: src
