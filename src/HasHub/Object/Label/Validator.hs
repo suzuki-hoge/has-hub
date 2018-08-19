@@ -5,6 +5,7 @@ module HasHub.Object.Label.Validator
 (
   areAllIn
 , module HasHub.FixMe
+, module HasHub.Object.Label.Type
 )
 where
 

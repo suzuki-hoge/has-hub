@@ -123,9 +123,11 @@ readLines fp = do
 (>>>) (Failure error) f = Failure error
 
 
-fixLogPath :: Maybe FilePath -> Validation [ConfigurationError] FilePath
-fixLogPath (Just x) = Success x
-fixLogPath Nothing  = Success "~/has-hub.log"
+fixLogPath :: Maybe FilePath -> IO (Validation [ConfigurationError] FilePath)
+fixLogPath (Just x) = return $ Success x
+fixLogPath Nothing  = do
+  home <- getHomeDirectory
+  return $ Success $ home ++ "/has-hub.log"
 
 
 fixProxy :: IO (Maybe Proxy)

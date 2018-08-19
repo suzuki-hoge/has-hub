@@ -25,6 +25,8 @@ instance FixMe YamlReadingError where
 
 readYaml :: (FromJSON a) => (a -> b) -> FilePath -> IO (Validation [YamlReadingError] [b])
 readYaml mapper path = do
+  putStrLn "\nparse yaml file."
+
   e <- (decodeFileEither path >>= evaluate) `catch` failure
 
   return $ case e of

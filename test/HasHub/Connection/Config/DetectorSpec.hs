@@ -4,6 +4,7 @@ module HasHub.Connection.Config.DetectorSpec where
 import Test.Hspec
 
 import System.Environment (setEnv)
+import System.Directory (getHomeDirectory)
 
 import HasHub.Connection.Config.Detector
 
@@ -137,13 +138,14 @@ spec = do
   describe "log path" $ do
       it "default" $ do
         let act = fixLogPath Nothing
+        home <- getHomeDirectory
 
-        act `shouldBe` Success "~/has-hub.log"
+        act `shouldReturn` Success (home ++ "/has-hub.log")
 
       it "specified" $ do
         let act = fixLogPath (Just "./out")
 
-        act `shouldBe` Success "./out"
+        act `shouldReturn` Success "./out"
 
   describe "proxy" $ do
       it "no env" $ do

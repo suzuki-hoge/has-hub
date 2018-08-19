@@ -7,36 +7,32 @@ where
 
 import Text.Printf (printf)
 
+import qualified HasHub.Command.ReferAll as RA
+
 import HasHub.Object.Object.Parser as Parser
 
 import HasHub.Object.Object.Client as OC
 import HasHub.Object.Pipeline.Client as PC
-import HasHub.Object.Label.Client as LC
-import HasHub.Object.Collaborator.Client as CC
 import HasHub.Object.Milestone.Client as MC
 
-import qualified HasHub.Object.Object.Validator as OV
-import qualified HasHub.Object.Pipeline.Validator as PV
-import qualified HasHub.Object.Label.Validator as LV
-import qualified HasHub.Object.Collaborator.Validator as CV
-import qualified HasHub.Object.Milestone.Validator as MV
+import HasHub.Object.Object.Validator as OV
+import HasHub.Object.Pipeline.Validator as PV
+import HasHub.Object.Label.Validator as LV
+import HasHub.Object.Collaborator.Validator as CV
+import HasHub.Object.Milestone.Validator as MV
 
 import HasHub.FixMe (flat, _message, printMessages, printFixMes, FixMe(..), Validation(..))
 
 
 execute :: FilePath -> IO ()
 execute yaml = do
-  putStrLn "\nparse yaml file."
   parsed <- Parser.readObjects yaml
+
   case parsed of
     Success(objects) -> do
       putStrLn "\nrefer all for yaml data validation."
 
-      epics         <- OC.referAll
-      pipelines     <- PC.referAll
-      labels        <- LC.referAll
-      collaborators <- CC.referAll
-      milestones    <- MC.referAll
+      (epics, pipelines, labels, collaborators, milestones) <- RA.execute'
 
       case flat [
           _message $ _parentEpicNumbers objects `OV.areAllIn` epics
@@ -65,7 +61,7 @@ createAll :: [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] ->IO ()
 createAll objects = createAll' (length objects) [] objects
   where
     createAll' :: Int -> [LinkedEpic] -> [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] -> IO ()
-    createAll' total _           []               _         _          _     = printf "\n%d objects created.\n\n" total
+    createAll' total _           []               _         _          _     = printf "\n%d objects created.\n" total
     createAll' total linkedEpics (object:objects) pipelines milestones epics = do
       let pipeline = _pipelineName object >>= PC.findIn pipelines
       let milestone = _milestoneTitle object >>= MC.findIn milestones

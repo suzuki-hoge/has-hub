@@ -6,6 +6,7 @@ import Data.Char
 import Text.Read
 import Options.Applicative hiding (Success, Failure)
 
+import qualified HasHub.Command.ReferAll as RA
 import qualified HasHub.Command.CreateObjects as CO
 import qualified HasHub.Command.Configure as C
 
@@ -14,7 +15,7 @@ import HasHub.Connection.Config.Type
 import HasHub.FixMe (printFixMes, Validation(..), isWritable)
 
 
-data Options = ReferOptions                             Owner Repository Token Token FilePath
+data Options = ReferAllOptions                          Owner Repository Token Token FilePath
              | CreateObjectsOptions            FilePath Owner Repository Token Token FilePath
              | CreateMilestonesOptions         FilePath Owner Repository Token Token FilePath
              | GenerateObjectsSampleOptions    FilePath
@@ -90,7 +91,7 @@ outP = strArgument $ mconcat [
 
 
 referOptionsP :: Parser Options
-referOptionsP = (<*>) helper $ ReferOptions <$> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
+referOptionsP = (<*>) helper $ ReferAllOptions <$> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
 referOptionsInfo :: ParserInfo Options
@@ -166,6 +167,21 @@ main = customExecParser (prefs showHelpOnError) optionsInfo >>= execute
 
 
 execute :: Options -> IO ()
+execute (ReferAllOptions owner repository gitHubToken zenHubToken logPath) = do
+  initialized <- initialize owner repository gitHubToken zenHubToken logPath
+
+  case initialized of
+    Success lp  -> do
+      writable <- isWritable lp
+
+      case writable of
+        Success () -> do
+          C.fetchRepositoryId
+          RA.execute
+        Failure fms -> printFixMes fms
+
+    Failure fms -> printFixMes fms
+
 execute (CreateObjectsOptions yaml owner repository gitHubToken zenHubToken logPath) = do
   initialized <- initialize owner repository gitHubToken zenHubToken logPath
 
@@ -174,7 +190,9 @@ execute (CreateObjectsOptions yaml owner repository gitHubToken zenHubToken logP
       writable <- isWritable lp
 
       case writable of
-        Success () -> CO.execute yaml
+        Success () -> do
+          C.fetchRepositoryId
+          CO.execute yaml
         Failure fms -> printFixMes fms
 
     Failure fms -> printFixMes fms

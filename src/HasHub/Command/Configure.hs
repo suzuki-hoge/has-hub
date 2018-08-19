@@ -4,6 +4,7 @@
 module HasHub.Command.Configure
 (
   initialize
+, fetchRepositoryId
 , deinitialize
 , ConfigurationError(..)
 )
@@ -48,7 +49,7 @@ detectAll owner' repository' gitHubToken' zenHubToken' logPath' = do
   repository <- detectRepository repository'
   gitHubToken <- detectGitHubToken gitHubToken'
   zenHubToken <- detectZenHubToken zenHubToken'
-  let logPath = fixLogPath logPath'
+  logPath <- fixLogPath logPath'
   proxy <- fixProxy
 
   putStrLn "\ndetect configs."
