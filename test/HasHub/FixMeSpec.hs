@@ -3,16 +3,18 @@ module HasHub.FixMeSpec where
 
 import Test.Hspec
 
+import System.Directory (emptyPermissions, setPermissions, getPermissions)
+
 import HasHub.FixMe
 
 
-sut :: [Int] -> [Int] -> Validation [NonExistentError Int] ()
-sut = areAllIn
 
 
 spec :: Spec
 spec = do
   describe "are all in" $ do
+    let sut = areAllIn :: [Int] -> [Int] -> Validation [NonExistentError Int] ()
+
     describe "success" $ do
       it "double in a few" $ do
         let act = [1, 2] `sut` [1, 2]
@@ -54,3 +56,57 @@ spec = do
         let act = [1] `sut` [2]
 
         act `shouldBe` Failure [NonExistentError 1]
+
+  describe "is writable" $ do
+    describe "success" $ do
+      it "existing path" $ do
+        let act = isWritable "test/dummies/out/out.txt"
+
+        act `shouldReturn` Success ()
+
+      it "writable directory" $ do
+        let act = isWritable "test/dummies/out/xxx.txt"
+
+        act `shouldReturn` Success ()
+
+    describe "failure" $ do
+      it "not writable path" $ do
+        let fp = "test/dummies/out/out.txt"
+        origin <- getPermissions fp
+        setPermissions fp emptyPermissions
+
+        let act = isWritable fp
+
+        act `shouldReturn` Failure [NotWritableFileError fp]
+
+        setPermissions fp origin
+
+      it "not parent directory" $ do
+        let fp = "test/dummies/out/xxx.txt"
+        let dp = "test/dummies/out"
+        origin <- getPermissions dp
+        setPermissions dp emptyPermissions
+
+        let act = isWritable fp
+
+        act `shouldReturn` Failure [NotWritableDirectoryError dp]
+
+        setPermissions dp origin
+
+      it "not writable directory" $ do
+        let fp = "test/dummies/out/xxx/out.txt"
+
+        let act = isWritable fp
+
+        act `shouldReturn` Failure [NotWritableDirectoryError "test/dummies/out/xxx"]
+
+    describe "message" $ do
+      it "not writable file" $ do
+        let act = toMessage $ NotWritableFileError "test/dummies/out/out.txt"
+
+        act `shouldBe` "not writable file: test/dummies/out/out.txt"
+
+      it "not writable directory" $ do
+        let act = toMessage $ NotWritableDirectoryError "test/dummies/out"
+
+        act `shouldBe` "not writable directory: test/dummies/out"

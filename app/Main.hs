@@ -11,7 +11,7 @@ import qualified HasHub.Command.Configure as C
 
 import HasHub.Connection.Config.Type
 
-import HasHub.FixMe (printFixMes, Validation(..))
+import HasHub.FixMe (printFixMes, Validation(..), isWritable)
 
 
 data Options = ReferOptions                             Owner Repository Token Token FilePath
@@ -166,15 +166,22 @@ main = customExecParser (prefs showHelpOnError) optionsInfo >>= execute
 
 
 execute :: Options -> IO ()
-execute (CreateObjectsOptions yaml owner repository gitHubToken zenHubToken fp) = do
-  initialized <- initialize owner repository gitHubToken zenHubToken fp
+execute (CreateObjectsOptions yaml owner repository gitHubToken zenHubToken logPath) = do
+  initialized <- initialize owner repository gitHubToken zenHubToken logPath
+
   case initialized of
-    Success ()  -> CO.execute yaml
+    Success lp  -> do
+      writable <- isWritable lp
+
+      case writable of
+        Success () -> CO.execute yaml
+        Failure fms -> printFixMes fms
+
     Failure fms -> printFixMes fms
 
 
-initialize :: Owner -> Repository -> Token -> Token -> FilePath -> IO (Validation [C.ConfigurationError] ())
-initialize owner repository gitHubToken zenHubToken fp = C.initialize (mb owner) (mb repository) (mb gitHubToken) (mb zenHubToken) (mb fp)
+initialize :: Owner -> Repository -> Token -> Token -> FilePath -> IO (Validation [C.ConfigurationError] (FilePath))
+initialize owner repository gitHubToken zenHubToken logPath = C.initialize (mb owner) (mb repository) (mb gitHubToken) (mb zenHubToken) (mb logPath)
   where
     mb :: String -> Maybe String
     mb "" = Nothing

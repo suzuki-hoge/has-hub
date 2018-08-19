@@ -1,18 +1,23 @@
 module HasHub.FixMe
 (
   asJust
+, isWritable
 , areAllIn
 , flat
 , _message
 , printMessages
 , printFixMes
 , FixMe(..)
+, NotWritableError(..)
 , NonExistentError(..)
 , (??)
 , module Data.Either.Validation
 )
 where
 
+
+import System.Directory (doesPathExist, getPermissions, writable)
+import System.FilePath.Posix (takeDirectory)
 
 import System.Exit (die)
 
@@ -24,15 +29,15 @@ class FixMe a where
   toMessage :: a -> String
 
 
-data NonExistentError a = NonExistentError a deriving (Eq, Show)
-
-
 asJust :: Maybe a -> IO a
 asJust (Just a) = return a
 asJust Nothing  = do
   putStrLn "\nunexpected connection error."
   putStrLn "  please check log"
   die "\nhas-hub is aborted.\n"
+
+
+data NonExistentError a = NonExistentError a deriving (Eq, Show)
 
 
 areAllIn :: (Eq a) => [a] -> [a] -> Validation [NonExistentError a] ()
@@ -48,6 +53,37 @@ areAllIn needles haystacks = map (contains haystacks) needles ?? ()
 (??) xs success = case catMaybes xs of
   [] -> Success success
   xs -> Failure xs
+
+
+data NotWritableError = NotWritableFileError FilePath | NotWritableDirectoryError FilePath deriving (Eq, Show)
+
+instance FixMe NotWritableError where
+  toMessage (NotWritableFileError      fp) = "not writable file: " ++ fp
+  toMessage (NotWritableDirectoryError dp) = "not writable directory: " ++ dp
+
+
+data Checked = Writable | NotExist | NotWritable deriving (Eq, Show)
+
+
+isWritable :: FilePath -> IO (Validation [NotWritableError] ())
+isWritable fp = do
+  let dp = takeDirectory fp
+  fc <- check fp
+  dc <- check dp
+
+  return $ case (fc, dc) of
+    (Writable,    _)        -> Success ()
+    (NotExist,    Writable) -> Success ()
+    (NotWritable, _)        -> Failure [NotWritableFileError fp]
+    (NotExist,    _)        -> Failure [NotWritableDirectoryError dp]
+
+    where
+      check :: FilePath -> IO Checked
+      check fp = do
+        e <- doesPathExist fp
+        if e
+          then (\w -> if w then Writable else NotWritable) . writable <$> getPermissions fp
+          else return NotExist
 
 
 flat :: [Validation [a] b] -> Validation [a] ()

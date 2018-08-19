@@ -135,6 +135,6 @@ fixProxy = do
 
   return $ case (p1, p2) of
     (Nothing, Nothing) -> Nothing
-    (p,       _      ) -> p
+    (p,       Nothing) -> p
     (_      , p      ) -> p
 

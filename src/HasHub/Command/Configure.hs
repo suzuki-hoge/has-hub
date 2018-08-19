@@ -23,21 +23,23 @@ import HasHub.Connection.Config.LocalConfig
 import HasHub.FixMe
 
 
-initialize :: Maybe Owner -> Maybe Repository -> Maybe Token -> Maybe Token -> Maybe FilePath -> IO (Validation [ConfigurationError] ())
+initialize :: Maybe Owner -> Maybe Repository -> Maybe Token -> Maybe Token -> Maybe FilePath -> IO (Validation [ConfigurationError] (FilePath))
 initialize owner' repository' gitHubToken' zenHubToken' logPath' = do
   detected <- detectAll owner' repository' gitHubToken' zenHubToken' logPath'
 
   case detected of
-    Success configs -> do
+    Success configs@(Configs _ _ _ _ lp) -> do
       setConfigs configs
-
-      putStrLn "\nfetch RepositoryId."
-      repositoryId <- asJust =<< (\json -> json ^? key "id" . _Integer) <$> getGitHub RepositoryIdInput
-      setRepositoryId $ (read . show) repositoryId
-
-      return $ Success ()
-
+      return $ Success lp
     Failure fms -> return $ Failure fms
+
+
+fetchRepositoryId :: IO ()
+fetchRepositoryId = do
+  putStrLn "\nfetch RepositoryId."
+
+  repositoryId <- asJust =<< (\json -> json ^? key "id" . _Integer) <$> getGitHub RepositoryIdInput
+  setRepositoryId $ (read . show) repositoryId
 
 
 detectAll :: Maybe Owner -> Maybe Repository -> Maybe Token -> Maybe Token -> Maybe FilePath -> IO (Validation [ConfigurationError] Configs)
