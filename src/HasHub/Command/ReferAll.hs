@@ -21,11 +21,11 @@ execute = do
 
   (epics, pipelines, labels, collaborators, milestones) <- execute'
 
-  printEpics epics
+  printEpics epics                          -- todo sort
   printPipelines pipelines
   printLabels labels
   printCollaborators collaborators
-  printMilestones milestones
+  printMilestones milestones                -- todo sort
 
   putStrLn "\nall objects referred."
 
@@ -78,4 +78,4 @@ printMilestones xs = do
   putStrLn "\nmilestones."
   if xs == [] then putStrLn "  no milestones" else mapM_ print xs
   where
-    print (Milestone _ (MilestoneTitle t) startOn dueOn) = printf "  %s (%s ~ %s)\n" t (_startOnString startOn) (_dueOnString dueOn)
+    print (Milestone _ title startOn dueOn) = printf "  %s\n" (_string title startOn dueOn)

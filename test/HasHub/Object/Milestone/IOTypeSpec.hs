@@ -28,6 +28,24 @@ spec = do
 
       act `shouldBe` "/milestones/1/start_date"
 
+    it "create git-hub with due on" $ do
+      let sut = F.createMilestoneInput1
+
+      toResource sut `shouldBe` "/milestones"
+      encode sut `shouldBe` "{\"due_on\":\"2018-04-30T23:59:59Z\",\"title\":\"sprint 1\"}"
+
+    it "create git-hub without due on" $ do
+      let sut = F.createMilestoneInput2
+
+      toResource sut `shouldBe` "/milestones"
+      encode sut `shouldBe` "{\"title\":\"sprint 2\"}"
+
+    it "create start on" $ do
+      let sut = F.createStartOnInput1
+
+      toResource sut `shouldBe` "/milestones/1/start_date"
+      encode sut `shouldBe` "{\"start_date\":\"2018-04-01T00:00:00Z\"}"
+
   describe "output" $ do
     it "number, title, due-on" $ do
       let act = asGitHubOutputs "[{\"number\": 1, \"title\": \"sprint 1\", \"due_on\": \"2018-04-30T23:59:59Z\"}, {\"number\": 2, \"title\": \"sprint 2\", \"due_on\": null}]"

@@ -30,11 +30,13 @@ findIn :: [Milestone] -> MilestoneTitle -> Maybe Milestone
 findIn milestones milestoneTitle = find (\milestone -> _title milestone == milestoneTitle) milestones
 
 
-_startOnString :: Maybe StartOn -> String
-_startOnString Nothing            = "          "
-_startOnString (Just (StartOn s)) = head $ splitOn "T" s
+_string :: MilestoneTitle -> Maybe StartOn -> Maybe DueOn -> String
+_string (MilestoneTitle t) startOn dueOn = t ++ " (" ++ (_startOnString startOn) ++ " ~ " ++ (_dueOnString dueOn) ++ ")"
+  where
+    _startOnString :: Maybe StartOn -> String
+    _startOnString Nothing            = "          "
+    _startOnString (Just (StartOn s)) = head $ splitOn "T" s
 
-
-_dueOnString :: Maybe DueOn -> String
-_dueOnString Nothing          = "          "
-_dueOnString (Just (DueOn s)) = head $ splitOn "T" s
+    _dueOnString :: Maybe DueOn -> String
+    _dueOnString Nothing          = "          "
+    _dueOnString (Just (DueOn s)) = head $ splitOn "T" s

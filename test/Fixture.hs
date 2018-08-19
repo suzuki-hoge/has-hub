@@ -65,7 +65,8 @@ dueOn1 = Just $ DueOn "2018-04-30T23:59:59Z"
 
 referGitHubOutput1 = ReferGitHubOutput milestoneNumber1 milestoneTitle1 dueOn1
 
---createMilestoneInput1 = CreateMilestoneInput milestoneTitle1 dueOn1
+createMilestoneInput1 = CreateMilestoneInput milestoneTitle1 dueOn1
+createStartOnInput1 = CreateStartOnInput milestoneNumber1 (StartOn "2018-04-01T00:00:00Z")
 
 milestone1 = Milestone milestoneNumber1 milestoneTitle1 startOn1 dueOn1
 
@@ -77,7 +78,7 @@ dueOn2 = Nothing
 
 referGitHubOutput2 = ReferGitHubOutput milestoneNumber2 milestoneTitle2 dueOn2
 
---createMilestoneInput2 = CreateMilestoneInput milestoneTitle2 dueOn2
+createMilestoneInput2 = CreateMilestoneInput milestoneTitle2 dueOn2
 
 milestone2 = Milestone milestoneNumber2 milestoneTitle2 startOn2 dueOn2
 

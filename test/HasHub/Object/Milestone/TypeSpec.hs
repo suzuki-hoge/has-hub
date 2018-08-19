@@ -8,28 +8,29 @@ import Test.Hspec
 
 import HasHub.Object.Milestone.Type
 
+import qualified Fixture as F
+
 
 spec :: Spec
 spec = do
   describe "to string" $ do
     describe "start on" $ do
-      it "nothing" $ do
-        let act = _startOnString Nothing
+      it "just to just" $ do
+        let act = _string F.milestoneTitle1 F.startOn1 F.dueOn1
 
-        act `shouldBe` "          "
+        act `shouldBe` "sprint 1 (2018-04-01 ~ 2018-04-30)"
 
-      it "just" $ do
-        let act = _startOnString (Just $ StartOn "2018-01-01T00:00:00.000Z")
+      it "just to nothing" $ do
+        let act = _string F.milestoneTitle1 F.startOn1 F.dueOn2
 
-        act `shouldBe` "2018-01-01"
+        act `shouldBe` "sprint 1 (2018-04-01 ~           )"
 
-    describe "due on" $ do
-      it "nothing" $ do
-        let act = _dueOnString Nothing
+      it "nothing to just" $ do
+        let act = _string F.milestoneTitle1 F.startOn2 F.dueOn1
 
-        act `shouldBe` "          "
+        act `shouldBe` "sprint 1 (           ~ 2018-04-30)"
 
-      it "just" $ do
-        let act = _dueOnString (Just $ DueOn "2018-01-31T23:59:59Z")
+      it "nothing to nothing" $ do
+        let act = _string F.milestoneTitle1 F.startOn2 F.dueOn2
 
-        act `shouldBe` "2018-01-31"
+        act `shouldBe` "sprint 1 (           ~           )"
