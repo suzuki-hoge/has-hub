@@ -11,12 +11,12 @@ import qualified HasHub.Command.Configure as C
 
 import HasHub.Connection.Config.Type
 
-import HasHub.FixMe (printFixMes, Validation(..))
+import HasHub.FixMe (printFixMes, Validation(..), isWritable)
 
 
-data Options = ReferOptions                             Owner Repository Token Token FilePath Proxy
-             | CreateObjectsOptions            FilePath Owner Repository Token Token FilePath Proxy
-             | CreateMilestonesOptions         FilePath Owner Repository Token Token FilePath Proxy
+data Options = ReferOptions                             Owner Repository Token Token FilePath
+             | CreateObjectsOptions            FilePath Owner Repository Token Token FilePath
+             | CreateMilestonesOptions         FilePath Owner Repository Token Token FilePath
              | GenerateObjectsSampleOptions    FilePath
              | GenerateMilestonesSampleOptions FilePath
              deriving Show
@@ -81,16 +81,6 @@ logPathP = strOption $ mconcat [
   ]
 
 
-proxyP :: Parser FilePath
-proxyP = strOption $ mconcat [
-    metavar "str"
-  , short 'p'
-  , long "proxy"
-  , value ""
-  , help "like xxx.xxx.xxx.xxx:xxxx"
-  ]
-
-
 outP :: Parser FilePath
 outP = strArgument $ mconcat [
     metavar "path"
@@ -100,7 +90,7 @@ outP = strArgument $ mconcat [
 
 
 referOptionsP :: Parser Options
-referOptionsP = (<*>) helper $ ReferOptions <$> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP <*> proxyP
+referOptionsP = (<*>) helper $ ReferOptions <$> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
 referOptionsInfo :: ParserInfo Options
@@ -111,7 +101,7 @@ referOptionsInfo = info referOptionsP $ mconcat [
 
 
 createObjectsOptionsP :: Parser Options
-createObjectsOptionsP = (<*>) helper $ CreateObjectsOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP <*> proxyP
+createObjectsOptionsP = (<*>) helper $ CreateObjectsOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
 createObjectsOptionsInfo :: ParserInfo Options
@@ -122,7 +112,7 @@ createObjectsOptionsInfo = info createObjectsOptionsP $ mconcat [
 
 
 createMilestonesOptionsP :: Parser Options
-createMilestonesOptionsP = (<*>) helper $ CreateMilestonesOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP <*> proxyP
+createMilestonesOptionsP = (<*>) helper $ CreateMilestonesOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
 createMilestonesOptionsInfo :: ParserInfo Options
@@ -176,15 +166,22 @@ main = customExecParser (prefs showHelpOnError) optionsInfo >>= execute
 
 
 execute :: Options -> IO ()
-execute (CreateObjectsOptions yaml owner repository gitHubToken zenHubToken fp proxy) = do
-  initialized <- initialize owner repository gitHubToken zenHubToken fp proxy
+execute (CreateObjectsOptions yaml owner repository gitHubToken zenHubToken logPath) = do
+  initialized <- initialize owner repository gitHubToken zenHubToken logPath
+
   case initialized of
-    Success ()  -> CO.execute yaml
+    Success lp  -> do
+      writable <- isWritable lp
+
+      case writable of
+        Success () -> CO.execute yaml
+        Failure fms -> printFixMes fms
+
     Failure fms -> printFixMes fms
 
 
-initialize :: Owner -> Repository -> Token -> Token -> FilePath -> Proxy -> IO (Validation [C.ConfigurationError] ())
-initialize owner repository gitHubToken zenHubToken fp proxy = C.initialize (mb owner) (mb repository) (mb gitHubToken) (mb zenHubToken) (mb fp) (mb proxy)
+initialize :: Owner -> Repository -> Token -> Token -> FilePath -> IO (Validation [C.ConfigurationError] (FilePath))
+initialize owner repository gitHubToken zenHubToken logPath = C.initialize (mb owner) (mb repository) (mb gitHubToken) (mb zenHubToken) (mb logPath)
   where
     mb :: String -> Maybe String
     mb "" = Nothing

@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b669a2067f58a69dad1ca3dd328c8c92aba8514486169e1542292cebda90a91d
+-- hash: cc4a62d7172a97d4d31276d8dbb3bef097c90e3e02ce47de35fa27de126bbf5e
 
 name:           has-hub
 version:        0.1.0.0
@@ -35,6 +35,7 @@ library
     , bytestring
     , directory
     , either
+    , filepath
     , http-client
     , http-client-tls
     , http-types
@@ -94,6 +95,7 @@ executable has-hub
     , bytestring
     , directory
     , either
+    , filepath
     , has-hub
     , http-client
     , http-client-tls
@@ -124,6 +126,7 @@ test-suite has-hub-test
     , bytestring
     , directory
     , either
+    , filepath
     , has-hub
     , hspec
     , http-client

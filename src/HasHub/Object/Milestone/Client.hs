@@ -16,7 +16,7 @@ referAll :: IO [Milestone]
 referAll = do
   putStrLn "  refer all Milestones"
 
-  asGitHubOutputs <$> getGitHub ReferGitHubInput >>= mapM withStartOn
+  getGitHub ReferGitHubInput >>= asGitHubOutputs >>= mapM withStartOn
   where
     withStartOn :: ReferGitHubOutput -> IO Milestone
     withStartOn (ReferGitHubOutput number title dueOn) = do

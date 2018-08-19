@@ -36,8 +36,9 @@ dependencies:
 - time
 - yaml
 - regex-posix
-- directory
 - optparse-applicative
+- directory
+- filepath
 
 library:
   source-dirs: src

@@ -25,11 +25,11 @@ referAll :: IO [Epic]
 referAll = do
   putStrLn "  refer all Issues"
 
-  outputs <- asIssueOutputs <$> getGitHub ReferIssueInput
+  outputs <- getGitHub ReferIssueInput >>= asIssueOutputs
 
   putStrLn "  refer all Epics"
 
-  epicNumbers <- asEpicNumbers <$> getZenHub ReferEpicInput
+  epicNumbers <- getZenHub ReferEpicInput >>= asEpicNumbers
 
   return . map _epic . filter (isEpic epicNumbers) $ outputs
 
@@ -47,7 +47,7 @@ createIssue :: Title -> Body -> Maybe Pipeline -> [Label] -> [Collaborator] -> M
 createIssue title@(Title t) body pipeline labels collaborators milestone estimate epics = do
   printf "  create Issue(%s) -> " t
 
-  number <- asIssueNumber <$> postGitHub (CreateIssueInput title body labels collaborators milestone)
+  number <- postGitHub (CreateIssueInput title body labels collaborators milestone) >>= asIssueNumber
 
   printf "[%s]\n" (show number)
 

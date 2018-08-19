@@ -128,6 +128,13 @@ fixLogPath (Just x) = Success x
 fixLogPath Nothing  = Success "~/has-hub.log"
 
 
-fixProxy :: Maybe Proxy -> IO (Validation [ConfigurationError] (Maybe Proxy))
-fixProxy Nothing = Success <$> lookupEnv "https_proxy"
-fixProxy input   = return $ Success input
+fixProxy :: IO (Maybe Proxy)
+fixProxy = do
+  p1 <- lookupEnv "https_proxy"
+  p2 <- lookupEnv "HTTPS_PROXY"
+
+  return $ case (p1, p2) of
+    (Nothing, Nothing) -> Nothing
+    (p,       Nothing) -> p
+    (_      , p      ) -> p
+

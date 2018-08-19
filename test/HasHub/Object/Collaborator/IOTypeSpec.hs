@@ -25,4 +25,4 @@ spec = do
     it "name" $ do
       let act = asCollaborators "[{\"login\": \"John\"}]"
 
-      act `shouldBe` [F.collaborator]
+      act `shouldReturn` [F.collaborator]

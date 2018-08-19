@@ -32,7 +32,7 @@ spec = do
     it "number, title, due-on" $ do
       let act = asGitHubOutputs "[{\"number\": 1, \"title\": \"sprint 1\", \"due_on\": \"2018-04-30T23:59:59Z\"}, {\"number\": 2, \"title\": \"sprint 2\", \"due_on\": null}]"
 
-      act `shouldBe` [F.referGitHubOutput1, F.referGitHubOutput2]
+      act `shouldReturn` [F.referGitHubOutput1, F.referGitHubOutput2]
 
     it "start-on" $ do
       let act = asStartOn "{\"start_date\": \"2018-04-01T00:00:00Z\"}"
