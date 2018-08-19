@@ -7,11 +7,11 @@ module HasHub.Object.Milestone.IOType where
 import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
 import Data.Aeson (FromJSON(..), Value(Object), (.:), (.:?), decode, ToJSON(..), object, (.=))
 
-import Data.Maybe (fromJust)
-
 import HasHub.Object.Milestone.Type
 
 import HasHub.Connection.Config.Type (ToResource(..))
+
+import HasHub.FixMe (asJust)
 
 
 -- input
@@ -53,12 +53,13 @@ data ReferGitHubOutput = ReferGitHubOutput MilestoneNumber MilestoneTitle (Maybe
 instance FromJSON ReferGitHubOutput where
   parseJSON (Object v) = ReferGitHubOutput <$> (MilestoneNumber <$> v .: "number") <*> (MilestoneTitle <$> v .: "title") <*> (fmap DueOn <$> v .:? "due_on")
 
-asGitHubOutputs :: LBS.ByteString -> [ReferGitHubOutput]
-asGitHubOutputs = fromJust . decode
+asGitHubOutputs :: LBS.ByteString -> IO [ReferGitHubOutput]
+asGitHubOutputs lbs = asJust $ decode lbs
 
 
 instance FromJSON StartOn where
   parseJSON (Object v) = StartOn <$> (v .: "start_date")
+
 
 asStartOn :: LBS.ByteString -> Maybe StartOn
 asStartOn = decode

@@ -74,14 +74,14 @@ spec = do
     it "issue-outputs" $ do
       let act = asIssueOutputs "[{\"number\": 2, \"title\": \"user registration api\"}]"
 
-      act `shouldBe` [F.referIssueOutput]
+      act `shouldReturn` [F.referIssueOutput]
 
     it "epic-numbers" $ do
       let act = asEpicNumbers "{\"epic_issues\": [{\"issue_number\": 1}, {\"issue_number\": 2}]}"
 
-      act `shouldBe` [F.epicNumber1, F.epicNumber2]
+      act `shouldReturn` [F.epicNumber1, F.epicNumber2]
 
     it "issue-number" $ do
       let act = asIssueNumber "{\"number\": 2}"
 
-      act `shouldBe` F.issueNumber
+      act `shouldReturn` F.issueNumber

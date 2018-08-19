@@ -14,14 +14,13 @@ import Data.Maybe (fromMaybe)
 
 import Control.Lens ((^?))
 import Data.Aeson.Lens (key, _Integer)
-import Data.Maybe (fromJust)
 
 import HasHub.Connection.Connector (getGitHub)
 
 import HasHub.Connection.Config.Detector
 import HasHub.Connection.Config.LocalConfig
 
-import Data.Either.Validation (Validation(..))
+import HasHub.FixMe
 
 
 initialize :: Maybe Owner -> Maybe Repository -> Maybe Token -> Maybe Token -> Maybe FilePath -> Maybe Proxy -> IO (Validation [ConfigurationError] ())
@@ -33,8 +32,8 @@ initialize owner' repository' gitHubToken' zenHubToken' logPath' proxy' = do
       setConfigs configs
 
       putStrLn "\nfetch RepositoryId."
-      json <- getGitHub RepositoryIdInput
-      setRepositoryId $ read . show . fromJust $ json ^? key "id" . _Integer
+      repositoryId <- asJust =<< (\json -> json ^? key "id" . _Integer) <$> getGitHub RepositoryIdInput
+      setRepositoryId $ (read . show) repositoryId
 
       return $ Success ()
 

@@ -16,4 +16,4 @@ referAll :: IO [Pipeline]
 referAll = do
   putStrLn "  refer all Pipelines"
 
-  asPipelines <$> getZenHub ReferInput
+  getZenHub ReferInput >>= asPipelines

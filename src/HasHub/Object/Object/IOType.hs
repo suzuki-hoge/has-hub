@@ -8,8 +8,6 @@ import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
 import Data.Aeson (FromJSON(..), Value(Object), (.:), decode, ToJSON(..), object, (.=))
 import Data.Aeson.Types (parseMaybe)
 
-import Data.Maybe (fromJust)
-
 import HasHub.Object.Object.Type
 import HasHub.Object.Pipeline.Type
 import HasHub.Object.Label.Type
@@ -17,6 +15,8 @@ import HasHub.Object.Collaborator.Type
 import HasHub.Object.Milestone.Type
 
 import HasHub.Connection.Config.Type (ToResource(..), RepositoryId)
+
+import HasHub.FixMe (asJust)
 
 
 -- input
@@ -97,8 +97,8 @@ instance ToJSON ConvertToEpicInput where
 instance FromJSON EpicNumber where
   parseJSON (Object v) = EpicNumber <$> (v .: "issue_number")
 
-asEpicNumbers :: LBS.ByteString -> [EpicNumber]
-asEpicNumbers = fromJust . parseInObject
+asEpicNumbers :: LBS.ByteString -> IO [EpicNumber]
+asEpicNumbers lbs = asJust $ parseInObject lbs
   where
     parseInObject :: LBS.ByteString -> Maybe [EpicNumber]
     parseInObject json = decode json >>= parseMaybe (\(Object v) -> v .: "epic_issues")
@@ -108,8 +108,8 @@ asEpicNumbers = fromJust . parseInObject
 instance FromJSON IssueNumber where
   parseJSON (Object v) = IssueNumber <$> (v .: "number")
 
-asIssueNumber :: LBS.ByteString -> IssueNumber
-asIssueNumber = fromJust . decode
+asIssueNumber :: LBS.ByteString -> IO IssueNumber
+asIssueNumber lbs = asJust $ decode lbs
 
 
 data ReferIssueOutput = ReferIssueOutput IssueNumber Title deriving (Eq, Show)
@@ -117,8 +117,8 @@ data ReferIssueOutput = ReferIssueOutput IssueNumber Title deriving (Eq, Show)
 instance FromJSON ReferIssueOutput where
   parseJSON (Object v) = ReferIssueOutput <$> (IssueNumber <$> v .: "number") <*> (Title <$> v .: "title")
 
-asIssueOutputs :: LBS.ByteString -> [ReferIssueOutput]
-asIssueOutputs = fromJust . decode
+asIssueOutputs :: LBS.ByteString -> IO [ReferIssueOutput]
+asIssueOutputs lbs = asJust $ decode lbs
 
 
 _epic :: ReferIssueOutput -> Epic

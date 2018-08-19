@@ -25,4 +25,4 @@ spec = do
     it "name" $ do
       let act = asLabels "[{\"name\": \"\229\174\159\232\163\133\"}, {\"name\": \"dev\"}]"
 
-      act `shouldBe` [F.label1, F.label2]
+      act `shouldReturn` [F.label1, F.label2]

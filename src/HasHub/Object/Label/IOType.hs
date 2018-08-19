@@ -7,11 +7,11 @@ module HasHub.Object.Label.IOType where
 import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
 import Data.Aeson (FromJSON(..), Value(Object), (.:), decode)
 
-import Data.Maybe (fromJust)
-
 import HasHub.Object.Label.Type
 
 import HasHub.Connection.Config.Type (ToResource(..))
+
+import HasHub.FixMe (asJust)
 
 
 -- input
@@ -29,5 +29,6 @@ instance ToResource ReferInput where
 instance FromJSON Label where
   parseJSON (Object v) = Label <$> (v .: "name")
 
-asLabels :: LBS.ByteString -> [Label]
-asLabels = fromJust . decode
+
+asLabels :: LBS.ByteString -> IO [Label]
+asLabels lbs = asJust $ decode lbs

@@ -25,4 +25,4 @@ spec = do
     it "id, name" $ do
       let act = asPipelines "{\"pipelines\": [{\"id\": \"5b02c59d2133e10681389873\", \"name\":\"backlog\"}, {\"id\": \"5b0577fa2133e1068138aabc\", \"name\": \"sprint backlog\"}]}"
 
-      act `shouldBe` [F.pipeline1, F.pipeline2]
+      act `shouldReturn` [F.pipeline1, F.pipeline2]

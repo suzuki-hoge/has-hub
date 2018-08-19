@@ -7,11 +7,11 @@ module HasHub.Object.Collaborator.IOType where
 import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
 import Data.Aeson (FromJSON(..), Value(Object), (.:), decode)
 
-import Data.Maybe (fromJust)
-
 import HasHub.Object.Collaborator.Type
 
 import HasHub.Connection.Config.Type (ToResource(..))
+
+import HasHub.FixMe (asJust)
 
 
 -- input
@@ -29,5 +29,6 @@ instance ToResource ReferInput where
 instance FromJSON Collaborator where
   parseJSON (Object v) = Collaborator <$> (v .: "login")
 
-asCollaborators :: LBS.ByteString -> [Collaborator]
-asCollaborators = fromJust . decode
+
+asCollaborators :: LBS.ByteString -> IO [Collaborator]
+asCollaborators lbs = asJust $ decode lbs

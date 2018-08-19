@@ -1,6 +1,7 @@
 module HasHub.FixMe
 (
-  areAllIn
+  asJust
+, areAllIn
 , flat
 , _message
 , printMessages
@@ -13,7 +14,9 @@ module HasHub.FixMe
 where
 
 
-import Data.Maybe (mapMaybe, catMaybes)
+import System.Exit (die)
+
+import Data.Maybe (mapMaybe, catMaybes, fromMaybe)
 import Data.Either.Validation (Validation(..))
 
 
@@ -22,6 +25,14 @@ class FixMe a where
 
 
 data NonExistentError a = NonExistentError a deriving (Eq, Show)
+
+
+asJust :: Maybe a -> IO a
+asJust (Just a) = return a
+asJust Nothing  = do
+  putStrLn "\nunexpected connection error."
+  putStrLn "  please check log"
+  die "\nhas-hub is aborted.\n"
 
 
 areAllIn :: (Eq a) => [a] -> [a] -> Validation [NonExistentError a] ()
@@ -58,7 +69,7 @@ printMessages :: [String] -> IO ()
 printMessages messages = do
   putStrLn "\nthere are several validation errors. please fix following errors."
   mapM_ (\error -> putStrLn $ "  " ++ error) messages
-  putStrLn "\nhas-hub is aborted.\n"
+  die "\nhas-hub is aborted.\n"
 
 
 printFixMes :: (FixMe fm) => [fm] -> IO ()
