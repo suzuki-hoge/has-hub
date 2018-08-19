@@ -147,21 +147,23 @@ spec = do
 
   describe "proxy" $ do
       it "no env" $ do
-        let act = fixProxy Nothing
+        let act = fixProxy
 
-        act `shouldReturn` Success Nothing
+        act `shouldReturn` Nothing
 
-      it "from env" $ do
+      it "from env that lower case name" $ do
         setEnv "https_proxy" "xxx.xxx.xxx.xxx:xxxx"
 
-        let act = fixProxy Nothing
+        let act = fixProxy
 
-        act `shouldReturn` Success (Just "xxx.xxx.xxx.xxx:xxxx")
+        act `shouldReturn` Just "xxx.xxx.xxx.xxx:xxxx"
 
-      it "specified" $ do
-        let act = fixProxy (Just "xxx.xxx.xxx.xxx:xxxx")
+      it "from env that upper case name" $ do
+        setEnv "HTTPS_PROXY" "xxx.xxx.xxx.xxx:xxxx"
 
-        act `shouldReturn` Success (Just "xxx.xxx.xxx.xxx:xxxx")
+        let act = fixProxy
+
+        act `shouldReturn` Just "xxx.xxx.xxx.xxx:xxxx"
 
   describe "message" $ do
     it "message" $ do

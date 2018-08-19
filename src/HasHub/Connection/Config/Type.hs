@@ -25,7 +25,7 @@ type Proxy = String
 type Resource = String
 
 
-data Configs = Configs Owner Repository Token Token FilePath (Maybe Proxy) deriving (Show)
+data Configs = Configs Owner Repository Token Token FilePath deriving (Show)
 
 
 class ToResource a where

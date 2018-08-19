@@ -23,9 +23,9 @@ import HasHub.Connection.Config.LocalConfig
 import HasHub.FixMe
 
 
-initialize :: Maybe Owner -> Maybe Repository -> Maybe Token -> Maybe Token -> Maybe FilePath -> Maybe Proxy -> IO (Validation [ConfigurationError] ())
-initialize owner' repository' gitHubToken' zenHubToken' logPath' proxy' = do
-  detected <- detectAll owner' repository' gitHubToken' zenHubToken' logPath' proxy'
+initialize :: Maybe Owner -> Maybe Repository -> Maybe Token -> Maybe Token -> Maybe FilePath -> IO (Validation [ConfigurationError] ())
+initialize owner' repository' gitHubToken' zenHubToken' logPath' = do
+  detected <- detectAll owner' repository' gitHubToken' zenHubToken' logPath'
 
   case detected of
     Success configs -> do
@@ -40,14 +40,14 @@ initialize owner' repository' gitHubToken' zenHubToken' logPath' proxy' = do
     Failure fms -> return $ Failure fms
 
 
-detectAll :: Maybe Owner -> Maybe Repository -> Maybe Token -> Maybe Token -> Maybe FilePath -> Maybe Proxy -> IO (Validation [ConfigurationError] Configs)
-detectAll owner' repository' gitHubToken' zenHubToken' logPath' proxy' = do
+detectAll :: Maybe Owner -> Maybe Repository -> Maybe Token -> Maybe Token -> Maybe FilePath -> IO (Validation [ConfigurationError] Configs)
+detectAll owner' repository' gitHubToken' zenHubToken' logPath' = do
   owner <- detectOwner owner'
   repository <- detectRepository repository'
   gitHubToken <- detectGitHubToken gitHubToken'
   zenHubToken <- detectZenHubToken zenHubToken'
   let logPath = fixLogPath logPath'
-  proxy <- fixProxy proxy'
+  proxy <- fixProxy
 
   putStrLn "\ndetect configs."
   putStrLn $ "  owner         : " ++ vString owner
@@ -55,9 +55,9 @@ detectAll owner' repository' gitHubToken' zenHubToken' logPath' proxy' = do
   putStrLn $ "  git-hub-token : " ++ (mask . vString) gitHubToken
   putStrLn $ "  zen-hub-token : " ++ (mask . vString) zenHubToken
   putStrLn $ "  log           : " ++ vString logPath
-  putStrLn $ "  proxy         : " ++ vString (fromMaybe "" <$> proxy)
+  putStrLn $ "  proxy         : " ++ fromMaybe "" proxy
 
-  return $ Configs <$> owner <*> repository <*> gitHubToken <*> zenHubToken <*> logPath <*> proxy
+  return $ Configs <$> owner <*> repository <*> gitHubToken <*> zenHubToken <*> logPath
 
 
 vString :: Validation [ConfigurationError] String -> String

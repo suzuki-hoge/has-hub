@@ -20,15 +20,12 @@ import HasHub.Connection.Config.Type
 
 
 setConfigs :: Configs -> IO ()
-setConfigs (Configs owner repository gitHubToken zenHubToken logPath proxy) = do
+setConfigs (Configs owner repository gitHubToken zenHubToken logPath) = do
   setEnv "has-hub.local-config.owner"         owner
   setEnv "has-hub.local-config.repository"    repository
   setEnv "has-hub.local-config.git-hub-token" gitHubToken
   setEnv "has-hub.local-config.zen-hub-token" zenHubToken
   setEnv "has-hub.local-config.log-path"      logPath
-  case proxy of
-    Just p -> setEnv "has-hub.local-config.proxy" p
-    Nothing -> return ()
 
   utc <- getCurrentTime
   tz <- getCurrentTimeZone
@@ -83,10 +80,6 @@ getLogPath :: IO FilePath
 getLogPath = getEnv "has-hub.local-config.log-path"
 
 
-getProxy :: IO (Maybe Proxy)
-getProxy = lookupEnv "has-hub.local-config.proxy"
-
-
 unsetAll :: IO ()
 unsetAll = do
   unsetEnv "has-hub.local-config.owner"
@@ -94,5 +87,4 @@ unsetAll = do
   unsetEnv "has-hub.local-config.git-hub-token"
   unsetEnv "has-hub.local-config.zen-hub-token"
   unsetEnv "has-hub.local-config.log-path"
-  unsetEnv "has-hub.local-config.proxy"
   unsetEnv "has-hub.local-config.request-id"
