@@ -5,6 +5,7 @@ module HasHub.Object.Pipeline.Validator
 (
   areAllIn
 , module HasHub.FixMe
+, module HasHub.Object.Pipeline.Type
 )
 where
 

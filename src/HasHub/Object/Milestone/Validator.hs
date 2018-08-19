@@ -5,6 +5,7 @@ module HasHub.Object.Milestone.Validator
 (
   areAllIn
 , module HasHub.FixMe
+, module HasHub.Object.Milestone.Type
 )
 where
 

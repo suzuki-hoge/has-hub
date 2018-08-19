@@ -34,7 +34,7 @@ asJust (Just a) = return a
 asJust Nothing  = do
   putStrLn "\nunexpected connection error."
   putStrLn "  please check log"
-  die "\nhas-hub is aborted.\n"
+  die "\nhas-hub is aborted."
 
 
 data NonExistentError a = NonExistentError a deriving (Eq, Show)
@@ -105,7 +105,7 @@ printMessages :: [String] -> IO ()
 printMessages messages = do
   putStrLn "\nthere are several validation errors. please fix following errors."
   mapM_ (\error -> putStrLn $ "  " ++ error) messages
-  die "\nhas-hub is aborted.\n"
+  die "\nhas-hub is aborted."
 
 
 printFixMes :: (FixMe fm) => [fm] -> IO ()

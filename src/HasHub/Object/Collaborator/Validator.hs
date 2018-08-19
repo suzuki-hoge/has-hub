@@ -5,6 +5,7 @@ module HasHub.Object.Collaborator.Validator
 (
   areAllIn
 , module HasHub.FixMe
+, module HasHub.Object.Collaborator.Type
 )
 where
 

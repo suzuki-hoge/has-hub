@@ -12,6 +12,7 @@ module HasHub.Object.Object.Validator
 , FormatError(..)
 , LinkError(..)
 , module HasHub.FixMe
+, module HasHub.Object.Object.Type
 )
 where
 
