@@ -25,7 +25,7 @@ import Data.Maybe (mapMaybe)
 import HasHub.Object.Object.Type
 import qualified HasHub.Object.Object.Type as T ((==?))
 
-import HasHub.FixMe (Validation(..), FixMe(..), NonExistentError(..))
+import HasHub.FixMe (Validation(..), FixMe(..), NonExistentError(..), FormatError(..))
 import qualified HasHub.FixMe as F (areAllIn, (??))
 
 
@@ -56,8 +56,6 @@ noDuplication numbers = case dups of
   where
     dups = sort numbers \\ (nub . sort) numbers
 
-
-newtype FormatError a = FormatError a deriving (Eq, Show) -- todo refactor for milestone creation.
 
 instance FixMe (FormatError EpicLinkNumber) where
   toMessage (FormatError (EpicLinkNumber s)) = "not satisfied ^?\\d$ format: " ++ s

@@ -57,7 +57,7 @@ type ReferredEpic = Epic
 type ParentEpic = Epic
 
 
-createAll :: [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] ->IO ()
+createAll :: [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] -> IO ()
 createAll objects = createAll' (length objects) [] objects
   where
     createAll' :: Int -> [LinkedEpic] -> [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] -> IO ()

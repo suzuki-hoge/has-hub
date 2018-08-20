@@ -21,7 +21,7 @@ import HasHub.Object.Milestone.Type
 import HasHub.FixMe (Validation(..))
 
 
-data YamlObject = EpicYamlObject
+data YamlObject = EpicYamlObject -- todo yaml-epic?
                   EpicLinkNumber
                   Title
                   Body

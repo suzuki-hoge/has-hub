@@ -8,6 +8,7 @@ import Options.Applicative hiding (Success, Failure)
 
 import qualified HasHub.Command.ReferAll as RA
 import qualified HasHub.Command.CreateObjects as CO
+import qualified HasHub.Command.CreateMilestones as CM
 import qualified HasHub.Command.Configure as C
 
 import HasHub.Connection.Config.Type
@@ -167,8 +168,14 @@ main = customExecParser (prefs showHelpOnError) optionsInfo >>= execute
 
 
 execute :: Options -> IO ()
-execute (ReferAllOptions owner repository gitHubToken zenHubToken logPath) = do
-  initialized <- initialize owner repository gitHubToken zenHubToken logPath
+execute (ReferAllOptions              owner repository gitHubToken zenHubToken logPath) = executeWithConnection  RA.execute       owner repository gitHubToken zenHubToken logPath
+execute (CreateObjectsOptions    yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection (CO.execute yaml) owner repository gitHubToken zenHubToken logPath
+execute (CreateMilestonesOptions yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection (CM.execute yaml) owner repository gitHubToken zenHubToken logPath
+
+
+executeWithConnection :: IO () -> Owner -> Repository -> Token -> Token -> FilePath -> IO ()
+executeWithConnection executor owner repository gitHubToken zenHubToken logPath = do
+  initialized <- C.initialize (mb owner) (mb repository) (mb gitHubToken) (mb zenHubToken) (mb logPath)
 
   case initialized of
     Success lp  -> do
@@ -177,30 +184,12 @@ execute (ReferAllOptions owner repository gitHubToken zenHubToken logPath) = do
       case writable of
         Success () -> do
           C.fetchRepositoryId
-          RA.execute
+          executor
         Failure fms -> printFixMes fms
 
     Failure fms -> printFixMes fms
 
-execute (CreateObjectsOptions yaml owner repository gitHubToken zenHubToken logPath) = do
-  initialized <- initialize owner repository gitHubToken zenHubToken logPath
-
-  case initialized of
-    Success lp  -> do
-      writable <- isWritable lp
-
-      case writable of
-        Success () -> do
-          C.fetchRepositoryId
-          CO.execute yaml
-        Failure fms -> printFixMes fms
-
-    Failure fms -> printFixMes fms
-
-
-initialize :: Owner -> Repository -> Token -> Token -> FilePath -> IO (Validation [C.ConfigurationError] (FilePath))
-initialize owner repository gitHubToken zenHubToken logPath = C.initialize (mb owner) (mb repository) (mb gitHubToken) (mb zenHubToken) (mb logPath)
-  where
-    mb :: String -> Maybe String
-    mb "" = Nothing
-    mb s  = Just s
+    where
+      mb :: String -> Maybe String
+      mb "" = Nothing
+      mb s  = Just s

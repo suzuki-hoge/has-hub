@@ -3,7 +3,7 @@ module HasHub.Connection.Config.DetectorSpec where
 
 import Test.Hspec
 
-import System.Environment (setEnv)
+import System.Environment (unsetEnv, setEnv)
 import System.Directory (getHomeDirectory)
 
 import HasHub.Connection.Config.Detector
@@ -149,6 +149,8 @@ spec = do
 
   describe "proxy" $ do
       it "no env" $ do
+        unsetEnv "https_proxy"
+
         let act = fixProxy
 
         act `shouldReturn` Nothing
