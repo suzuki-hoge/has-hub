@@ -6,6 +6,9 @@ module HasHub.Object.Milestone.Parser where
 
 import Data.Aeson (FromJSON(..), Value(Object), (.:), (.:?))
 
+import Data.List (nub)
+import Data.Maybe (mapMaybe)
+
 import HasHub.Yaml.Reader (readYaml, YamlReadingError(..))
 
 import HasHub.Object.Milestone.Type
@@ -27,3 +30,24 @@ readObjects = readYaml mapping
   where
     mapping :: YamlMilestone -> YamlMilestone
     mapping = id
+
+
+_titles :: [YamlMilestone] -> [MilestoneTitle]
+_titles = map _title
+  where
+    _title :: YamlMilestone -> MilestoneTitle
+    _title (YamlMilestone x _ _) = x
+
+
+_startOns :: [YamlMilestone] -> [StartOn]
+_startOns = nub . mapMaybe _startOn
+  where
+    _startOn :: YamlMilestone -> Maybe StartOn
+    _startOn (YamlMilestone _ x _) = x
+
+
+_dueOns :: [YamlMilestone] -> [DueOn]
+_dueOns = nub . mapMaybe _dueOn
+  where
+    _dueOn :: YamlMilestone -> Maybe DueOn
+    _dueOn (YamlMilestone _ _ x) = x

@@ -8,6 +8,7 @@ module HasHub.FixMe
 , printMessages
 , printFixMes
 , FixMe(..)
+, FormatError(..)
 , NotWritableError(..)
 , NonExistentError(..)
 , (??)
@@ -35,6 +36,9 @@ asJust Nothing  = do
   putStrLn "\nunexpected connection error."
   putStrLn "  please check log"
   die "\nhas-hub is aborted."
+
+
+newtype FormatError a = FormatError a deriving (Eq, Show)
 
 
 data NonExistentError a = NonExistentError a deriving (Eq, Show)

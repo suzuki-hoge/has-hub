@@ -60,18 +60,18 @@ spec = do
   describe "is writable" $ do
     describe "success" $ do
       it "existing path" $ do
-        let act = isWritable "test/dummies/out/out.txt"
+        let act = isWritable "test/dummies/output/out.txt"
 
         act `shouldReturn` Success ()
 
       it "writable directory" $ do
-        let act = isWritable "test/dummies/out/xxx.txt"
+        let act = isWritable "test/dummies/output/xxx.txt"
 
         act `shouldReturn` Success ()
 
     describe "failure" $ do
       it "not writable path" $ do
-        let fp = "test/dummies/out/out.txt"
+        let fp = "test/dummies/output/out.txt"
         origin <- getPermissions fp
         setPermissions fp emptyPermissions
 
@@ -82,8 +82,8 @@ spec = do
         setPermissions fp origin
 
       it "not parent directory" $ do
-        let fp = "test/dummies/out/xxx.txt"
-        let dp = "test/dummies/out"
+        let fp = "test/dummies/output/xxx.txt"
+        let dp = "test/dummies/output"
         origin <- getPermissions dp
         setPermissions dp emptyPermissions
 
@@ -94,19 +94,19 @@ spec = do
         setPermissions dp origin
 
       it "not writable directory" $ do
-        let fp = "test/dummies/out/xxx/out.txt"
+        let fp = "test/dummies/output/xxx/out.txt"
 
         let act = isWritable fp
 
-        act `shouldReturn` Failure [NotWritableDirectoryError "test/dummies/out/xxx"]
+        act `shouldReturn` Failure [NotWritableDirectoryError "test/dummies/output/xxx"]
 
     describe "message" $ do
       it "not writable file" $ do
-        let act = toMessage $ NotWritableFileError "test/dummies/out/out.txt"
+        let act = toMessage $ NotWritableFileError "test/dummies/output/out.txt"
 
-        act `shouldBe` "not writable file: test/dummies/out/out.txt"
+        act `shouldBe` "not writable file: test/dummies/output/out.txt"
 
       it "not writable directory" $ do
-        let act = toMessage $ NotWritableDirectoryError "test/dummies/out"
+        let act = toMessage $ NotWritableDirectoryError "test/dummies/output"
 
-        act `shouldBe` "not writable directory: test/dummies/out"
+        act `shouldBe` "not writable directory: test/dummies/output"

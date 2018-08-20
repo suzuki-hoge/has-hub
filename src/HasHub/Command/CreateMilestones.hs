@@ -12,6 +12,7 @@ import qualified HasHub.Command.ReferAll as RA
 import HasHub.Object.Milestone.Parser as Parser
 
 import HasHub.Object.Milestone.Client as MC
+import HasHub.Object.Milestone.Validator as MV
 
 import HasHub.FixMe
 
@@ -21,7 +22,19 @@ execute yaml = do
   parsed <- Parser.readObjects yaml
 
   case parsed of
-    Success(yamls) -> createAll yamls
+    Success(yamls) -> do
+      putStrLn "\nrefer for yaml data validation."
+
+      milestones <- MC.referAll
+
+      case flat [
+          _message $ _titles yamls `MV.areAllNotIn` milestones
+        , _message $ MV.dueOnFormat $ _dueOns yamls
+        , _message $ MV.startOnFormat $ _startOns yamls
+        ] of
+        Success ()     -> createAll yamls
+        Failure errors -> printMessages errors
+
     Failure fms -> printFixMes fms
 
 
@@ -44,7 +57,3 @@ createAll yamls = createAll' (length yamls) yamls -- todo objects -> yamls
           printf "\ncreate Milestone. (%d / %d)\n" current total
 
           MC.create title startOn dueOn
-
-
--- todo yaml format validation
--- todo check existence
