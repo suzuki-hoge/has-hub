@@ -8,6 +8,7 @@ import Options.Applicative hiding (Success, Failure)
 
 import qualified HasHub.Command.ReferAll as RA
 import qualified HasHub.Command.GenerateObjectsSample as GOS
+import qualified HasHub.Command.GenerateMilestonesSample as GMS
 import qualified HasHub.Command.CreateObjects as CO
 import qualified HasHub.Command.CreateMilestones as CM
 import qualified HasHub.Command.Configure as C
@@ -169,10 +170,11 @@ main = customExecParser (prefs showHelpOnError) optionsInfo >>= execute
 
 
 execute :: Options -> IO ()
-execute (ReferAllOptions                   owner repository gitHubToken zenHubToken logPath) = executeWithConnection   RA.execute         owner repository gitHubToken zenHubToken logPath
-execute (GenerateObjectsSampleOptions output                                               ) = executeWithOutput      GOS.execute output
-execute (CreateObjectsOptions         yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (CO.execute yaml)   owner repository gitHubToken zenHubToken logPath
-execute (CreateMilestonesOptions      yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (CM.execute yaml)   owner repository gitHubToken zenHubToken logPath
+execute (ReferAllOptions                             owner repository gitHubToken zenHubToken logPath) = executeWithConnection   RA.execute        owner repository gitHubToken zenHubToken logPath
+execute (GenerateObjectsSampleOptions    output                                                      ) = executeWithOutput      GOS.execute output
+execute (GenerateMilestonesSampleOptions output                                                      ) = executeWithOutput      GMS.execute output
+execute (CreateObjectsOptions                   yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (CO.execute yaml)  owner repository gitHubToken zenHubToken logPath
+execute (CreateMilestonesOptions                yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (CM.execute yaml)  owner repository gitHubToken zenHubToken logPath
 
 
 executeWithOutput :: (FilePath -> IO ()) -> FilePath -> IO ()

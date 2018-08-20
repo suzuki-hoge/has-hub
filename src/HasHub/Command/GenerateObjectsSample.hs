@@ -5,8 +5,6 @@ module HasHub.Command.GenerateObjectsSample
 where
 
 
-import Text.Printf (printf)
-
 import HasHub.Object.Object.Parser as Parser
 
 
