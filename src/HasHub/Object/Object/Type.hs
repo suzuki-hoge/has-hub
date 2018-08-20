@@ -21,6 +21,11 @@ data LinkedEpic = LinkedEpic EpicLinkNumber Epic deriving Show
 
 
 data Epic = Epic EpicNumber Title deriving (Eq, Show)
+instance Ord Epic where
+  (Epic (EpicNumber n1) _) <  (Epic (EpicNumber n2) _) = n1 <  n2
+  (Epic (EpicNumber n1) _) <= (Epic (EpicNumber n2) _) = n1 <= n2
+  (Epic (EpicNumber n1) _) >  (Epic (EpicNumber n2) _) = n1 >  n2
+  (Epic (EpicNumber n1) _) >= (Epic (EpicNumber n2) _) = n1 >= n2
 
 
 newtype IssueNumber = IssueNumber Int deriving (Eq)

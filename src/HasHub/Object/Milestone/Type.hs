@@ -20,6 +20,11 @@ newtype DueOn = DueOn String deriving (Eq, Show)
 
 
 data Milestone = Milestone MilestoneNumber MilestoneTitle (Maybe StartOn) (Maybe DueOn) deriving (Eq, Show)
+instance Ord Milestone where
+  (Milestone _ (MilestoneTitle t1) _ _) <  (Milestone _ (MilestoneTitle t2) _ _) = t1 <  t2
+  (Milestone _ (MilestoneTitle t1) _ _) <= (Milestone _ (MilestoneTitle t2) _ _) = t1 <= t2
+  (Milestone _ (MilestoneTitle t1) _ _) >  (Milestone _ (MilestoneTitle t2) _ _) = t1 >  t2
+  (Milestone _ (MilestoneTitle t1) _ _) >= (Milestone _ (MilestoneTitle t2) _ _) = t1 >= t2
 
 
 _title :: Milestone -> MilestoneTitle

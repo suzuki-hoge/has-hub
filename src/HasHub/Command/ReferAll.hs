@@ -7,6 +7,7 @@ where
 
 
 import Text.Printf (printf)
+import Data.List (sort)
 
 import HasHub.Object.Object.Client as OC
 import HasHub.Object.Pipeline.Client as PC
@@ -21,11 +22,11 @@ execute = do
 
   (epics, pipelines, labels, collaborators, milestones) <- execute'
 
-  printEpics epics                          -- todo sort
+  printEpics epics
   printPipelines pipelines
   printLabels labels
   printCollaborators collaborators
-  printMilestones milestones                -- todo sort
+  printMilestones milestones
 
   putStrLn "\nall objects referred."
 
@@ -44,7 +45,7 @@ execute' = do
 printEpics :: [Epic] -> IO ()
 printEpics xs = do
   putStrLn "\nepics."
-  if null xs then putStrLn "  no episc" else mapM_ print xs
+  if null xs then putStrLn "  no episc" else mapM_ print (sort xs)
   where
     print (Epic (EpicNumber n) (Title t)) = printf "  #%d %s\n" n t
 
@@ -76,6 +77,6 @@ printCollaborators xs = do
 printMilestones :: [Milestone] -> IO ()
 printMilestones xs = do
   putStrLn "\nmilestones."
-  if null xs then putStrLn "  no milestones" else mapM_ print xs
+  if null xs then putStrLn "  no milestones" else mapM_ print (sort xs)
   where
     print (Milestone _ title startOn dueOn) = printf "  %s\n" (_string title startOn dueOn)
