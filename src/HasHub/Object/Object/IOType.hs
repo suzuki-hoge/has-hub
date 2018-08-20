@@ -126,4 +126,4 @@ _epic (ReferIssueOutput issueNumber title) = Epic (_epicNumber issueNumber) titl
 
 
 isEpic :: [EpicNumber] -> ReferIssueOutput -> Bool
-isEpic epicNumbers (ReferIssueOutput issueNumber _) = (_epicNumber issueNumber) `elem` epicNumbers
+isEpic epicNumbers (ReferIssueOutput issueNumber _) = _epicNumber issueNumber `elem` epicNumbers

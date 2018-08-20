@@ -22,7 +22,7 @@ execute yaml = do
   parsed <- Parser.readObjects yaml
 
   case parsed of
-    Success(yamls) -> do
+    Success yamls -> do
       putStrLn "\nrefer for yaml data validation."
 
       milestones <- MC.referAll

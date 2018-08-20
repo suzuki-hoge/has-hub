@@ -19,7 +19,7 @@ import HasHub.FixMe (FixMe(..), Validation(..))
 data YamlReadingError = YamlParseError | NoYamlError FilePath deriving (Eq, Show)
 
 instance FixMe YamlReadingError where
-  toMessage (YamlParseError) = "yaml parse error"
+  toMessage  YamlParseError  = "yaml parse error"
   toMessage (NoYamlError fp) = "no yaml error: " ++ fp
 
 

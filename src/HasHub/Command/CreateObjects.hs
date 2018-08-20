@@ -29,7 +29,7 @@ execute yaml = do
   parsed <- Parser.readObjects yaml
 
   case parsed of
-    Success(objects) -> do
+    Success objects -> do
       putStrLn "\nrefer all for yaml data validation."
 
       (epics, pipelines, labels, collaborators, milestones) <- RA.execute'

@@ -234,6 +234,6 @@ spec = do
       it "not defined error" $ do
         let parent     = (2, QuestionEpicNumber "?1")
 
-        let act = toMessage $ NotDefinedError $ (3, QuestionEpicNumber "?2")
+        let act = toMessage $ NotDefinedError (3, QuestionEpicNumber "?2")
 
         act `shouldBe` "can't resolve definition link: use ?2 on line 3, but ?2 is not defined"

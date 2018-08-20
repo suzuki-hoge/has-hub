@@ -182,8 +182,7 @@ executeWithOutput executor output = do
   writable <- isWritable output
 
   case writable of
-    Success () -> do
-      executor output
+    Success ()  -> executor output
     Failure fms -> printFixMes fms
 
 

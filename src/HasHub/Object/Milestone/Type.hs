@@ -31,7 +31,7 @@ findIn milestones milestoneTitle = find (\milestone -> _title milestone == miles
 
 
 _string :: MilestoneTitle -> Maybe StartOn -> Maybe DueOn -> String
-_string (MilestoneTitle t) startOn dueOn = t ++ " (" ++ (_startOnString startOn) ++ " ~ " ++ (_dueOnString dueOn) ++ ")"
+_string (MilestoneTitle t) startOn dueOn = t ++ " (" ++ _startOnString startOn ++ " ~ " ++ _dueOnString dueOn ++ ")"
   where
     _startOnString :: Maybe StartOn -> String
     _startOnString Nothing            = "          "
