@@ -30,7 +30,7 @@ data YamlObject = EpicYamlObject -- todo yaml-epic?
                   [Collaborator]
                   (Maybe MilestoneTitle)
                   (Maybe Estimate)
-                  [ParentEpicNumber]
+                  [LinkingEpicNumber]
             | IssueYamlObject
                   Title
                   Body
@@ -39,7 +39,7 @@ data YamlObject = EpicYamlObject -- todo yaml-epic?
                   [Collaborator]
                   (Maybe MilestoneTitle)
                   (Maybe Estimate)
-                  [ParentEpicNumber]
+                  [LinkingEpicNumber]
             deriving (Eq, Show)
 
 
@@ -62,7 +62,7 @@ readObjects :: FilePath -> IO (Validation [YamlReadingError] [YamlObject])
 readObjects = readYaml mapping
   where
     mapping :: YamlWrappedObject -> YamlObject
-    mapping (YamlWrappedObject meln t mb mpn ls cs mmt me es) = createEither meln (Title t) (Body <?> mb) (PipelineName <$> mpn) (Label <??> ls) (Collaborator <??> cs) (MilestoneTitle <$> mmt) (Estimate <$> me) (toParent <??> es)
+    mapping (YamlWrappedObject meln t mb mpn ls cs mmt me es) = createEither meln (Title t) (Body <?> mb) (PipelineName <$> mpn) (Label <??> ls) (Collaborator <??> cs) (MilestoneTitle <$> mmt) (Estimate <$> me) (toLinking <??> es)
       where
         createEither (Just eln) = EpicYamlObject (EpicLinkNumber eln)
         createEither Nothing    = IssueYamlObject
@@ -76,8 +76,8 @@ readObjects = readYaml mapping
         f <??> Nothing = []
         f <??> (Just xs) = map f xs
 
-        toParent :: String -> ParentEpicNumber
-        toParent s = if head s == '#' then SharpEpicNumber s else QuestionEpicNumber s
+        toLinking :: String -> LinkingEpicNumber
+        toLinking s = if head s == '#' then SharpEpicNumber s else QuestionEpicNumber s
 
 
 _epicLinkNumbers :: [YamlObject] -> [EpicLinkNumber]
@@ -123,25 +123,25 @@ _milestoneTitle (EpicYamlObject _ _ _ _ _ _ x _ _) = x
 _milestoneTitle (IssueYamlObject  _ _ _ _ _ x _ _) = x
 
 
-_parentEpicNumbers :: [YamlObject] -> [ParentEpicNumber]
-_parentEpicNumbers = nub . concatMap _parentEpicNumber
+_linkingEpicNumbers :: [YamlObject] -> [LinkingEpicNumber]
+_linkingEpicNumbers = nub . concatMap _linkingEpicNumber
 
-_parentEpicNumber :: YamlObject -> [ParentEpicNumber]
-_parentEpicNumber (EpicYamlObject _ _ _ _ _ _ _ _ x) = x
-_parentEpicNumber (IssueYamlObject  _ _ _ _ _ _ _ x) = x
-
-
-_definitionEpicLinkNumbers :: [YamlObject] -> [Definition] -- todo linked
-_definitionEpicLinkNumbers objects = mapMaybe _definitionEpicLinkNumber (zip [1..] objects)
-
-_definitionEpicLinkNumber :: (LineNum, YamlObject) -> Maybe Definition
-_definitionEpicLinkNumber (n, EpicYamlObject x _ _ _ _ _ _ _ _) = Just (n, x)
-_definitionEpicLinkNumber (_, IssueYamlObject  _ _ _ _ _ _ _ _) = Nothing
+_linkingEpicNumber :: YamlObject -> [LinkingEpicNumber]
+_linkingEpicNumber (EpicYamlObject _ _ _ _ _ _ _ _ x) = x
+_linkingEpicNumber (IssueYamlObject  _ _ _ _ _ _ _ x) = x
 
 
-_parentEpicLinkNumbers :: [YamlObject] -> [Parent] -- todo linking
-_parentEpicLinkNumbers objects = concatMap _parentEpicLinkNumber (zip [1..] objects)
+_linkeds :: [YamlObject] -> [Linked]
+_linkeds objects = mapMaybe _linked (zip [1..] objects)
 
-_parentEpicLinkNumber :: (LineNum, YamlObject) -> [Parent]
-_parentEpicLinkNumber (n, EpicYamlObject _ _ _ _ _ _ _ _ xs) = map (\x -> (n, x)) xs
-_parentEpicLinkNumber (n, IssueYamlObject  _ _ _ _ _ _ _ xs) = map (\x -> (n, x)) xs
+_linked :: (LineNum, YamlObject) -> Maybe Linked
+_linked (n, EpicYamlObject x _ _ _ _ _ _ _ _) = Just (n, x)
+_linked (_, IssueYamlObject  _ _ _ _ _ _ _ _) = Nothing
+
+
+_linkings :: [YamlObject] -> [Linking]
+_linkings objects = concatMap _linking (zip [1..] objects)
+
+_linking :: (LineNum, YamlObject) -> [Linking]
+_linking (n, EpicYamlObject _ _ _ _ _ _ _ _ xs) = map (\x -> (n, x)) xs
+_linking (n, IssueYamlObject  _ _ _ _ _ _ _ xs) = map (\x -> (n, x)) xs

@@ -35,15 +35,15 @@ execute yaml = do
       (epics, pipelines, labels, collaborators, milestones) <- RA.execute'
 
       case flat [
-          _message $ _parentEpicNumbers objects `OV.areAllIn` epics
+          _message $ _linkingEpicNumbers objects `OV.areAllIn` epics
         , _message $ _pipelineNames objects `PV.areAllIn` pipelines
         , _message $ _labels objects `LV.areAllIn` labels
         , _message $ _collaborators objects `CV.areAllIn` collaborators
         , _message $ _milestoneTitles objects `MV.areAllIn` milestones
         , _message $ OV.noDuplication $ _epicLinkNumbersWithDuplication objects
         , _message $ OV.linkNumberFormat $ _epicLinkNumbers objects
-        , _message $ OV.parentNumberFormat $ _parentEpicNumbers objects
-        , _message $ OV.linking (_definitionEpicLinkNumbers objects) (_parentEpicLinkNumbers objects) -- todo operator
+        , _message $ OV.linkingNumberFormat $ _linkingEpicNumbers objects
+        , _message $ OV.linking (_linkeds objects) (_linkings objects) -- todo operator
         ] of
         Success ()     -> createAll objects pipelines milestones epics
         Failure errors -> printMessages errors
@@ -54,7 +54,7 @@ execute yaml = do
 type Current = Int
 type Total = Int
 type ReferredEpic = Epic
-type ParentEpic = Epic
+type LinkingEpic = Epic
 
 
 createAll :: [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] -> IO ()
@@ -62,22 +62,22 @@ createAll objects = createAll' (length objects) [] objects
   where
     createAll' :: Int -> [LinkedEpic] -> [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] -> IO ()
     createAll' total _           []               _         _          _     = printf "\n%d objects created.\n" total
-    createAll' total linkedEpics (object:objects) pipelines milestones epics = do
+    createAll' total linkedEpics (object:objects) pipelines milestones referreds = do
       let pipeline = _pipelineName object >>= PC.findIn pipelines
       let milestone = _milestoneTitle object >>= MC.findIn milestones
-      let parentEpics = _parentEpicNumber object >>= OC.findIn linkedEpics epics
+      let linkings = _linkingEpicNumber object >>= OC.findIn linkedEpics referreds
 
-      linkedEpic <- create object pipeline milestone parentEpics (total - length objects) total
+      linkedEpic <- create object pipeline milestone linkings (total - length objects) total
 
-      createAll' total (linkedEpic ++ linkedEpics) objects pipelines milestones epics
+      createAll' total (linkedEpic ++ linkedEpics) objects pipelines milestones referreds
       where
-        create :: YamlObject -> Maybe Pipeline -> Maybe Milestone -> [ParentEpic] -> Current -> Total -> IO [LinkedEpic]
-        create (EpicYamlObject epicLinkNumber title body _ labels collaborators _ estimate _) pipeline milestone epics current total = do
+        create :: YamlObject -> Maybe Pipeline -> Maybe Milestone -> [LinkingEpic] -> Current -> Total -> IO [LinkedEpic]
+        create (EpicYamlObject epicLinkNumber title body _ labels collaborators _ estimate _) pipeline milestone linkings current total = do
           printf "\ncreate Epic. (%d / %d)\n" current total
 
-          (:[]) <$> OC.createEpic epicLinkNumber title body pipeline labels collaborators milestone estimate epics
+          (:[]) <$> OC.createEpic epicLinkNumber title body pipeline labels collaborators milestone estimate linkings
 
-        create (IssueYamlObject title body _ labels collaborators _ estimate _) pipeline milestone epics current total = do
+        create (IssueYamlObject title body _ labels collaborators _ estimate _) pipeline milestone linkings current total = do
           printf "\ncreate Issue. (%d / %d)\n" current total
 
-          const [] <$> OC.createIssue title body pipeline labels collaborators milestone estimate epics
+          const [] <$> OC.createIssue title body pipeline labels collaborators milestone estimate linkings

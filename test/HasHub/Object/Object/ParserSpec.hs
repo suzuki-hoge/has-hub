@@ -86,17 +86,17 @@ spec = do
 
       act `shouldBe` []
 
-    it "parentEpicNumbers" $ do
-      let act = _parentEpicNumbers objects
+    it "linkingEpicNumbers" $ do
+      let act = _linkingEpicNumbers objects
 
       act `shouldBe` [QuestionEpicNumber "?1", SharpEpicNumber "#", QuestionEpicNumber "?2", QuestionEpicNumber "?"]
 
-    it "definitionEpicLinkNumbers" $ do
-      let act = _definitionEpicLinkNumbers objects
+    it "linkeds" $ do
+      let act = _linkeds objects
 
       act `shouldBe` [(1, EpicLinkNumber "?1"), (2, EpicLinkNumber "?1"), (3, EpicLinkNumber "?3")]
 
-    it "parentEpicLinkNumbers" $ do
-      let act = _parentEpicLinkNumbers objects
+    it "linkings" $ do
+      let act = _linkings objects
 
       act `shouldBe` [(1, QuestionEpicNumber "?1"), (2, SharpEpicNumber "#"), (3, QuestionEpicNumber "?1"), (3, QuestionEpicNumber "?2"), (4, QuestionEpicNumber "?")]
