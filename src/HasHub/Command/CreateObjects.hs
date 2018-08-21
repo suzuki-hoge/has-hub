@@ -29,23 +29,23 @@ execute yaml = do
   parsed <- Parser.readObjects yaml
 
   case parsed of
-    Success objects -> do
+    Success yamls -> do
       putStrLn "\nrefer all for yaml data validation."
 
       (epics, pipelines, labels, collaborators, milestones) <- RA.execute'
 
       case flat [
-          _message $ _linkingEpicNumbers objects `OV.areAllIn` epics
-        , _message $ _pipelineNames objects `PV.areAllIn` pipelines
-        , _message $ _labels objects `LV.areAllIn` labels
-        , _message $ _collaborators objects `CV.areAllIn` collaborators
-        , _message $ _milestoneTitles objects `MV.areAllIn` milestones
-        , _message $ OV.noDuplication $ _epicLinkNumbersWithDuplication objects
-        , _message $ OV.linkNumberFormat $ _epicLinkNumbers objects
-        , _message $ OV.linkingNumberFormat $ _linkingEpicNumbers objects
-        , _message $ OV.linking (_linkeds objects) (_linkings objects) -- todo operator
+          _message $ _linkingEpicNumbers yamls `OV.areAllIn` epics
+        , _message $ _pipelineNames yamls `PV.areAllIn` pipelines
+        , _message $ _labels yamls `LV.areAllIn` labels
+        , _message $ _collaborators yamls `CV.areAllIn` collaborators
+        , _message $ _milestoneTitles yamls `MV.areAllIn` milestones
+        , _message $ OV.noDuplication $ _epicLinkNumbersWithDuplication yamls
+        , _message $ OV.linkNumberFormat $ _epicLinkNumbers yamls
+        , _message $ OV.linkingNumberFormat $ _linkingEpicNumbers yamls
+        , _message $ _linkings yamls `OV.linkTo` _linkeds yamls
         ] of
-        Success ()     -> createAll objects pipelines milestones epics
+        Success ()     -> createAll yamls pipelines milestones epics
         Failure errors -> printMessages errors
 
     Failure fms -> printFixMes fms
@@ -58,26 +58,26 @@ type LinkingEpic = Epic
 
 
 createAll :: [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] -> IO ()
-createAll objects = createAll' (length objects) [] objects
+createAll yamls = createAll' (length yamls) [] yamls
   where
     createAll' :: Int -> [LinkedEpic] -> [YamlObject] -> [Pipeline] -> [Milestone] -> [ReferredEpic] -> IO ()
     createAll' total _           []               _         _          _     = printf "\n%d objects created.\n" total
-    createAll' total linkedEpics (object:objects) pipelines milestones referreds = do
-      let pipeline = _pipelineName object >>= PC.findIn pipelines
-      let milestone = _milestoneTitle object >>= MC.findIn milestones
-      let linkings = _linkingEpicNumber object >>= OC.findIn linkedEpics referreds
+    createAll' total linkedEpics (yaml:yamls) pipelines milestones referreds = do
+      let pipeline = _pipelineName yaml >>= PC.findIn pipelines
+      let milestone = _milestoneTitle yaml >>= MC.findIn milestones
+      let linkings = _linkingEpicNumber yaml >>= OC.findIn linkedEpics referreds
 
-      linkedEpic <- create object pipeline milestone linkings (total - length objects) total
+      linkedEpic <- create yaml pipeline milestone linkings (total - length yamls) total
 
-      createAll' total (linkedEpic ++ linkedEpics) objects pipelines milestones referreds
+      createAll' total (linkedEpic ++ linkedEpics) yamls pipelines milestones referreds
       where
         create :: YamlObject -> Maybe Pipeline -> Maybe Milestone -> [LinkingEpic] -> Current -> Total -> IO [LinkedEpic]
-        create (EpicYamlObject epicLinkNumber title body _ labels collaborators _ estimate _) pipeline milestone linkings current total = do
+        create (YamlEpic epicLinkNumber title body _ labels collaborators _ estimate _) pipeline milestone linkings current total = do
           printf "\ncreate Epic. (%d / %d)\n" current total
 
           (:[]) <$> OC.createEpic epicLinkNumber title body pipeline labels collaborators milestone estimate linkings
 
-        create (IssueYamlObject title body _ labels collaborators _ estimate _) pipeline milestone linkings current total = do
+        create (YamlIssue title body _ labels collaborators _ estimate _) pipeline milestone linkings current total = do
           printf "\ncreate Issue. (%d / %d)\n" current total
 
           const [] <$> OC.createIssue title body pipeline labels collaborators milestone estimate linkings

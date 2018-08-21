@@ -7,7 +7,7 @@ module HasHub.Object.Object.Validator
 , noDuplication
 , linkNumberFormat
 , linkingNumberFormat
-, linking
+, linkTo
 , DuplicationError(..)
 , FormatError(..)
 , LinkError(..)
@@ -101,8 +101,8 @@ instance FixMe LinkError where
   toMessage (NotDefinedError         (pn, QuestionEpicNumber s)) = "can't resolve linking epic: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is not defined"
 
 
-linking :: [Linked] -> [Linking] -> Validation [LinkError] ()
-linking linkeds linkings = map (validate linkeds) linkings F.?? ()
+linkTo :: [Linking] -> [Linked] -> Validation [LinkError] ()
+linkTo linkings linkeds = map (validate linkeds) linkings F.?? ()
   where
     validate :: [Linked] -> Linking -> Maybe LinkError
     validate linkeds         (_, SharpEpicNumber _) = Nothing

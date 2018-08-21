@@ -140,37 +140,37 @@ spec = do
   describe "linking" $ do
     describe "success" $ do
       it "def at line-1, use at line-2" $ do
-        let act = linking [(1, EpicLinkNumber "?1")] [(2, QuestionEpicNumber "?1")]
+        let act = [(2, QuestionEpicNumber "?1")] `linkTo` [(1, EpicLinkNumber "?1")]
 
         act `shouldBe` Success ()
 
       it "def at line-1, no use" $ do
-        let act = linking [(1, EpicLinkNumber "?1")] []
+        let act = [] `linkTo` [(1, EpicLinkNumber "?1")]
 
         act `shouldBe` Success ()
 
       it "def at line-1, sharp on line-1" $ do
-        let act = linking [(1, EpicLinkNumber "?1")] [(1, SharpEpicNumber "#1")]
+        let act = [(1, SharpEpicNumber "#1")] `linkTo` [(1, EpicLinkNumber "?1")]
 
         act `shouldBe` Success ()
 
       it "def at line-1 and line-2, use at line-2 and line-4 and sharp on line-3" $ do
-        let act = linking [(1, EpicLinkNumber "?1"), (2, EpicLinkNumber "?2")] [(2, QuestionEpicNumber "?1"), (3, SharpEpicNumber "#1"), (4, QuestionEpicNumber "?2")]
+        let act = [(2, QuestionEpicNumber "?1"), (3, SharpEpicNumber "#1"), (4, QuestionEpicNumber "?2")] `linkTo` [(1, EpicLinkNumber "?1"), (2, EpicLinkNumber "?2")]
 
         act `shouldBe` Success ()
 
       it "empty" $ do
-        let act = linking [] []
+        let act = [] `linkTo` []
 
         act `shouldBe` Success ()
 
       it "define error is ignore format error" $ do
-        let act = linking [(1, EpicLinkNumber "?")] [(1, QuestionEpicNumber "?")]
+        let act =  [(1, QuestionEpicNumber "?")] `linkTo` [(1, EpicLinkNumber "?")]
 
         act `shouldBe` Success ()
 
       it "not defined error is ignore format error" $ do
-        let act = linking [] [(1, QuestionEpicNumber "?")]
+        let act = [(1, QuestionEpicNumber "?")] `linkTo` []
 
         act `shouldBe` Success ()
 
@@ -178,7 +178,7 @@ spec = do
       it "no def, use at line-1" $ do
         let linking1 = (2, QuestionEpicNumber "?2")
 
-        let act = linking [] [linking1]
+        let act = [linking1] `linkTo` []
 
         act `shouldBe` Failure [NotDefinedError linking1]
 
@@ -186,7 +186,7 @@ spec = do
         let linked1  = (1, EpicLinkNumber     "?1")
         let linking1 = (2, QuestionEpicNumber "?2")
 
-        let act = linking [linked1] [linking1]
+        let act = [linking1] `linkTo` [linked1]
 
         act `shouldBe` Failure [NotDefinedError linking1]
 
@@ -194,7 +194,7 @@ spec = do
         let linked1  = (1, EpicLinkNumber     "?1")
         let linking1 = (1, QuestionEpicNumber "?1")
 
-        let act = linking [linked1] [linking1]
+        let act = [linking1] `linkTo` [linked1]
 
         act `shouldBe` Failure [DefineLineError linked1 linking1]
 
@@ -202,7 +202,7 @@ spec = do
         let linked1  = (2, EpicLinkNumber     "?1")
         let linking1 = (1, QuestionEpicNumber "?1")
 
-        let act = linking [linked1] [linking1]
+        let act = [linking1] `linkTo` [linked1]
 
         act `shouldBe` Failure [DefineLineError linked1 linking1]
 
@@ -213,7 +213,7 @@ spec = do
         let linking3 = (2, QuestionEpicNumber "?2")
         let linking4 = (3, QuestionEpicNumber "?2")
 
-        let act = linking [linked1] [linking1, linking2, linking3, linking4]
+        let act = [linking1, linking2, linking3, linking4] `linkTo` [linked1]
 
         act `shouldBe` Failure [
             DefineLineError linked1 linking1

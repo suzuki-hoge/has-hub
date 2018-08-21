@@ -43,7 +43,7 @@ type Total = Int
 
 
 createAll :: [YamlMilestone] -> IO ()
-createAll yamls = createAll' (length yamls) yamls -- todo objects -> yamls
+createAll yamls = createAll' (length yamls) yamls
   where
     createAll' :: Int -> [YamlMilestone] -> IO ()
     createAll' total []           = printf "\n%d milestones created.\n" total
