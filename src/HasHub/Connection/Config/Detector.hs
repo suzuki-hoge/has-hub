@@ -107,7 +107,7 @@ fixToken Nothing        key fp = (>>> f key) <$> readLines fp
     f :: Key -> [Line] -> Validation [ConfigurationError] Line
     f key lines = case find (startswith key) lines of
       Just line -> Success $ splitOn ":" line !! 1
-      Nothing   -> Failure [ConfigurationError $ (init key) ++ " config missing."]
+      Nothing   -> Failure [ConfigurationError $ init key ++ " config missing."]
 
 
 readLines :: FilePath -> IO (Validation [ConfigurationError] [Line])

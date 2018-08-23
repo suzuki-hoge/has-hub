@@ -22,7 +22,7 @@ execute yaml = do
   parsed <- Parser.readObjects yaml
 
   case parsed of
-    Success(yamls) -> do
+    Success yamls -> do
       putStrLn "\nrefer for yaml data validation."
 
       milestones <- MC.referAll
@@ -43,7 +43,7 @@ type Total = Int
 
 
 createAll :: [YamlMilestone] -> IO ()
-createAll yamls = createAll' (length yamls) yamls -- todo objects -> yamls
+createAll yamls = createAll' (length yamls) yamls
   where
     createAll' :: Int -> [YamlMilestone] -> IO ()
     createAll' total []           = printf "\n%d milestones created.\n" total

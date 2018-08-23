@@ -6,8 +6,8 @@ module HasHub.Object.Object.Validator
   areAllIn
 , noDuplication
 , linkNumberFormat
-, parentNumberFormat
-, linking
+, linkingNumberFormat
+, linkTo
 , DuplicationError(..)
 , FormatError(..)
 , LinkError(..)
@@ -33,10 +33,10 @@ instance FixMe (NonExistentError EpicNumber) where
   toMessage (NonExistentError (EpicNumber n)) = "no such epic: #" ++ show n
 
 
-areAllIn :: [ParentEpicNumber] -> [Epic] -> Validation [NonExistentError EpicNumber] ()
+areAllIn :: [LinkingEpicNumber] -> [Epic] -> Validation [NonExistentError EpicNumber] ()
 areAllIn needles haystacks = mapMaybe toEpicNumberIfSharp needles `F.areAllIn` map _number haystacks
   where
-    toEpicNumberIfSharp :: ParentEpicNumber -> Maybe EpicNumber
+    toEpicNumberIfSharp :: LinkingEpicNumber -> Maybe EpicNumber
     toEpicNumberIfSharp (QuestionEpicNumber _) = Nothing
     toEpicNumberIfSharp (SharpEpicNumber s)
       | s `_isNumberedBy` '#' = Just $ _toEpicNumber s
@@ -68,15 +68,15 @@ linkNumberFormat numbers = map validate numbers F.?? ()
     validate number@(EpicLinkNumber s) = s `isNumberedBy` '?' $ number
 
 
-instance FixMe (FormatError ParentEpicNumber) where
+instance FixMe (FormatError LinkingEpicNumber) where
   toMessage (FormatError (SharpEpicNumber s))    = "not satisfied ^#\\d$ format: " ++ s
   toMessage (FormatError (QuestionEpicNumber s)) = "not satisfied ^?\\d$ format: " ++ s
 
 
-parentNumberFormat :: [ParentEpicNumber] -> Validation [FormatError ParentEpicNumber] ()
-parentNumberFormat numbers = map validate numbers F.?? ()
+linkingNumberFormat :: [LinkingEpicNumber] -> Validation [FormatError LinkingEpicNumber] ()
+linkingNumberFormat numbers = map validate numbers F.?? ()
   where
-    validate :: ParentEpicNumber -> Maybe (FormatError ParentEpicNumber)
+    validate :: LinkingEpicNumber -> Maybe (FormatError LinkingEpicNumber)
     validate number@(SharpEpicNumber s)    = s `isNumberedBy` '#' $ number
     validate number@(QuestionEpicNumber s) = s `isNumberedBy` '?' $ number
 
@@ -94,28 +94,28 @@ _isNotNumberedBy :: String -> Char -> Bool
 _isNotNumberedBy s c = not $ s `_isNumberedBy` c
 
 
-data LinkError = DefineLineError Definition Parent | NotDefinedError Parent deriving (Eq, Show)
+data LinkError = DefineLineError Linked Linking | NotDefinedError Linking deriving (Eq, Show)
 
 instance FixMe LinkError where
-  toMessage (DefineLineError (dn, _) (pn, QuestionEpicNumber s)) = "can't resolve definition link: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is defined at line " ++ show dn
-  toMessage (NotDefinedError         (pn, QuestionEpicNumber s)) = "can't resolve definition link: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is not defined"
+  toMessage (DefineLineError (dn, _) (pn, QuestionEpicNumber s)) = "can't resolve linking epic: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is defined at line " ++ show dn
+  toMessage (NotDefinedError         (pn, QuestionEpicNumber s)) = "can't resolve linking epic: use " ++ s ++ " on line " ++ show pn ++ ", but " ++ s ++ " is not defined"
 
 
-linking :: [Definition] -> [Parent] -> Validation [LinkError] ()
-linking definitions parents = map (validate definitions) parents F.?? ()
+linkTo :: [Linking] -> [Linked] -> Validation [LinkError] ()
+linkTo linkings linkeds = map (validate linkeds) linkings F.?? ()
   where
-    validate :: [Definition] -> Parent -> Maybe LinkError
-    validate definitions        (_, SharpEpicNumber _) = Nothing
-    validate definitions parent@(_, QuestionEpicNumber qen)
+    validate :: [Linked] -> Linking -> Maybe LinkError
+    validate linkeds         (_, SharpEpicNumber _) = Nothing
+    validate linkeds linking@(_, QuestionEpicNumber qen)
       | qen `_isNotNumberedBy` '?' = Nothing
-      | otherwise                  = case find (==? parent) definitions of
-        Just definition
-          | definition <? parent  -> Nothing
-          | otherwise             -> Just $ DefineLineError definition parent
-        Nothing                   -> Just $ NotDefinedError parent
+      | otherwise                  = case find (==? linking) linkeds of
+        Just linkeds
+          | linkeds <? linking    -> Nothing
+          | otherwise             -> Just $ DefineLineError linkeds linking
+        Nothing                   -> Just $ NotDefinedError linking
       where
-        (<?) :: Definition -> Parent -> Bool
+        (<?) :: Linked -> Linking -> Bool
         (<?) (dn, _) (pn, _) = dn < pn
 
-        (==?) :: Definition -> Parent -> Bool
+        (==?) :: Linked -> Linking -> Bool
         (==?) (_, epicLinkNumber) (_, questionEpicNumber) = epicLinkNumber T.==? questionEpicNumber

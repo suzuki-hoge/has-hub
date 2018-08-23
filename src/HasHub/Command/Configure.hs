@@ -24,7 +24,7 @@ import HasHub.Connection.Config.LocalConfig
 import HasHub.FixMe
 
 
-initialize :: Maybe Owner -> Maybe Repository -> Maybe Token -> Maybe Token -> Maybe FilePath -> IO (Validation [ConfigurationError] (FilePath))
+initialize :: Maybe Owner -> Maybe Repository -> Maybe Token -> Maybe Token -> Maybe FilePath -> IO (Validation [ConfigurationError] FilePath)
 initialize owner' repository' gitHubToken' zenHubToken' logPath' = do
   detected <- detectAll owner' repository' gitHubToken' zenHubToken' logPath'
 

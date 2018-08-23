@@ -23,80 +23,80 @@ spec = do
       act <- readObjects "test/dummies/yaml/objects/minimum_parameter_epic.yaml"
 
       act `shouldBe` Success [
-          EpicYamlObject F.epicLinkNumber F.title1 F.emptyBody Nothing [] [] Nothing Nothing []
+          YamlEpic F.epicLinkNumber F.title1 F.emptyBody Nothing [] [] Nothing Nothing []
         ]
 
     it "minimum parameter issue" $ do
       act <- readObjects "test/dummies/yaml/objects/minimum_parameter_epic.yaml"
 
       act `shouldBe` Success [
-          EpicYamlObject F.epicLinkNumber F.title1 F.emptyBody Nothing [] [] Nothing Nothing []
+          YamlEpic F.epicLinkNumber F.title1 F.emptyBody Nothing [] [] Nothing Nothing []
         ]
 
     it "contained unknown key" $ do
       act <- readObjects "test/dummies/yaml/objects/contained_unknown_key_issue.yaml"
 
       act `shouldBe` Success [
-          IssueYamlObject F.title2 F.emptyBody Nothing [] [] Nothing Nothing []
+          YamlIssue F.title2 F.emptyBody Nothing [] [] Nothing Nothing []
         ]
 
     it "epic and issue" $ do
       act <- readObjects "test/dummies/yaml/objects/epic_and_issue.yaml"
 
       act `shouldBe` Success [
-          EpicYamlObject F.epicLinkNumber F.title1 F.body1 Nothing [] [] Nothing Nothing []
-        , IssueYamlObject F.title2 F.body2 (Just F.pipelineName2) [F.label2] [F.collaborator] (Just F.milestoneTitle2) (Just F.estimate2) [F.questionEpicNumber, F.sharpEpicNumber]
+          YamlEpic F.epicLinkNumber F.title1 F.body1 Nothing [] [] Nothing Nothing []
+        , YamlIssue F.title2 F.body2 (Just F.pipelineName2) [F.label2] [F.collaborator] (Just F.milestoneTitle2) (Just F.estimate2) [F.questionEpicNumber, F.sharpEpicNumber]
         ]
 
   describe "extract functions" $ do
-    let epic1 = EpicYamlObject  (EpicLinkNumber "?1") (Title "foo") (Body "foo.") (Just $ PipelineName "backlog")        [Label "dev",  Label "java"]   [Collaborator "John"] Nothing (Just $ Estimate 1) [QuestionEpicNumber "?1"]
-    let epic2 = EpicYamlObject  (EpicLinkNumber "?1") (Title "foo") (Body "foo.") (Just $ PipelineName "sprint backlog") [Label "java"]                 [Collaborator "Jane"] Nothing (Just $ Estimate 1) [SharpEpicNumber "#"]
-    let epic3 = EpicYamlObject  (EpicLinkNumber "?3") (Title "foo") (Body "foo.") (Just $ PipelineName "sprint backlog") [Label "java", Label "oracle"] []                    Nothing (Just $ Estimate 1) [QuestionEpicNumber "?1", QuestionEpicNumber "?2"]
-    let issue = IssueYamlObject                       (Title "foo") (Body "foo.") (Just $ PipelineName "doing")          [Label "dev",  Label "oracle"] []                    Nothing (Just $ Estimate 1) [QuestionEpicNumber "?"]
+    let epic1 = YamlEpic  (EpicLinkNumber "?1") (Title "foo") (Body "foo.") (Just $ PipelineName "backlog")        [Label "dev",  Label "java"]   [Collaborator "John"] Nothing (Just $ Estimate 1) [QuestionEpicNumber "?1"]
+    let epic2 = YamlEpic  (EpicLinkNumber "?1") (Title "foo") (Body "foo.") (Just $ PipelineName "sprint backlog") [Label "java"]                 [Collaborator "Jane"] Nothing (Just $ Estimate 1) [SharpEpicNumber "#"]
+    let epic3 = YamlEpic  (EpicLinkNumber "?3") (Title "foo") (Body "foo.") (Just $ PipelineName "sprint backlog") [Label "java", Label "oracle"] []                    Nothing (Just $ Estimate 1) [QuestionEpicNumber "?1", QuestionEpicNumber "?2"]
+    let issue = YamlIssue                       (Title "foo") (Body "foo.") (Just $ PipelineName "doing")          [Label "dev",  Label "oracle"] []                    Nothing (Just $ Estimate 1) [QuestionEpicNumber "?"]
 
-    let objects = [epic1, epic2, epic3, issue]
+    let yamls = [epic1, epic2, epic3, issue]
 
     it "epicLinkNumbers" $ do
-      let act = _epicLinkNumbers objects
+      let act = _epicLinkNumbers yamls
 
       act `shouldBe` [EpicLinkNumber "?1", EpicLinkNumber "?3"]
 
     it "epicLinkNumbersWithDuplication" $ do
-      let act = _epicLinkNumbersWithDuplication objects
+      let act = _epicLinkNumbersWithDuplication yamls
 
       act `shouldBe` [EpicLinkNumber "?1", EpicLinkNumber "?1", EpicLinkNumber "?3"]
 
     it "pipelineNames" $ do
-      let act = _pipelineNames objects
+      let act = _pipelineNames yamls
 
       act `shouldBe` [PipelineName "backlog", PipelineName "sprint backlog", PipelineName "doing"]
 
     it "labels" $ do
-      let act = _labels objects
+      let act = _labels yamls
 
       act `shouldBe` [Label "dev", Label "java", Label "oracle"]
 
     it "collaborators" $ do
-      let act = _collaborators objects
+      let act = _collaborators yamls
 
       act `shouldBe` [Collaborator "John", Collaborator "Jane"]
 
     it "milestoneTitles" $ do
-      let act = _milestoneTitles objects
+      let act = _milestoneTitles yamls
 
       act `shouldBe` []
 
-    it "parentEpicNumbers" $ do
-      let act = _parentEpicNumbers objects
+    it "linkingEpicNumbers" $ do
+      let act = _linkingEpicNumbers yamls
 
       act `shouldBe` [QuestionEpicNumber "?1", SharpEpicNumber "#", QuestionEpicNumber "?2", QuestionEpicNumber "?"]
 
-    it "definitionEpicLinkNumbers" $ do
-      let act = _definitionEpicLinkNumbers objects
+    it "linkeds" $ do
+      let act = _linkeds yamls
 
       act `shouldBe` [(1, EpicLinkNumber "?1"), (2, EpicLinkNumber "?1"), (3, EpicLinkNumber "?3")]
 
-    it "parentEpicLinkNumbers" $ do
-      let act = _parentEpicLinkNumbers objects
+    it "linkings" $ do
+      let act = _linkings yamls
 
       act `shouldBe` [(1, QuestionEpicNumber "?1"), (2, SharpEpicNumber "#"), (3, QuestionEpicNumber "?1"), (3, QuestionEpicNumber "?2"), (4, QuestionEpicNumber "?")]

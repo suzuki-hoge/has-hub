@@ -41,7 +41,7 @@ asJust Nothing  = do
 newtype FormatError a = FormatError a deriving (Eq, Show)
 
 
-data NonExistentError a = NonExistentError a deriving (Eq, Show)
+newtype NonExistentError a = NonExistentError a deriving (Eq, Show)
 
 
 areAllIn :: (Eq a) => [a] -> [a] -> Validation [NonExistentError a] ()

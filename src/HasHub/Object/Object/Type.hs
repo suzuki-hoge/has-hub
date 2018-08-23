@@ -12,15 +12,20 @@ instance Show EpicNumber where
 newtype EpicLinkNumber = EpicLinkNumber String deriving (Eq, Ord, Show)
 
 
-data ParentEpicNumber = SharpEpicNumber String
-                      | QuestionEpicNumber String
-                      deriving (Eq, Ord, Show)
+data LinkingEpicNumber = SharpEpicNumber String
+                       | QuestionEpicNumber String
+                       deriving (Eq, Ord, Show)
 
 
 data LinkedEpic = LinkedEpic EpicLinkNumber Epic deriving Show
 
 
 data Epic = Epic EpicNumber Title deriving (Eq, Show)
+instance Ord Epic where
+  (Epic (EpicNumber n1) _) <  (Epic (EpicNumber n2) _) = n1 <  n2
+  (Epic (EpicNumber n1) _) <= (Epic (EpicNumber n2) _) = n1 <= n2
+  (Epic (EpicNumber n1) _) >  (Epic (EpicNumber n2) _) = n1 >  n2
+  (Epic (EpicNumber n1) _) >= (Epic (EpicNumber n2) _) = n1 >= n2
 
 
 newtype IssueNumber = IssueNumber Int deriving (Eq)
@@ -48,17 +53,17 @@ _number (Epic number _) = number
 
 
 type LineNum = Int
-type Definition = (LineNum, EpicLinkNumber)
-type Parent = (LineNum, ParentEpicNumber)
+type Linked = (LineNum, EpicLinkNumber)
+type Linking = (LineNum, LinkingEpicNumber)
 
 
-findIn :: [LinkedEpic] -> [Epic] -> ParentEpicNumber -> [Epic]
+findIn :: [LinkedEpic] -> [Epic] -> LinkingEpicNumber -> [Epic]
 findIn linkedEpics referredEpics number@(SharpEpicNumber _) = filtered
   where
     filtered :: [Epic]
     filtered = filter (\(Epic epicNumber _) -> epicNumber ==? number) referredEpics
 
-    (==?) :: EpicNumber -> ParentEpicNumber -> Bool
+    (==?) :: EpicNumber -> LinkingEpicNumber -> Bool
     (==?) (EpicNumber n) (SharpEpicNumber sen) = "#" ++ show n == sen
 
 findIn linkedEpics referredEpics questionEpicNumber  = map _epic filtered
@@ -74,5 +79,5 @@ _toEpicNumber :: String -> EpicNumber
 _toEpicNumber s = EpicNumber $ (read . tail) s
 
 
-(==?) :: EpicLinkNumber -> ParentEpicNumber -> Bool
+(==?) :: EpicLinkNumber -> LinkingEpicNumber -> Bool
 (==?) (EpicLinkNumber eln) (QuestionEpicNumber qen) = eln == qen

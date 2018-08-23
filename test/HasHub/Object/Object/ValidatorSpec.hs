@@ -102,21 +102,21 @@ spec = do
 
         act `shouldBe` "not satisfied ^?\\d$ format: 1"
 
-  describe "parent-number format" $ do
+  describe "linking-number format" $ do
     describe "success" $ do
       it "starts with ? and number only, starts with # and number only" $ do
-        let act = parentNumberFormat [QuestionEpicNumber "?1", SharpEpicNumber "#1", SharpEpicNumber "#123"]
+        let act = linkingNumberFormat [QuestionEpicNumber "?1", SharpEpicNumber "#1", SharpEpicNumber "#123"]
 
         act `shouldBe` Success ()
 
       it "empty" $ do
-        let act = parentNumberFormat []
+        let act = linkingNumberFormat []
 
         act `shouldBe` Success ()
 
     describe "failure" $ do
       it "valid, sharp-only, sharp-and-contain-non-number, no-mark, double-mark" $ do
-        let act = parentNumberFormat [SharpEpicNumber "#1", SharpEpicNumber "#", SharpEpicNumber "# 1", QuestionEpicNumber "1", QuestionEpicNumber "?#"]
+        let act = linkingNumberFormat [SharpEpicNumber "#1", SharpEpicNumber "#", SharpEpicNumber "# 1", QuestionEpicNumber "1", QuestionEpicNumber "?#"]
 
         act `shouldBe` Failure [
             FormatError $ SharpEpicNumber "#"
@@ -140,100 +140,100 @@ spec = do
   describe "linking" $ do
     describe "success" $ do
       it "def at line-1, use at line-2" $ do
-        let act = linking [(1, EpicLinkNumber "?1")] [(2, QuestionEpicNumber "?1")]
+        let act = [(2, QuestionEpicNumber "?1")] `linkTo` [(1, EpicLinkNumber "?1")]
 
         act `shouldBe` Success ()
 
       it "def at line-1, no use" $ do
-        let act = linking [(1, EpicLinkNumber "?1")] []
+        let act = [] `linkTo` [(1, EpicLinkNumber "?1")]
 
         act `shouldBe` Success ()
 
       it "def at line-1, sharp on line-1" $ do
-        let act = linking [(1, EpicLinkNumber "?1")] [(1, SharpEpicNumber "#1")]
+        let act = [(1, SharpEpicNumber "#1")] `linkTo` [(1, EpicLinkNumber "?1")]
 
         act `shouldBe` Success ()
 
       it "def at line-1 and line-2, use at line-2 and line-4 and sharp on line-3" $ do
-        let act = linking [(1, EpicLinkNumber "?1"), (2, EpicLinkNumber "?2")] [(2, QuestionEpicNumber "?1"), (3, SharpEpicNumber "#1"), (4, QuestionEpicNumber "?2")]
+        let act = [(2, QuestionEpicNumber "?1"), (3, SharpEpicNumber "#1"), (4, QuestionEpicNumber "?2")] `linkTo` [(1, EpicLinkNumber "?1"), (2, EpicLinkNumber "?2")]
 
         act `shouldBe` Success ()
 
       it "empty" $ do
-        let act = linking [] []
+        let act = [] `linkTo` []
 
         act `shouldBe` Success ()
 
       it "define error is ignore format error" $ do
-        let act = linking [(1, EpicLinkNumber "?")] [(1, QuestionEpicNumber "?")]
+        let act =  [(1, QuestionEpicNumber "?")] `linkTo` [(1, EpicLinkNumber "?")]
 
         act `shouldBe` Success ()
 
       it "not defined error is ignore format error" $ do
-        let act = linking [] [(1, QuestionEpicNumber "?")]
+        let act = [(1, QuestionEpicNumber "?")] `linkTo` []
 
         act `shouldBe` Success ()
 
     describe "failure" $ do
       it "no def, use at line-1" $ do
-        let parent1     = (1, QuestionEpicNumber "?1")
+        let linking1 = (2, QuestionEpicNumber "?2")
 
-        let act = linking [] [parent1]
+        let act = [linking1] `linkTo` []
 
-        act `shouldBe` Failure [NotDefinedError parent1]
+        act `shouldBe` Failure [NotDefinedError linking1]
 
       it "def at line-1, use at line-2 but mismatch number" $ do
-        let definition1 = (1, EpicLinkNumber     "?1")
-        let parent1     = (2, QuestionEpicNumber "?2")
+        let linked1  = (1, EpicLinkNumber     "?1")
+        let linking1 = (2, QuestionEpicNumber "?2")
 
-        let act = linking [definition1] [parent1]
+        let act = [linking1] `linkTo` [linked1]
 
-        act `shouldBe` Failure [NotDefinedError parent1]
+        act `shouldBe` Failure [NotDefinedError linking1]
 
       it "def at line-1, use at line-1" $ do
-        let definition1 = (1, EpicLinkNumber     "?1")
-        let parent1     = (1, QuestionEpicNumber "?1")
+        let linked1  = (1, EpicLinkNumber     "?1")
+        let linking1 = (1, QuestionEpicNumber "?1")
 
-        let act = linking [definition1] [parent1]
+        let act = [linking1] `linkTo` [linked1]
 
-        act `shouldBe` Failure [DefineLineError definition1 parent1]
+        act `shouldBe` Failure [DefineLineError linked1 linking1]
 
       it "def at line-2, use at line-1" $ do
-        let definition1 = (2, EpicLinkNumber     "?1")
-        let parent1     = (1, QuestionEpicNumber "?1")
+        let linked1  = (2, EpicLinkNumber     "?1")
+        let linking1 = (1, QuestionEpicNumber "?1")
 
-        let act = linking [definition1] [parent1]
+        let act = [linking1] `linkTo` [linked1]
 
-        act `shouldBe` Failure [DefineLineError definition1 parent1]
+        act `shouldBe` Failure [DefineLineError linked1 linking1]
 
       it "def at line-1, use at line-1 and mismatch number and sharp on line-2 and mismatch number" $ do
-        let definition1 = (1, EpicLinkNumber     "?1")
-        let parent1     = (1, QuestionEpicNumber "?1")
-        let parent2     = (2, SharpEpicNumber    "#1")
-        let parent3     = (2, QuestionEpicNumber "?2")
-        let parent4     = (3, QuestionEpicNumber "?2")
+        let linked1  = (1, EpicLinkNumber     "?1")
+        let linking1 = (1, QuestionEpicNumber "?1")
+        let linking2 = (2, SharpEpicNumber    "#1")
+        let linking3 = (2, QuestionEpicNumber "?2")
+        let linking4 = (3, QuestionEpicNumber "?2")
 
-        let act = linking [definition1] [parent1, parent2, parent3, parent4]
+        let act = [linking1, linking2, linking3, linking4] `linkTo` [linked1]
 
         act `shouldBe` Failure [
-            DefineLineError definition1 parent1
-          , NotDefinedError parent3
-          , NotDefinedError parent4
+            DefineLineError linked1 linking1
+          , NotDefinedError linking3
+          , NotDefinedError linking4
           ]
 
     describe "message" $ do
       it "define line error" $ do
-        let definition = (3, EpicLinkNumber     "?1")
-        let parent     = (2, QuestionEpicNumber "?1")
+        let linked     = (3, EpicLinkNumber     "?1")
+        let linking    = (2, QuestionEpicNumber "?1")
 
-        let act = toMessage $ DefineLineError definition parent
+        let act = toMessage $ DefineLineError linked linking
 
-        act `shouldBe` "can't resolve definition link: use ?1 on line 2, but ?1 is defined at line 3"
+        act `shouldBe` "can't resolve linking epic: use ?1 on line 2, but ?1 is defined at line 3"
 
     describe "message" $ do
       it "not defined error" $ do
-        let parent     = (2, QuestionEpicNumber "?1")
+        let linking    = (2, QuestionEpicNumber "?1")
 
-        let act = toMessage $ NotDefinedError $ (3, QuestionEpicNumber "?2")
+        let act = toMessage $ NotDefinedError (3, QuestionEpicNumber "?2")
 
-        act `shouldBe` "can't resolve definition link: use ?2 on line 3, but ?2 is not defined"
+        act `shouldBe` "can't resolve linking epic: use ?2 on line 3, but ?2 is not defined"
