@@ -34,7 +34,7 @@ areAllIn needles haystacks = needles `F.areAllIn` map _title haystacks
 newtype ExistingError = ExistingError MilestoneTitle deriving (Eq, Show)
 
 instance FixMe ExistingError where
-  toMessage (ExistingError (MilestoneTitle t)) = "already existing milestone: " ++ t
+  toMessage (ExistingError (MilestoneTitle t)) = "already existing: " ++ t
 
 
 areAllNotIn :: [MilestoneTitle] -> [Milestone] -> Validation [ExistingError] ()
@@ -46,18 +46,12 @@ areAllNotIn needles haystacks = map (notContains (map _title haystacks)) needles
       else Just $ ExistingError needle
 
 
-instance FixMe (FormatError DueOn) where
-  toMessage (FormatError (DueOn s))   = "not satisfied ^yyyy-mm-dd$ format: " ++ head (splitOn "T" s)
-
 instance FixMe (FormatError StartOn) where
-  toMessage (FormatError (StartOn s)) = "not satisfied ^yyyy-mm-dd$ format: " ++ head (splitOn "T" s)
+  toMessage (FormatError (StartOn s)) = "not match format(yyyy-mm-dd): " ++ head (splitOn "T" s)
 
 
-dueOnFormat :: [DueOn] -> Validation [FormatError DueOn] ()
-dueOnFormat dueOns = map validate dueOns F.?? ()
-  where
-    validate :: DueOn -> Maybe (FormatError DueOn)
-    validate dueOn@(DueOn s) = isDate s dueOn
+instance FixMe (FormatError DueOn) where
+  toMessage (FormatError (DueOn s))   = "not match format(yyyy-mm-dd): " ++ head (splitOn "T" s)
 
 
 startOnFormat :: [StartOn] -> Validation [FormatError StartOn] ()
@@ -65,6 +59,13 @@ startOnFormat startOns = map validate startOns F.?? ()
   where
     validate :: StartOn -> Maybe (FormatError StartOn)
     validate startOn@(StartOn s) = isDate s startOn
+
+
+dueOnFormat :: [DueOn] -> Validation [FormatError DueOn] ()
+dueOnFormat dueOns = map validate dueOns F.?? ()
+  where
+    validate :: DueOn -> Maybe (FormatError DueOn)
+    validate dueOn@(DueOn s) = isDate s dueOn
 
 
 isDate :: String -> a -> Maybe (FormatError a)
