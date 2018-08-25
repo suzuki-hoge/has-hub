@@ -8,6 +8,7 @@ where
 import Text.Printf (printf)
 
 import qualified HasHub.Command.ReferAll as RA
+import qualified HasHub.Command.ValidateObjects as VO
 
 import HasHub.Object.Object.Parser as Parser
 
@@ -15,38 +16,22 @@ import HasHub.Object.Object.Client as OC
 import HasHub.Object.Pipeline.Client as PC
 import HasHub.Object.Milestone.Client as MC
 
-import HasHub.Object.Object.Validator as OV
-import HasHub.Object.Pipeline.Validator as PV
-import HasHub.Object.Label.Validator as LV
-import HasHub.Object.Collaborator.Validator as CV
-import HasHub.Object.Milestone.Validator as MV
-
-import HasHub.FixMe (flat, _message, printMessages, printFixMes, FixMe(..), Validation(..))
+import HasHub.FixMe (printMessages, printFixMes, Validation(..))
 
 
 execute :: FilePath -> IO ()
 execute yaml = do
+  putStrLn "\ncreate objects."
+
   parsed <- Parser.readObjects yaml
 
   case parsed of
     Success yamls -> do
-      putStrLn "\nrefer all for yaml data validation."
+      validated <- VO.execute' yamls
 
-      (epics, pipelines, labels, collaborators, milestones) <- RA.execute'
-
-      case flat [
-          _message $ _linkingEpicNumbers yamls `OV.areAllIn` epics
-        , _message $ _pipelineNames yamls `PV.areAllIn` pipelines
-        , _message $ _labels yamls `LV.areAllIn` labels
-        , _message $ _collaborators yamls `CV.areAllIn` collaborators
-        , _message $ _milestoneTitles yamls `MV.areAllIn` milestones
-        , _message $ OV.noDuplication $ _epicLinkNumbersWithDuplication yamls
-        , _message $ OV.linkNumberFormat $ _epicLinkNumbers yamls
-        , _message $ OV.linkingNumberFormat $ _linkingEpicNumbers yamls
-        , _message $ _linkings yamls `OV.linkTo` _linkeds yamls
-        ] of
-        Success ()     -> createAll yamls pipelines milestones epics
-        Failure errors -> printMessages errors
+      case validated of
+        Success (pipelines, milestones, epics) -> createAll yamls pipelines milestones epics
+        Failure errors                         -> printMessages errors
 
     Failure fms -> printFixMes fms
 

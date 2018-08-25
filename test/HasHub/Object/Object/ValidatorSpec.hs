@@ -100,7 +100,7 @@ spec = do
       it "error on question-epic-number" $ do
         let act = toMessage $ FormatError $ EpicLinkNumber "1"
 
-        act `shouldBe` "not satisfied ^?\\d$ format: 1"
+        act `shouldBe` "not match format(?\\d): 1"
 
   describe "linking-number format" $ do
     describe "success" $ do
@@ -129,13 +129,13 @@ spec = do
       it "error on sharp-epic-number" $ do
         let act = toMessage $ FormatError $ SharpEpicNumber "#"
 
-        act `shouldBe` "not satisfied ^#\\d$ format: #"
+        act `shouldBe` "not match format(#\\d): #"
 
     describe "message" $ do
       it "error on question-epic-number" $ do
         let act = toMessage $ FormatError $ QuestionEpicNumber "1"
 
-        act `shouldBe` "not satisfied ^?\\d$ format: 1"
+        act `shouldBe` "not match format(?\\d): 1"
 
   describe "linking" $ do
     describe "success" $ do

@@ -58,7 +58,7 @@ noDuplication numbers = case dups of
 
 
 instance FixMe (FormatError EpicLinkNumber) where
-  toMessage (FormatError (EpicLinkNumber s)) = "not satisfied ^?\\d$ format: " ++ s
+  toMessage (FormatError (EpicLinkNumber s)) = "not match format(?\\d): " ++ s
 
 
 linkNumberFormat :: [EpicLinkNumber] -> Validation [FormatError EpicLinkNumber] ()
@@ -69,8 +69,8 @@ linkNumberFormat numbers = map validate numbers F.?? ()
 
 
 instance FixMe (FormatError LinkingEpicNumber) where
-  toMessage (FormatError (SharpEpicNumber s))    = "not satisfied ^#\\d$ format: " ++ s
-  toMessage (FormatError (QuestionEpicNumber s)) = "not satisfied ^?\\d$ format: " ++ s
+  toMessage (FormatError (SharpEpicNumber s))    = "not match format(#\\d): " ++ s
+  toMessage (FormatError (QuestionEpicNumber s)) = "not match format(?\\d): " ++ s
 
 
 linkingNumberFormat :: [LinkingEpicNumber] -> Validation [FormatError LinkingEpicNumber] ()

@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 79612b423041c47f7cfcd8bae2213153e700667aa521a65a998639c173a1589f
+-- hash: fae561eeed89d42c4823f570a187ee1bc3736533b3985ececbc44846eb941ded
 
 name:           has-hub
 version:        0.1.0.0
@@ -55,6 +55,8 @@ library
       HasHub.Command.GenerateMilestonesSample
       HasHub.Command.GenerateObjectsSample
       HasHub.Command.ReferAll
+      HasHub.Command.ValidateMilestones
+      HasHub.Command.ValidateObjects
       HasHub.Connection.Config.Detector
       HasHub.Connection.Config.LocalConfig
       HasHub.Connection.Config.Type

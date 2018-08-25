@@ -9,6 +9,8 @@ import Options.Applicative hiding (Success, Failure)
 import qualified HasHub.Command.ReferAll as RA
 import qualified HasHub.Command.GenerateObjectsSample as GOS
 import qualified HasHub.Command.GenerateMilestonesSample as GMS
+import qualified HasHub.Command.ValidateObjects as VO
+import qualified HasHub.Command.ValidateMilestones as VM
 import qualified HasHub.Command.CreateObjects as CO
 import qualified HasHub.Command.CreateMilestones as CM
 import qualified HasHub.Command.Configure as C
@@ -21,6 +23,8 @@ import HasHub.FixMe (printFixMes, Validation(..), isWritable)
 data Options = ReferAllOptions                          Owner Repository Token Token FilePath
              | GenerateObjectsSampleOptions    FilePath
              | GenerateMilestonesSampleOptions FilePath
+             | ValidateObjectsOptions          FilePath Owner Repository Token Token FilePath
+             | ValidateMilestonesOptions       FilePath Owner Repository Token Token FilePath
              | CreateObjectsOptions            FilePath Owner Repository Token Token FilePath
              | CreateMilestonesOptions         FilePath Owner Repository Token Token FilePath
              deriving Show
@@ -93,74 +97,63 @@ outP = strArgument $ mconcat [
   ]
 
 
-referOptionsP :: Parser Options
-referOptionsP = (<*>) helper $ ReferAllOptions <$> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
+referAllI :: ParserInfo Options
+referAllI = info optionsP $ mconcat [header "refer all issues, epics, pipelines, labels, collaborators, milestones.", failureCode 1]
+  where
+    optionsP = (<*>) helper $ ReferAllOptions <$> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
-referOptionsInfo :: ParserInfo Options
-referOptionsInfo = info referOptionsP $ mconcat [
-    header "refer all objects"
-  , failureCode 1
-  ]
+generateObjectsSampleI :: ParserInfo Options
+generateObjectsSampleI = info optionsP $ mconcat [header "generate objects sample yaml file.", failureCode 1]
+  where
+    optionsP = (<*>) helper $ GenerateObjectsSampleOptions <$> outP :: Parser Options
 
 
-createObjectsOptionsP :: Parser Options
-createObjectsOptionsP = (<*>) helper $ CreateObjectsOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
+generateMilestonesSampleI :: ParserInfo Options
+generateMilestonesSampleI = info optionsP $ mconcat [header "generate milestones sample yaml file.", failureCode 1]
+  where
+    optionsP = (<*>) helper $ GenerateMilestonesSampleOptions <$> outP :: Parser Options
 
 
-createObjectsOptionsInfo :: ParserInfo Options
-createObjectsOptionsInfo = info createObjectsOptionsP $ mconcat [
-    header "create epics and issues"
-  , failureCode 1
-  ]
+validateObjectsI :: ParserInfo Options
+validateObjectsI = info optionsP $ mconcat [header "validate objects yaml file.", failureCode 1]
+  where
+    optionsP = (<*>) helper $ ValidateObjectsOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
-createMilestonesOptionsP :: Parser Options
-createMilestonesOptionsP = (<*>) helper $ CreateMilestonesOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
+validateMilestonesI :: ParserInfo Options
+validateMilestonesI = info optionsP $ mconcat [header "validate milestones yaml file.", failureCode 1]
+  where
+    optionsP = (<*>) helper $ ValidateMilestonesOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
-createMilestonesOptionsInfo :: ParserInfo Options
-createMilestonesOptionsInfo = info createMilestonesOptionsP $ mconcat [
-    header "create milestones"
-  , failureCode 1
-  ]
+createObjectsI :: ParserInfo Options
+createObjectsI = info optionsP $ mconcat [header "create objects.", failureCode 1]
+  where
+    optionsP = (<*>) helper $ CreateObjectsOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
-generateObjectsSampleOptionsP :: Parser Options
-generateObjectsSampleOptionsP = (<*>) helper $ GenerateObjectsSampleOptions <$> outP
-
-
-generateObjectsSampleOptionsInfo :: ParserInfo Options
-generateObjectsSampleOptionsInfo = info generateObjectsSampleOptionsP $ mconcat [
-    header "generate sample yaml"
-  , failureCode 1
-  ]
-
-
-generateMilestonesSampleOptionsP :: Parser Options
-generateMilestonesSampleOptionsP = (<*>) helper $ GenerateMilestonesSampleOptions <$> outP
-
-
-generateMilestonesSampleOptionsInfo :: ParserInfo Options
-generateMilestonesSampleOptionsInfo = info generateMilestonesSampleOptionsP $ mconcat [
-    header "generate sample yaml"
-  , failureCode 1
-  ]
+createMilestonesI :: ParserInfo Options
+createMilestonesI = info optionsP $ mconcat [header "create milestones.", failureCode 1]
+  where
+    optionsP = (<*>) helper $ CreateMilestonesOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
 optionsP :: Parser Options
 optionsP = (<*>) helper $ subparser $ mconcat [
-    command "refer-all"                  referOptionsInfo
-  , command "create-objects"             createObjectsOptionsInfo
-  , command "create-milestones"          createMilestonesOptionsInfo
-  , command "generate-objects-sample"    generateObjectsSampleOptionsInfo
-  , command "generate-milestones-sample" generateMilestonesSampleOptionsInfo
+    command "refer-all"                  referAllI
+  , command "generate-objects-sample"    generateObjectsSampleI
+  , command "generate-milestones-sample" generateMilestonesSampleI
+  , command "validate-objects"           validateObjectsI
+  , command "validate-milestones"        validateMilestonesI
+  , command "create-objects"             createObjectsI
+  , command "create-milestones"          createMilestonesI
   ]
 
 
 optionsInfo :: ParserInfo Options
 optionsInfo = info optionsP $ mconcat [
-    header "operate git hub and zen hub with yaml"
+    header "operate git hub and zen hub with yaml file."
   , failureCode 1
   ]
 
@@ -173,17 +166,10 @@ execute :: Options -> IO ()
 execute (ReferAllOptions                             owner repository gitHubToken zenHubToken logPath) = executeWithConnection   RA.execute        owner repository gitHubToken zenHubToken logPath
 execute (GenerateObjectsSampleOptions    output                                                      ) = executeWithOutput      GOS.execute output
 execute (GenerateMilestonesSampleOptions output                                                      ) = executeWithOutput      GMS.execute output
+execute (ValidateObjectsOptions                 yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (VO.execute yaml)  owner repository gitHubToken zenHubToken logPath
+execute (ValidateMilestonesOptions              yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (VM.execute yaml)  owner repository gitHubToken zenHubToken logPath
 execute (CreateObjectsOptions                   yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (CO.execute yaml)  owner repository gitHubToken zenHubToken logPath
 execute (CreateMilestonesOptions                yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (CM.execute yaml)  owner repository gitHubToken zenHubToken logPath
-
-
-executeWithOutput :: (FilePath -> IO ()) -> FilePath -> IO ()
-executeWithOutput executor output = do
-  writable <- isWritable output
-
-  case writable of
-    Success ()  -> executor output
-    Failure fms -> printFixMes fms
 
 
 executeWithConnection :: IO () -> Owner -> Repository -> Token -> Token -> FilePath -> IO ()
@@ -206,3 +192,12 @@ executeWithConnection executor owner repository gitHubToken zenHubToken logPath 
       mb :: String -> Maybe String
       mb "" = Nothing
       mb s  = Just s
+
+
+executeWithOutput :: (FilePath -> IO ()) -> FilePath -> IO ()
+executeWithOutput executor output = do
+  writable <- isWritable output
+
+  case writable of
+    Success ()  -> executor output
+    Failure fms -> printFixMes fms

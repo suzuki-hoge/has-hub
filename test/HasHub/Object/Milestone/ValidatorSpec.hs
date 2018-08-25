@@ -50,7 +50,7 @@ spec = do
       it "message" $ do
         let act = toMessage $ FormatError $ DueOn "2018/01/31T23:59:59Z"
 
-        act `shouldBe` "not satisfied ^yyyy-mm-dd$ format: 2018/01/31"
+        act `shouldBe` "not match format(yyyy-mm-dd): 2018/01/31"
 
   describe "start on format" $ do
     describe "success" $ do
@@ -76,7 +76,7 @@ spec = do
       it "message" $ do
         let act = toMessage $ FormatError $ StartOn "2018/01/01T00:00:00Z"
 
-        act `shouldBe` "not satisfied ^yyyy-mm-dd$ format: 2018/01/01"
+        act `shouldBe` "not match format(yyyy-mm-dd): 2018/01/01"
 
   describe "are all not in" $ do
     it "success" $ do
@@ -92,4 +92,4 @@ spec = do
     it "message" $ do
       let act = toMessage $ ExistingError F.milestoneTitle1
 
-      act `shouldBe` "already existing milestone: sprint 1"
+      act `shouldBe` "already existing: sprint 1"
