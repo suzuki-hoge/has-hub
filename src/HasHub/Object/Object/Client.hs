@@ -21,17 +21,12 @@ import HasHub.Object.Milestone.Type
 import HasHub.Connection.Connector (getGitHub, getZenHub, postGitHub, postZenHub_, postZenHub'_, putZenHub_)
 
 
+
 referAll :: IO [Epic]
 referAll = do
-  putStrLn "  refer all Issues"
-
-  outputs <- getGitHub ReferIssueInput >>= asIssueOutputs
-
   putStrLn "  refer all Epics"
 
-  epicNumbers <- getZenHub ReferEpicInput >>= asEpicNumbers
-
-  return . map _epic . filter (isEpic epicNumbers) $ outputs
+  getGitHub ReferEpicsInput asEpics
 
 
 createEpic :: EpicLinkNumber -> Title -> Body -> Maybe Pipeline -> [Label] -> [Collaborator] -> Maybe Milestone -> Maybe Estimate -> [Epic] -> IO LinkedEpic

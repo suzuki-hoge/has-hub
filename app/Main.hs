@@ -141,13 +141,13 @@ createMilestonesI = info optionsP $ mconcat [header "create milestones.", failur
 
 optionsP :: Parser Options
 optionsP = (<*>) helper $ subparser $ mconcat [
-    command "refer-all"                  referAllI
-  , command "generate-objects-sample"    generateObjectsSampleI
-  , command "generate-milestones-sample" generateMilestonesSampleI
-  , command "validate-objects"           validateObjectsI
-  , command "validate-milestones"        validateMilestonesI
-  , command "create-objects"             createObjectsI
-  , command "create-milestones"          createMilestonesI
+    command "refer-all"             referAllI
+  , command "gen-objects-sample"    generateObjectsSampleI
+  , command "gen-milestones-sample" generateMilestonesSampleI
+  , command "validate-objects"      validateObjectsI
+  , command "validate-milestones"   validateMilestonesI
+  , command "create-objects"        createObjectsI
+  , command "create-milestones"     createMilestonesI
   ]
 
 

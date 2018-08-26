@@ -14,24 +14,71 @@ import HasHub.Object.Label.Type
 import HasHub.Object.Collaborator.Type
 import HasHub.Object.Milestone.Type
 
-import HasHub.Connection.Config.Type (ToResource(..), RepositoryId)
+import HasHub.Connection.Config.Type (ToResource(..), RepositoryId, QueryParser(..), PaginationQueryParser(..), mkAfter)
 
 import HasHub.FixMe (asJust)
 
 
--- input
+-- refer epics
 
 
-data ReferIssueInput = ReferIssueInput
+data ReferEpicsInput = ReferEpicsInput
 
-instance ToResource ReferIssueInput where
-  toResource _ = "/issues"
+instance QueryParser ReferEpicsInput where
+  toQueryPart _ owner repository cursor = unlines [
+      "query {"
+    , "  repository(owner:\"" ++ owner ++ "\", name:\"" ++ repository ++ "\") {"
+    , "    issues(first:100, states:OPEN, labels:[\"Epic\"]" ++ mkAfter cursor ++ ") {"
+    , "      nodes {"
+    , "        title"
+    , "        number"
+    , "      }"
+    , "      pageInfo {"
+    , "        hasNextPage"
+    , "        endCursor"
+    , "      }"
+    , "    }"
+    , "  }"
+    , "}"
+    ]
+
+instance PaginationQueryParser ReferEpicsInput where
+  parseHasNext _ = asJust . parse
+    where
+      parse :: LBS.ByteString -> Maybe Bool
+      parse lbs = decode lbs
+          >>= parseMaybe (.: "data")
+          >>= parseMaybe (.: "repository")
+          >>= parseMaybe (.: "issues")
+          >>= parseMaybe (.: "pageInfo")
+          >>= parseMaybe (.: "hasNextPage")
+  parseEndCursor _ = parse
+    where
+      parse :: LBS.ByteString -> Maybe String
+      parse lbs = decode lbs
+          >>= parseMaybe (.: "data")
+          >>= parseMaybe (.: "repository")
+          >>= parseMaybe (.: "issues")
+          >>= parseMaybe (.: "pageInfo")
+          >>= parseMaybe (.: "endCursor")
 
 
-data ReferEpicInput = ReferEpicInput
+instance FromJSON Epic where
+  parseJSON (Object v) = Epic <$> (EpicNumber <$> v .: "number") <*> (Title <$> v .: "title")
 
-instance ToResource ReferEpicInput where
-  toResource _ = "/epics"
+
+asEpics :: LBS.ByteString -> IO [Epic]
+asEpics lbs = asJust $ parse lbs
+  where
+    parse :: LBS.ByteString -> Maybe [Epic]
+    parse json = decode json
+        >>= parseMaybe (.: "data")
+        >>= parseMaybe (.: "repository")
+        >>= parseMaybe (.: "issues")
+        >>= parseMaybe (.: "nodes")
+
+
+-- create issue
 
 
 data CreateIssueInput = CreateIssueInput Title Body [Label] [Collaborator] (Maybe Milestone)
@@ -48,6 +95,16 @@ instance ToJSON CreateIssueInput where
     ] ++ maybe [] (\(Milestone (MilestoneNumber n) _ _ _) -> ["milestone" .= n]) milestone
 
 
+instance FromJSON IssueNumber where
+  parseJSON (Object v) = IssueNumber <$> (v .: "number")
+
+asIssueNumber :: LBS.ByteString -> IO IssueNumber
+asIssueNumber lbs = asJust $ decode lbs
+
+
+-- set pipeline
+
+
 data SetPipelineInput = SetPipelineInput IssueNumber Pipeline
 
 instance ToResource SetPipelineInput where
@@ -58,6 +115,9 @@ instance ToJSON SetPipelineInput where
       "pipeline_id" .= i
     , "position"    .= ("bottom" :: String)
     ]
+
+
+-- set estimate
 
 
 data SetEstimateInput = SetEstimateInput IssueNumber Estimate
@@ -71,6 +131,9 @@ instance ToJSON SetEstimateInput where
     ]
 
 
+-- set epic
+
+
 data SetEpicInput = SetEpicInput IssueNumber EpicNumber RepositoryId
 
 instance ToResource SetEpicInput where
@@ -82,6 +145,9 @@ instance ToJSON SetEpicInput where
     ]
 
 
+-- convert to epic
+
+
 newtype ConvertToEpicInput = ConvertToEpicInput IssueNumber
 
 instance ToResource ConvertToEpicInput where
@@ -89,41 +155,3 @@ instance ToResource ConvertToEpicInput where
 
 instance ToJSON ConvertToEpicInput where
   toJSON _ = object []
-
-
--- output
-
-
-instance FromJSON EpicNumber where
-  parseJSON (Object v) = EpicNumber <$> (v .: "issue_number")
-
-asEpicNumbers :: LBS.ByteString -> IO [EpicNumber]
-asEpicNumbers lbs = asJust $ parseInObject lbs
-  where
-    parseInObject :: LBS.ByteString -> Maybe [EpicNumber]
-    parseInObject json = decode json >>= parseMaybe (\(Object v) -> v .: "epic_issues")
-    -- https://artyom.me/aeson#parsing-without-creating-extra-types
-
-
-instance FromJSON IssueNumber where
-  parseJSON (Object v) = IssueNumber <$> (v .: "number")
-
-asIssueNumber :: LBS.ByteString -> IO IssueNumber
-asIssueNumber lbs = asJust $ decode lbs
-
-
-data ReferIssueOutput = ReferIssueOutput IssueNumber Title deriving (Eq, Show)
-
-instance FromJSON ReferIssueOutput where
-  parseJSON (Object v) = ReferIssueOutput <$> (IssueNumber <$> v .: "number") <*> (Title <$> v .: "title")
-
-asIssueOutputs :: LBS.ByteString -> IO [ReferIssueOutput]
-asIssueOutputs lbs = asJust $ decode lbs
-
-
-_epic :: ReferIssueOutput -> Epic
-_epic (ReferIssueOutput issueNumber title) = Epic (_epicNumber issueNumber) title
-
-
-isEpic :: [EpicNumber] -> ReferIssueOutput -> Bool
-isEpic epicNumbers (ReferIssueOutput issueNumber _) = _epicNumber issueNumber `elem` epicNumbers

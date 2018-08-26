@@ -15,10 +15,14 @@ import HasHub.Connection.Config.Type (ToResource(..))
 import HasHub.FixMe (asJust)
 
 
-data ReferInput = ReferInput
+-- refer pipelines
 
-instance ToResource ReferInput where
+
+data ReferPipelinesInput = ReferPipelinesInput
+
+instance ToResource ReferPipelinesInput where
   toResource _ = "/board"
+
 
 instance FromJSON Pipeline where
   parseJSON (Object v) = Pipeline <$> (PipelineId <$> v .: "id") <*> (PipelineName <$> v .: "name")

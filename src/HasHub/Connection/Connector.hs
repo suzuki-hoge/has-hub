@@ -4,6 +4,7 @@
 module HasHub.Connection.Connector
 (
   getGitHub
+, getGitHub'
 , getZenHub
 , postGitHub
 , postZenHub_
@@ -17,7 +18,8 @@ import Network.HTTP.Client (parseRequest_, Request(..), RequestBody(..), newMana
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.HTTP.Types (RequestHeaders, Method)
 
-import Data.Aeson (ToJSON, encode)
+import Data.Aeson (ToJSON, encode, Value(Object), (.:), decode, object, (.=))
+import Data.Aeson.Types (parseMaybe)
 
 import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
 
@@ -26,8 +28,40 @@ import HasHub.Connection.Logger (logRequest, logResponse)
 import HasHub.Connection.Config.Type
 
 
-getGitHub :: (ToResource input) => input -> IO LBS.ByteString
-getGitHub = secureGet LC.getGitHubHeaders LC.getGitHubEndpoint
+getGitHub :: (QueryParser qp, PaginationQueryParser qp) => qp -> (LBS.ByteString -> IO [a]) -> IO [a]
+getGitHub = secureV4RecursiveGet Nothing []
+
+
+getGitHub' :: (QueryParser qp) => qp -> IO LBS.ByteString
+getGitHub' = secureV4Get Nothing
+
+
+secureV4RecursiveGet :: (QueryParser qp, PaginationQueryParser qp) => Cursor -> [a] -> qp -> (LBS.ByteString -> IO [a]) -> IO [a]
+secureV4RecursiveGet currentCursor acc qp parse = do
+  lbs <- secureV4Get currentCursor qp
+
+  fetched <- parse lbs
+  hasNext <- parseHasNext qp lbs
+  let endCursor = parseEndCursor qp lbs
+
+  if hasNext
+    then secureV4RecursiveGet endCursor (acc ++ fetched) qp parse
+    else return $ acc ++ fetched
+
+
+secureV4Get :: (QueryParser qp) => Cursor -> qp -> IO LBS.ByteString
+secureV4Get currentCursor qp = do
+  headers <- LC.getGitHubV4Headers
+  owner <- LC.getOwner
+  repository <- LC.getRepository
+
+  secureFetching (parseRequest_ "https://api.github.com/graphql") {
+      method = "POST"
+    , requestHeaders = headers
+    , requestBody = RequestBodyLBS $ encode $ object [
+        "query" .= toQueryPart qp owner repository currentCursor
+      ]
+  }
 
 
 getZenHub :: (ToResource input) => input -> IO LBS.ByteString
@@ -35,7 +69,7 @@ getZenHub = secureGet LC.getZenHubHeaders LC.getZenHubEndpoint
 
 
 postGitHub :: (ToResource input, ToJSON input) => input -> IO LBS.ByteString
-postGitHub = secureUpdate "POST" LC.getGitHubHeaders LC.getGitHubEndpoint
+postGitHub = secureUpdate "POST" LC.getGitHubV3Headers LC.getGitHubEndpoint
 
 
 postZenHub_ :: (ToResource input, ToJSON input) => input -> IO ()

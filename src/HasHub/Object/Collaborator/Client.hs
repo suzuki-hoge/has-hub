@@ -16,4 +16,4 @@ referAll :: IO [Collaborator]
 referAll = do
   putStrLn "  refer all Collaborators"
 
-  getGitHub ReferInput >>= asCollaborators
+  getGitHub ReferCollaboratorsInput asCollaborators

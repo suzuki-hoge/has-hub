@@ -16,4 +16,4 @@ referAll :: IO [Label]
 referAll = do
   putStrLn "  refer all Labels"
 
-  getGitHub ReferInput >>= asLabels
+  getGitHub ReferLabelsInput asLabels

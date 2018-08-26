@@ -8,21 +8,62 @@ import Test.Hspec
 
 import HasHub.Object.Collaborator.IOType
 
-import HasHub.Connection.Config.Type (toResource)
+import HasHub.Connection.Config.Type (QueryParser(..), PaginationQueryParser(..))
 
 import qualified Fixture as F
 
 
 spec :: Spec
 spec = do
-  describe "input" $ do
-    it "refer collaborators" $ do
-      let act = toResource ReferInput
+  describe "refer collaborators" $ do
+    it "first input" $ do
+      let act = toQueryPart ReferCollaboratorsInput F.owner F.repository Nothing
 
-      act `shouldBe` "/collaborators"
+      act `shouldBe` unlines [
+          "query {"
+        , "  repository(owner:\"suzuki-hoge\", name:\"has-hub-workspace\") {"
+        , "    assignableUsers(first:100) {"
+        , "      nodes {"
+        , "        login"
+        , "      }"
+        , "      pageInfo {"
+        , "        hasNextPage"
+        , "        endCursor"
+        , "      }"
+        , "    }"
+        , "  }"
+        , "}"
+        ]
 
-  describe "output" $ do
-    it "name" $ do
-      let act = asCollaborators "[{\"login\": \"John\"}]"
+    it "second input" $ do
+      let act = toQueryPart ReferCollaboratorsInput F.owner F.repository F.cursor
 
-      act `shouldReturn` [F.collaborator]
+      act `shouldBe` unlines [
+          "query {"
+        , "  repository(owner:\"suzuki-hoge\", name:\"has-hub-workspace\") {"
+        , "    assignableUsers(first:100, after:\"abcd==\") {"
+        , "      nodes {"
+        , "        login"
+        , "      }"
+        , "      pageInfo {"
+        , "        hasNextPage"
+        , "        endCursor"
+        , "      }"
+        , "    }"
+        , "  }"
+        , "}"
+        ]
+
+    it "first output" $ do
+      let sut = "{\"data\":{\"repository\":{\"assignableUsers\":{\"nodes\":[{\"login\": \"suzuki-hoge\"}],\"pageInfo\":{\"endCursor\":\"abcd==\",\"hasNextPage\":true}}}}}"
+
+      asCollaborators sut `shouldReturn` [F.collaborator]
+      parseHasNext ReferCollaboratorsInput sut `shouldReturn` True
+      parseEndCursor ReferCollaboratorsInput sut `shouldBe` (Just "abcd==")
+
+    it "last output" $ do
+      let sut = "{\"data\":{\"repository\":{\"assignableUsers\":{\"nodes\":[],\"pageInfo\":{\"endCursor\":null,\"hasNextPage\":false}}}}}"
+
+      asCollaborators sut `shouldReturn` []
+      parseHasNext ReferCollaboratorsInput sut `shouldReturn` False
+      parseEndCursor ReferCollaboratorsInput sut `shouldBe` Nothing
