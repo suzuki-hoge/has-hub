@@ -44,39 +44,49 @@ execute' = do
 
 printEpics :: [Epic] -> IO ()
 printEpics xs = do
-  putStrLn "\nepics."
+  putStrLn "\nEpics."
   if null xs then putStrLn "  no episc" else mapM_ print (sort xs)
+  printResults xs
   where
     print (Epic (EpicNumber n) (Title t)) = printf "  #%d %s\n" n t
 
 
 printPipelines :: [Pipeline] -> IO ()
 printPipelines xs = do
-  putStrLn "\npipelines."
+  putStrLn "\nPipelines."
   if null xs then putStrLn "  no pipelines" else mapM_ print xs
+  printResults xs
   where
     print (Pipeline _ (PipelineName n)) = printf "  %s\n" n
 
 
 printLabels :: [Label] -> IO ()
 printLabels xs = do
-  putStrLn "\nlabels."
+  putStrLn "\nLabels."
   if null xs then putStrLn "  no labels" else mapM_ print xs
+  printResults xs
   where
     print (Label n) = printf "  %s\n" n
 
 
 printCollaborators :: [Collaborator] -> IO ()
 printCollaborators xs = do
-  putStrLn "\nassignees."
+  putStrLn "\nAssignees."
   if null xs then putStrLn "  no assignees" else mapM_ print xs
+  printResults xs
   where
     print (Collaborator n) = printf "  %s\n" n
 
 
 printMilestones :: [Milestone] -> IO ()
 printMilestones xs = do
-  putStrLn "\nmilestones."
+  putStrLn "\nMilestones."
   if null xs then putStrLn "  no milestones" else mapM_ print (sort xs)
+  printResults xs
   where
     print (Milestone _ title startOn dueOn) = printf "  %s\n" (_string title startOn dueOn)
+
+
+printResults :: [a] -> IO ()
+printResults [x] = putStrLn "\n  1 result."
+printResults xs  = printf "\n  %d results.\n" $ length xs

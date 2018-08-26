@@ -4,13 +4,6 @@
 gtoken='xxx'; ztoken='yyy';
 ```
 
-## Repository
-### Refer
-```
-curl -sS -H "Authorization: token $gtoken" https://api.github.com/repos/suzuki-hoge/has-hub-workspace | jq .id
-131509978
-```
-
 ## Pipeline
 ### Refer
 ```
@@ -20,33 +13,7 @@ curl -sS -H "X-Authentication-Token: $ztoken" https://api.zenhub.io/p1/repositor
 ["5b02c59d2133e10681389876","reviewing"]
 ```
 
-## Label
-### Refer
-```
-curl -sS -H "Authorization: token $gtoken" 'https://api.github.com/repos/suzuki-hoge/has-hub-workspace/labels' | jq -c '.[] | .name'     
-"label 1"
-```
-
-## Collaborator
-### Refer
-```
-curl -sS -H "Authorization: token $gtoken" https://api.github.com/repos/suzuki-hoge/has-hub-workspace/collaborators | jq -c '.[] | .login'
-"suzuki-hoge"
-```
-
 ## Milestone
-### Refer
-```
-curl -sS -H "Authorization: token $gtoken" 'https://api.github.com/repos/suzuki-hoge/has-hub-workspace/milestones?state=all' | jq -c '.[] | [.number, .title, .due_on]'
-[1,"sprint 1",null]
-[2,"sprint 2","2018-05-31T07:00:00Z"]
-```
-
-```
-curl -sS -H "X-Authentication-Token: $ztoken" https://api.zenhub.io/p1/repositories/131509978/milestones/2/start_date | jq .start_date
-"2018-05-23T03:00:00.000Z"
-```
-
 ### Create
 ```
 curl -sS -H "Authorization: token $gtoken" -X POST https://api.github.com/repos/suzuki-hoge/has-hub-workspace/milestones -d '{"title": "sprint 3", "due_on": "2018-05-01T23:59:59Z"}' | jq -c '[.number, .title, .due_on]'
@@ -59,14 +26,6 @@ curl -sS -H 'content-type:application/json' -H "X-Authentication-Token: $ztoken"
 ```
 
 ## Issue
-### Refer
-```
-curl -sS -H "X-Authentication-Token: $ztoken" https://api.zenhub.io/p1/repositories/131509978/epics | jq -c '.epic_issues[] | .issue_number'
-5
-4
-3
-```
-
 ### Create
 ```
 curl -sS -H "Authorization: token $gtoken" https://api.github.com/repos/suzuki-hoge/has-hub-workspace/issues | jq -c '.[] | [.number, .title]'
@@ -87,16 +46,6 @@ curl -sS -H 'content-type:application/json' -H "X-Authentication-Token: $ztoken"
 3
 ```
 
-## Epic
-### Refer
-```
-curl -sS -H "X-Authentication-Token: $ztoken" https://api.zenhub.io/p1/repositories/131509978/epics | jq -c '.epic_issues[] | .issue_number'
-5
-4
-3
-```
-
-### Create
 ```
 curl -sS -H 'content-type:application/json' -H "X-Authentication-Token: $ztoken" https://api.zenhub.io/p1/repositories/131509978/issues/4/convert_to_epic -X POST -d '{}'
 ```

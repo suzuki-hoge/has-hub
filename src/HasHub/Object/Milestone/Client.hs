@@ -19,11 +19,12 @@ referAll :: IO [Milestone]
 referAll = do
   putStrLn "  refer all Milestones"
 
-  getGitHub ReferGitHubInput >>= asGitHubOutputs >>= mapM withStartOn
+  getGitHub ReferGitHubMilestonesInput asGitHubMilestones >>= mapM withStartOn
   where
-    withStartOn :: ReferGitHubOutput -> IO Milestone
-    withStartOn (ReferGitHubOutput number title dueOn) = do
+    withStartOn :: ReferGitHubMilestonesOutput -> IO Milestone
+    withStartOn (ReferGitHubMilestonesOutput number title dueOn) = do
       startOn <- asStartOn <$> getZenHub (ReferStartOnInput number)
+
       return $ Milestone number title startOn dueOn
 
 
@@ -31,7 +32,7 @@ create :: MilestoneTitle -> Maybe StartOn -> Maybe DueOn -> IO ()
 create title startOn dueOn = do
   printf "  create %s\n" (_string title startOn dueOn)
 
-  number <- postGitHub (CreateMilestoneInput title dueOn) >>= asNumber
+  number <- postGitHub (CreateGitHubMilestoneInput title dueOn) >>= asNumber
 
   mapM_ (setStartOn number) startOn
 

@@ -16,7 +16,7 @@ import Data.Maybe (fromMaybe)
 import Control.Lens ((^?))
 import Data.Aeson.Lens (key, _Integer)
 
-import HasHub.Connection.Connector (getGitHub)
+import HasHub.Connection.Connector (getGitHub')
 
 import HasHub.Connection.Config.Detector
 import HasHub.Connection.Config.LocalConfig
@@ -39,7 +39,8 @@ fetchRepositoryId :: IO ()
 fetchRepositoryId = do
   putStrLn "\nfetch RepositoryId."
 
-  repositoryId <- asJust =<< (\json -> json ^? key "id" . _Integer) <$> getGitHub RepositoryIdInput
+  repositoryId <- asJust =<< (\json -> json ^? key "data" . key "repository" . key "databaseId" . _Integer) <$> getGitHub' RepositoryIdInput
+
   setRepositoryId $ (read . show) repositoryId
 
 

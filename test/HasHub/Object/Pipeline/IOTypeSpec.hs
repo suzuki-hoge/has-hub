@@ -15,14 +15,13 @@ import qualified Fixture as F
 
 spec :: Spec
 spec = do
-  describe "input" $ do
-    it "refer pipelines" $ do
-      let act = toResource ReferInput
+  describe "refer pipelines" $ do
+    it "resource" $ do
+      let act = toResource ReferPipelinesInput
 
       act `shouldBe` "/board"
 
-  describe "output" $ do
-    it "id, name" $ do
-      let act = asPipelines "{\"pipelines\": [{\"id\": \"5b02c59d2133e10681389873\", \"name\":\"backlog\"}, {\"id\": \"5b0577fa2133e1068138aabc\", \"name\": \"sprint backlog\"}]}"
+    it "output" $ do
+      let act = asPipelines "{\"pipelines\": [{\"id\": \"abc123\", \"name\":\"backlog\"}, {\"id\": \"xyz789\", \"name\": \"sprint backlog\"}]}"
 
       act `shouldReturn` [F.pipeline1, F.pipeline2]

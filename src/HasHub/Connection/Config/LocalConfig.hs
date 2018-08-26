@@ -55,6 +55,14 @@ getGitHubEndpoint = do
   return $ "https://api.github.com/repos/" ++ owner ++ "/" ++ repository
 
 
+getOwner :: IO Owner
+getOwner = getEnv "has-hub.local-config.owner"
+
+
+getRepository :: IO Repository
+getRepository = getEnv "has-hub.local-config.repository"
+
+
 getZenHubEndpoint :: IO Endpoint
 getZenHubEndpoint = do
   rid <- getRepositoryId
@@ -62,11 +70,18 @@ getZenHubEndpoint = do
   return $ "https://api.zenhub.io/p1/repositories/" ++ show rid
 
 
-getGitHubHeaders :: IO RequestHeaders
-getGitHubHeaders = do
+getGitHubV3Headers :: IO RequestHeaders
+getGitHubV3Headers = do
   token <- getEnv "has-hub.local-config.git-hub-token"
 
   return [("User-Agent", "curl"), ("Authorization", BS.pack $ "token " ++ token)]
+
+
+getGitHubV4Headers :: IO RequestHeaders
+getGitHubV4Headers = do
+  token <- getEnv "has-hub.local-config.git-hub-token"
+
+  return [("content-type", "application/json"), ("User-Agent", "curl"), ("Authorization", BS.pack $ "bearer " ++ token)]
 
 
 getZenHubHeaders :: IO RequestHeaders

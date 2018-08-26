@@ -6,24 +6,56 @@ module HasHub.Object.Collaborator.IOType where
 
 import qualified Data.ByteString.Lazy.Internal as LBS (ByteString)
 import Data.Aeson (FromJSON(..), Value(Object), (.:), decode)
+import Data.Aeson.Types (parseMaybe)
 
 import HasHub.Object.Collaborator.Type
 
-import HasHub.Connection.Config.Type (ToResource(..))
+import HasHub.Connection.Config.Type (QueryParser(..), PaginationQueryParser(..), mkAfter)
 
 import HasHub.FixMe (asJust)
 
 
--- input
+-- refer collaborators
 
 
-data ReferInput = ReferInput
+data ReferCollaboratorsInput = ReferCollaboratorsInput
 
-instance ToResource ReferInput where
-  toResource _ = "/collaborators"
+instance QueryParser ReferCollaboratorsInput where
+  toQueryPart _ owner repository cursor = unlines [
+      "query {"
+    , "  repository(owner:\"" ++ owner ++ "\", name:\"" ++ repository ++ "\") {"
+    , "    assignableUsers(first:100" ++ mkAfter cursor ++ ") {"
+    , "      nodes {"
+    , "        login"
+    , "      }"
+    , "      pageInfo {"
+    , "        hasNextPage"
+    , "        endCursor"
+    , "      }"
+    , "    }"
+    , "  }"
+    , "}"
+    ]
 
-
--- output
+instance PaginationQueryParser ReferCollaboratorsInput where
+  parseHasNext _ = asJust . parse
+    where
+      parse :: LBS.ByteString -> Maybe Bool
+      parse lbs = decode lbs
+          >>= parseMaybe (.: "data")
+          >>= parseMaybe (.: "repository")
+          >>= parseMaybe (.: "assignableUsers")
+          >>= parseMaybe (.: "pageInfo")
+          >>= parseMaybe (.: "hasNextPage")
+  parseEndCursor _ = parse
+    where
+      parse :: LBS.ByteString -> Maybe String
+      parse lbs = decode lbs
+          >>= parseMaybe (.: "data")
+          >>= parseMaybe (.: "repository")
+          >>= parseMaybe (.: "assignableUsers")
+          >>= parseMaybe (.: "pageInfo")
+          >>= parseMaybe (.: "endCursor")
 
 
 instance FromJSON Collaborator where
@@ -31,4 +63,11 @@ instance FromJSON Collaborator where
 
 
 asCollaborators :: LBS.ByteString -> IO [Collaborator]
-asCollaborators lbs = asJust $ decode lbs
+asCollaborators lbs = asJust $ parse lbs
+  where
+    parse :: LBS.ByteString -> Maybe [Collaborator]
+    parse json = decode json
+        >>= parseMaybe (.: "data")
+        >>= parseMaybe (.: "repository")
+        >>= parseMaybe (.: "assignableUsers")
+        >>= parseMaybe (.: "nodes")
