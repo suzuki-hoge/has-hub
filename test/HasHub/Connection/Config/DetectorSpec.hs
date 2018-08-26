@@ -13,164 +13,68 @@ import HasHub.FixMe (FixMe(..), Validation(..))
 
 spec :: Spec
 spec = do
-  describe "owner" $ do
-    describe "success" $ do
-      it "detect https protocol" $ do
-        let act = fixOwner Nothing "test/dummies/cwd/valid_https_protocol_config"
+  describe "fix config" $ do
+    it "no command line arguments and execute at project1" $ do
+      let sut = fixConfig Nothing "test/dummies/config/home/project1"
 
-        act `shouldReturn` Success "https-owner"
+      sut "owner:" `shouldReturn` Success "owner-1"
+      sut "repository:" `shouldReturn` Success "workspace-1"
+      sut "git-hub-token:" `shouldReturn` Success "12345678"
+      sut "zen-hub-token:" `shouldReturn` Success "12345678abcdefgh"
 
-      it "detect git protocol" $ do
-        let act = fixOwner Nothing "test/dummies/cwd/valid_git_protocol_config"
+    it "no command line arguments and execute at project2" $ do
+      let sut = fixConfig Nothing "test/dummies/config/home/project2"
 
-        act `shouldReturn` Success "git-owner"
+      sut "owner:" `shouldReturn` Success "owner-2"
+      sut "repository:" `shouldReturn` Success "workspace-2"
+      sut "git-hub-token:" `shouldReturn` Success "12345678"
+      sut "zen-hub-token:" `shouldReturn` Success "12345678abcdefgh"
 
-      it "detect git protocol with dot" $ do
-        let act = fixOwner Nothing "test/dummies/cwd/valid_git_protocol_with_dot_config"
+    it "owner specified by command line argument and execute at project1" $ do
+      let sut = fixConfig (Just "suzuki-hoge") "test/dummies/config/home/project1"
 
-        act `shouldReturn` Success "git-owner"
+      sut "owner:" `shouldReturn` Success "suzuki-hoge"
 
-      it "specified" $ do
-        let act = fixOwner (Just "suzuki-hoge") "test/dummies/cwd/xxx"
+    it "log-path not specified by command line argument" $ do
+      let sut = fixLogPath Nothing "test/dummies/config/home"
 
-        act `shouldReturn` Success "suzuki-hoge"
+      sut "log-full-path:" `shouldReturn` Success "/tmp/has-hub.log"
 
-    describe "failure" $ do
-      it "not git directory" $ do
-        let act = fixOwner Nothing "test/dummies/cwd/xxx"
+    it "log-path specified by command line argument" $ do
+      let sut = fixLogPath (Just "~/has-hub.log") "test/dummies/config/home"
+      home <- getHomeDirectory
 
-        act `shouldReturn` Failure [ConfigurationError "test/dummies/cwd/xxx is not found."]
+      sut "log-full-path:" `shouldReturn` Success (home ++ "/has-hub.log")
 
-      it "no remote config" $ do
-        let act = fixOwner Nothing "test/dummies/cwd/no_remote_config"
+    it "not specified by command line argument and no config" $ do
+      let sut = fixConfig Nothing "test/dummies/config/home/project1"
 
-        act `shouldReturn` Failure [ConfigurationError "remote config missing."]
+      sut "foo-key:" `shouldReturn` Failure [ConfigurationError "foo-key not found in config"]
 
-      it "invalid protocol" $ do
-        let act = fixOwner Nothing "test/dummies/cwd/invalid_remote_config"
-
-        act `shouldReturn` Failure [ConfigurationError "invalid remote config."]
-
-  describe "repository" $ do
-    describe "success" $ do
-      it "detect https protocol" $ do
-        let act = fixRepository Nothing "test/dummies/cwd/valid_https_protocol_config"
-
-        act `shouldReturn` Success "https-repository"
-
-      it "detect git protocol" $ do
-        let act = fixRepository Nothing "test/dummies/cwd/valid_git_protocol_config"
-
-        act `shouldReturn` Success "git-repository"
-
-      it "detect git protocol with dot" $ do
-        let act = fixRepository Nothing "test/dummies/cwd/valid_git_protocol_with_dot_config"
-
-        act `shouldReturn` Success "git-repository"
-
-      it "specified" $ do
-        let act = fixRepository (Just "has-hub-workspace") "test/dummies/cwd/not_git_directory"
-
-        act `shouldReturn` Success "has-hub-workspace"
-
-    describe "failure" $ do
-      it "not git directory" $ do
-        let act = fixRepository Nothing "test/dummies/cwd/xxx"
-
-        act `shouldReturn` Failure [ConfigurationError "test/dummies/cwd/xxx is not found."]
-
-      it "no remote config" $ do
-        let act = fixRepository Nothing "test/dummies/cwd/no_remote_config"
-
-        act `shouldReturn` Failure [ConfigurationError "remote config missing."]
-
-      it "invalid protocol" $ do
-        let act = fixRepository Nothing "test/dummies/cwd/invalid_remote_config"
-
-        act `shouldReturn` Failure [ConfigurationError "invalid remote config."]
-
-  describe "git hub token" $ do
-    describe "success" $ do
-      it "detect" $ do
-        let act = fixToken Nothing "git-hub-token:" "test/dummies/home/valid_config"
-
-        act `shouldReturn` Success "12345678"
-
-      it "specified" $ do
-        let act = fixToken (Just "xxxxxxxx") "git-hub-token:" "test/dummies/home/xxx"
-
-        act `shouldReturn` Success "xxxxxxxx"
-
-    describe "failure" $ do
-      it "no config" $ do
-        let act = fixToken Nothing "git-hub-token:" "test/dummies/home/xxx"
-
-        act `shouldReturn` Failure [ConfigurationError "test/dummies/home/xxx is not found."]
-
-      it "invalid config" $ do
-        let act = fixToken Nothing "git-hub-token:" "test/dummies/home/invalid_config"
-
-        act `shouldReturn` Failure [ConfigurationError "git-hub-token config missing."]
-
-  describe "zen hub token" $ do
-    describe "success" $ do
-      it "detect" $ do
-        let act = fixToken Nothing "zen-hub-token:" "test/dummies/home/valid_config"
-
-        act `shouldReturn` Success "12345678abcdefgh"
-
-      it "specified" $ do
-        let act = fixToken (Just "xxxxxxxxxxxxxxxx") "zen-hub-token:" "test/dummies/home/xxx"
-
-        act `shouldReturn` Success "xxxxxxxxxxxxxxxx"
-
-    describe "failure" $ do
-      it "no config" $ do
-        let act = fixToken Nothing "zen-hub-token:" "test/dummies/home/xxx"
-
-        act `shouldReturn` Failure [ConfigurationError "test/dummies/home/xxx is not found."]
-
-      it "invalid config" $ do
-        let act = fixToken Nothing "zen-hub-token:" "test/dummies/home/invalid_config"
-
-        act `shouldReturn` Failure [ConfigurationError "zen-hub-token config missing."]
-
-  describe "log path" $ do
-      it "default" $ do
-        let act = fixLogPath Nothing
-        home <- getHomeDirectory
-
-        act `shouldReturn` Success (home ++ "/has-hub.log")
-
-      it "specified" $ do
-        let act = fixLogPath (Just "./out")
-
-        act `shouldReturn` Success "./out"
-
-  describe "proxy" $ do
+  describe "detect proxy" $ do
       it "no env" $ do
         unsetEnv "https_proxy"
 
-        let act = fixProxy
+        let act = detectProxy
 
         act `shouldReturn` Nothing
 
       it "from env that lower case name" $ do
         setEnv "https_proxy" "xxx.xxx.xxx.xxx:xxxx"
 
-        let act = fixProxy
+        let act = detectProxy
 
         act `shouldReturn` Just "xxx.xxx.xxx.xxx:xxxx"
 
       it "from env that upper case name" $ do
         setEnv "HTTPS_PROXY" "xxx.xxx.xxx.xxx:xxxx"
 
-        let act = fixProxy
+        let act = detectProxy
 
         act `shouldReturn` Just "xxx.xxx.xxx.xxx:xxxx"
 
   describe "message" $ do
     it "message" $ do
-      let act = toMessage $ ConfigurationError "missing."
+      let act = toMessage $ ConfigurationError "foo-key not found in config"
 
-      act `shouldBe` "configuration error: missing."
+      act `shouldBe` "configuration error: foo-key not found in config"
