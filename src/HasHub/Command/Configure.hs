@@ -50,8 +50,8 @@ detectAll owner' repository' gitHubToken' zenHubToken' logPath' = do
   repository <- detectRepository repository'
   gitHubToken <- detectGitHubToken gitHubToken'
   zenHubToken <- detectZenHubToken zenHubToken'
-  logPath <- fixLogPath logPath'
-  proxy <- fixProxy
+  logPath <- detectLogPath logPath'
+  proxy <- detectProxy
 
   putStrLn "\ndetect configs."
   putStrLn $ "  owner         : " ++ vString owner

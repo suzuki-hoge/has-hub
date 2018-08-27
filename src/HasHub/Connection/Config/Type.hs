@@ -45,7 +45,7 @@ class PaginationQueryParser a where
 
 
 mkAfter :: Cursor -> String
-mkAfter mx = fromMaybe "" $ (\x -> ", after:\"" ++ x ++ "\"") <$> mx
+mkAfter mx = maybe "" (\ x -> ", after:\"" ++ x ++ "\"") mx
 
 
 class ToResource a where

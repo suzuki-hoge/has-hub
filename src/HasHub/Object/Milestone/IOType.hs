@@ -103,9 +103,9 @@ instance ToResource CreateGitHubMilestoneInput where
   toResource _ = "/milestones"
 
 instance ToJSON CreateGitHubMilestoneInput where
-  toJSON (CreateGitHubMilestoneInput (MilestoneTitle t) dueOn) = object $ [
+  toJSON (CreateGitHubMilestoneInput (MilestoneTitle t) dueOn) = object $ (
     "title" .= t
-    ] ++ maybe [] (\(DueOn d) -> ["due_on" .= d]) dueOn
+    ) : maybe [] (\(DueOn d) -> ["due_on" .= d]) dueOn
 
 
 instance FromJSON MilestoneNumber where

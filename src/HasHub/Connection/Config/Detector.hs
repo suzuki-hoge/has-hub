@@ -1,14 +1,13 @@
 module HasHub.Connection.Config.Detector
 (
   detectOwner
-, fixOwner
 , detectRepository
-, fixRepository
 , detectGitHubToken
 , detectZenHubToken
-, fixToken
+, fixConfig
+, detectLogPath
 , fixLogPath
-, fixProxy
+, detectProxy
 , ConfigurationError(..)
 , module HasHub.Connection.Config.Type
 , module HasHub.FixMe
@@ -17,10 +16,11 @@ where
 
 
 import System.Directory (doesFileExist, getCurrentDirectory, getHomeDirectory)
+import System.FilePath.Posix (takeDirectory, (</>))
 import System.Environment (lookupEnv)
-import Data.List (find, isInfixOf)
+import Data.List (find)
+import Data.List.Utils (replace)
 import Data.List.Split (splitOn)
-import Data.Maybe (fromMaybe)
 import Data.String.Utils (startswith)
 
 import HasHub.Connection.Config.Type
@@ -34,104 +34,92 @@ instance FixMe ConfigurationError where
   toMessage (ConfigurationError s) = "configuration error: " ++ s
 
 
-type Line = String
-
-
 detectOwner :: Maybe Owner -> IO (Validation [ConfigurationError] Owner)
-detectOwner input = getGitConfigPath >>= fixOwner input
-
-
-fixOwner :: Maybe Owner -> FilePath -> IO (Validation [ConfigurationError] Repository)
-fixOwner input@(Just x) _  = return $ Success x
-fixOwner Nothing        fp = (>>> parseOwner) <$> getGitConfigLine fp
-  where
-    parseOwner :: Line -> Validation [ConfigurationError] Owner
-    parseOwner line
-      | "https://" `isInfixOf` line = Success $ trimDot $ splitOn "/" line !! 3
-      | "git@"     `isInfixOf` line = let
-        x = splitOn "/" line !! 0
-        in Success $ trimDot $ splitOn ":" x !! 1
-      | otherwise                   = Failure [ConfigurationError "invalid remote config."]
+detectOwner input = do
+  current <- getCurrentDirectory
+  fixConfig input current "owner:"
 
 
 detectRepository :: Maybe Repository -> IO (Validation [ConfigurationError] Repository)
-detectRepository input = getGitConfigPath >>= fixRepository input
-
-
-fixRepository :: Maybe Repository -> FilePath -> IO (Validation [ConfigurationError] Repository)
-fixRepository input@(Just x) _  = return $ Success x
-fixRepository Nothing        fp = (>>> parseRepository) <$> getGitConfigLine fp
-  where
-    parseRepository :: Line -> Validation [ConfigurationError] Repository
-    parseRepository line
-      | "https://" `isInfixOf` line = Success $ trimDot $ splitOn "/" line !! 4
-      | "git@"     `isInfixOf` line = Success $ trimDot $ splitOn "/" line !! 1
-      | otherwise                   = Failure [ConfigurationError "invalid remote config."]
-
-
-trimDot :: String -> String
-trimDot s = "." `splitOn` s !! 0
-
-
-getGitConfigPath :: IO FilePath
-getGitConfigPath = (++ "/.git/config") <$> getCurrentDirectory
-
-
-getGitConfigLine :: FilePath -> IO (Validation [ConfigurationError] Line)
-getGitConfigLine fp = (>>> findUrlLine) <$> readLines fp
-  where
-    findUrlLine :: [Line] -> Validation [ConfigurationError] Line
-    findUrlLine lines = case find (isInfixOf "url") lines of
-      Just line -> Success line
-      Nothing   -> Failure [ConfigurationError "remote config missing."]
-
-
-getHasHubConfigPath :: IO FilePath
-getHasHubConfigPath = (++ "/.has-hub.conf") <$> getHomeDirectory
+detectRepository input = do
+  current <- getCurrentDirectory
+  fixConfig input current "repository:"
 
 
 detectGitHubToken :: Maybe Token -> IO (Validation [ConfigurationError] Token)
-detectGitHubToken input = getHasHubConfigPath >>= fixToken input "git-hub-token:"
+detectGitHubToken input = do
+  current <- getCurrentDirectory
+  fixConfig input current "git-hub-token:"
 
 
 detectZenHubToken :: Maybe Token -> IO (Validation [ConfigurationError] Token)
-detectZenHubToken input = getHasHubConfigPath >>= fixToken input "zen-hub-token:"
+detectZenHubToken input = do
+  current <- getCurrentDirectory
+  fixConfig input current "zen-hub-token:"
 
+
+detectLogPath :: Maybe FilePath -> IO (Validation [ConfigurationError] FilePath)
+detectLogPath input = do
+  current <- getCurrentDirectory
+  fixLogPath input current "log-full-path:"
+
+
+type Line = String
 
 type Key = String
 
-fixToken :: Maybe Token -> Key -> FilePath -> IO (Validation [ConfigurationError] Token)
-fixToken input@(Just x) key fp = return $ Success x
-fixToken Nothing        key fp = (>>> f key) <$> readLines fp
-  where
-    f :: Key -> [Line] -> Validation [ConfigurationError] Line
-    f key lines = case find (startswith key) lines of
-      Just line -> Success $ splitOn ":" line !! 1
-      Nothing   -> Failure [ConfigurationError $ init key ++ " config missing."]
+
+fixConfig :: Maybe String -> FilePath -> Key -> IO (Validation [ConfigurationError] String)
+fixConfig input@(Just x) _         _   = return $ Success x
+fixConfig Nothing        directory key = do
+  found <- findByKeyOrUpper directory key
+  return $ case found of
+    Just x  -> Success x
+    Nothing -> Failure [ConfigurationError $ init key ++ " not found in config"]
 
 
-readLines :: FilePath -> IO (Validation [ConfigurationError] [Line])
-readLines fp = do
+fixLogPath :: Maybe FilePath -> FilePath -> Key -> IO (Validation [ConfigurationError] FilePath)
+fixLogPath input@(Just x) _         _   = toAbsolute x
+fixLogPath Nothing        directory key = do
+  found <- findByKeyOrUpper directory key
+  case found of
+    Just x  -> toAbsolute x
+    Nothing -> return $ Failure [ConfigurationError $ init key ++ " not found in config"]
+
+
+toAbsolute :: FilePath -> IO (Validation [ConfigurationError] FilePath)
+toAbsolute fp = do
+  home <- getHomeDirectory
+  return $ Success $ replace "~" home fp
+
+
+findByKeyOrUpper :: FilePath -> Key -> IO (Maybe String)
+findByKeyOrUpper directory key = do
+  let config = directory </> ".has-hub.conf"
+  found <- findBy key <$> readLine config
+
+  case (found, directory == "/" || directory == ".") of
+    (Just x,  _)     -> return $ Just x
+    (Nothing, True)  -> return Nothing
+    (Nothing, False) -> findByKeyOrUpper (takeDirectory directory) key
+
+
+readLine :: FilePath -> IO [Line]
+readLine fp = do
   b <- doesFileExist fp
   if b
-    then Success . lines <$> readFile fp
-    else return $ Failure [ConfigurationError $ fp ++ " is not found."]
+    then lines <$> readFile fp
+    else return []
 
 
-(>>>) :: Validation [ConfigurationError] a -> (a -> Validation [ConfigurationError] b) -> Validation [ConfigurationError] b
-(>>>) (Success line)  f = f line
-(>>>) (Failure error) f = Failure error
+findBy :: Key -> [Line] -> Maybe String
+findBy key lines = case find (startswith key) lines of
+  Just line -> Just $ splitOn ":" line !! 1
+  Nothing   -> Nothing
 
 
-fixLogPath :: Maybe FilePath -> IO (Validation [ConfigurationError] FilePath)
-fixLogPath (Just x) = return $ Success x
-fixLogPath Nothing  = do
-  home <- getHomeDirectory
-  return $ Success $ home ++ "/has-hub.log"
-
-
-fixProxy :: IO (Maybe Proxy)
-fixProxy = do
+detectProxy :: IO (Maybe Proxy)
+detectProxy = do
   p1 <- lookupEnv "https_proxy"
   p2 <- lookupEnv "HTTPS_PROXY"
 
@@ -139,4 +127,3 @@ fixProxy = do
     (Nothing, Nothing) -> Nothing
     (p,       Nothing) -> p
     (_      , p      ) -> p
-
