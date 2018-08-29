@@ -5,9 +5,11 @@ module HasHub.Object.Milestone.Validator
 (
   areAllIn
 , areAllNotIn
+, noDuplication
 , dueOnFormat
 , startOnFormat
 , ExistingError(..)
+, DuplicationError(..)
 , module HasHub.FixMe
 , module HasHub.Object.Milestone.Type
 )
@@ -15,6 +17,8 @@ where
 
 
 import Text.Regex.Posix ((=~))
+
+import Data.List (nub, sort, (\\), find)
 import Data.List.Split (splitOn)
 
 import HasHub.Object.Milestone.Type
@@ -44,6 +48,20 @@ areAllNotIn needles haystacks = map (notContains (map _title haystacks)) needles
     notContains haystacks needle = if needle `notElem` haystacks
       then Nothing
       else Just $ ExistingError needle
+
+
+newtype DuplicationError = DuplicationError MilestoneTitle deriving (Eq, Show)
+
+instance FixMe DuplicationError where
+  toMessage (DuplicationError (MilestoneTitle t)) = "duplicate definition: " ++ t
+
+
+noDuplication :: [MilestoneTitle] -> Validation [DuplicationError] ()
+noDuplication titles = case dups of
+  [] -> Success ()
+  xs -> Failure $ map DuplicationError xs
+  where
+    dups = sort titles \\ (nub . sort) titles
 
 
 instance FixMe (FormatError StartOn) where

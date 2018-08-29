@@ -17,9 +17,9 @@ import HasHub.Object.Milestone.Validator as MV
 import HasHub.FixMe
 
 
-execute :: FilePath -> IO ()
-execute yaml = do
-  parsed <- Parser.readObjects yaml
+execute :: [FilePath] -> IO ()
+execute fsp = do
+  parsed <- Parser.readObjects fsp
 
   case parsed of
     Success yamls -> do

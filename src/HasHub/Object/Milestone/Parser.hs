@@ -9,7 +9,7 @@ import Data.Aeson (FromJSON(..), Value(Object), (.:), (.:?))
 import Data.List (nub)
 import Data.Maybe (mapMaybe)
 
-import HasHub.Yaml.Reader (readYaml, YamlReadingError(..))
+import HasHub.Yaml.Reader (readYamls, YamlReadingError(..))
 
 import HasHub.Object.Milestone.Type
 
@@ -25,8 +25,8 @@ instance FromJSON YamlMilestone where
       _dueOn s = DueOn $ s ++ "T23:59:59Z"
 
 
-readObjects :: FilePath -> IO (Validation [YamlReadingError] [YamlMilestone])
-readObjects = readYaml mapping
+readObjects :: [FilePath] -> IO (Validation [YamlReadingError] [YamlMilestone])
+readObjects = readYamls mapping
   where
     mapping :: YamlMilestone -> YamlMilestone
     mapping = id

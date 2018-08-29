@@ -10,7 +10,7 @@ import Data.List (find)
 newtype MilestoneNumber = MilestoneNumber Int deriving (Eq, Show)
 
 
-newtype MilestoneTitle = MilestoneTitle String deriving (Eq, Show)
+newtype MilestoneTitle = MilestoneTitle String deriving (Eq, Ord, Show)
 
 
 newtype StartOn = StartOn String deriving (Eq, Show)

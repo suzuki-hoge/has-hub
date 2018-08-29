@@ -20,18 +20,18 @@ import HasHub.Connection.Config.Type
 import HasHub.FixMe (printFixMes, Validation(..), isWritable)
 
 
-data Options = ReferAllOptions                          Owner Repository Token Token FilePath
+data Options = ReferAllOptions                            Owner Repository Token Token FilePath
              | GenerateObjectsSampleOptions    FilePath
              | GenerateMilestonesSampleOptions FilePath
-             | ValidateObjectsOptions          FilePath Owner Repository Token Token FilePath
-             | ValidateMilestonesOptions       FilePath Owner Repository Token Token FilePath
-             | CreateObjectsOptions            FilePath Owner Repository Token Token FilePath
-             | CreateMilestonesOptions         FilePath Owner Repository Token Token FilePath
+             | ValidateObjectsOptions          [FilePath] Owner Repository Token Token FilePath
+             | ValidateMilestonesOptions       [FilePath] Owner Repository Token Token FilePath
+             | CreateObjectsOptions            [FilePath] Owner Repository Token Token FilePath
+             | CreateMilestonesOptions         [FilePath] Owner Repository Token Token FilePath
              deriving Show
 
 
-yamlP :: Parser FilePath
-yamlP = strArgument $ mconcat [
+fpsP :: Parser [FilePath]
+fpsP = some $ strArgument $ mconcat [
     metavar "path"
   , action "file"
   , help "input file"
@@ -116,27 +116,27 @@ generateMilestonesSampleI = info optionsP $ mconcat [header "generate milestones
 
 
 validateObjectsI :: ParserInfo Options
-validateObjectsI = info optionsP $ mconcat [header "validate objects yaml file.", failureCode 1]
+validateObjectsI = info optionsP $ mconcat [header "validate objects yaml files.", failureCode 1]
   where
-    optionsP = (<*>) helper $ ValidateObjectsOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
+    optionsP = (<*>) helper $ ValidateObjectsOptions <$> fpsP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
 validateMilestonesI :: ParserInfo Options
-validateMilestonesI = info optionsP $ mconcat [header "validate milestones yaml file.", failureCode 1]
+validateMilestonesI = info optionsP $ mconcat [header "validate milestones yaml files.", failureCode 1]
   where
-    optionsP = (<*>) helper $ ValidateMilestonesOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
+    optionsP = (<*>) helper $ ValidateMilestonesOptions <$> fpsP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
 createObjectsI :: ParserInfo Options
 createObjectsI = info optionsP $ mconcat [header "create objects.", failureCode 1]
   where
-    optionsP = (<*>) helper $ CreateObjectsOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
+    optionsP = (<*>) helper $ CreateObjectsOptions <$> fpsP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
 createMilestonesI :: ParserInfo Options
 createMilestonesI = info optionsP $ mconcat [header "create milestones.", failureCode 1]
   where
-    optionsP = (<*>) helper $ CreateMilestonesOptions <$> yamlP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
+    optionsP = (<*>) helper $ CreateMilestonesOptions <$> fpsP <*> ownerP <*> repositoryP <*> gitHubTokenP <*> zenHubTokenP <*> logPathP
 
 
 optionsP :: Parser Options
@@ -153,7 +153,7 @@ optionsP = (<*>) helper $ subparser $ mconcat [
 
 optionsInfo :: ParserInfo Options
 optionsInfo = info optionsP $ mconcat [
-    header "operate git hub and zen hub with yaml file."
+    header "operate git hub and zen hub with yaml files."
   , failureCode 1
   ]
 
@@ -163,13 +163,13 @@ main = customExecParser (prefs showHelpOnError) optionsInfo >>= execute
 
 
 execute :: Options -> IO ()
-execute (ReferAllOptions                             owner repository gitHubToken zenHubToken logPath) = executeWithConnection   RA.execute        owner repository gitHubToken zenHubToken logPath
-execute (GenerateObjectsSampleOptions    output                                                      ) = executeWithOutput      GOS.execute output
-execute (GenerateMilestonesSampleOptions output                                                      ) = executeWithOutput      GMS.execute output
-execute (ValidateObjectsOptions                 yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (VO.execute yaml)  owner repository gitHubToken zenHubToken logPath
-execute (ValidateMilestonesOptions              yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (VM.execute yaml)  owner repository gitHubToken zenHubToken logPath
-execute (CreateObjectsOptions                   yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (CO.execute yaml)  owner repository gitHubToken zenHubToken logPath
-execute (CreateMilestonesOptions                yaml owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (CM.execute yaml)  owner repository gitHubToken zenHubToken logPath
+execute (ReferAllOptions                            owner repository gitHubToken zenHubToken logPath) = executeWithConnection   RA.execute        owner repository gitHubToken zenHubToken logPath
+execute (GenerateObjectsSampleOptions    output                                                     ) = executeWithOutput      GOS.execute output
+execute (GenerateMilestonesSampleOptions output                                                     ) = executeWithOutput      GMS.execute output
+execute (ValidateObjectsOptions                 fps owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (VO.execute fps)   owner repository gitHubToken zenHubToken logPath
+execute (ValidateMilestonesOptions              fps owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (VM.execute fps)   owner repository gitHubToken zenHubToken logPath
+execute (CreateObjectsOptions                   fps owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (CO.execute fps)   owner repository gitHubToken zenHubToken logPath
+execute (CreateMilestonesOptions                fps owner repository gitHubToken zenHubToken logPath) = executeWithConnection  (CM.execute fps)   owner repository gitHubToken zenHubToken logPath
 
 
 executeWithConnection :: IO () -> Owner -> Repository -> Token -> Token -> FilePath -> IO ()
