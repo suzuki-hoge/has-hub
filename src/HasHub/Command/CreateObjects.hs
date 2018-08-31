@@ -19,11 +19,11 @@ import HasHub.Object.Milestone.Client as MC
 import HasHub.FixMe (printMessages, printFixMes, Validation(..))
 
 
-execute :: FilePath -> IO ()
-execute yaml = do
+execute :: [FilePath] -> IO ()
+execute fps = do
   putStrLn "\ncreate objects."
 
-  parsed <- Parser.readObjects yaml
+  parsed <- Parser.readObjects fps
 
   case parsed of
     Success yamls -> do

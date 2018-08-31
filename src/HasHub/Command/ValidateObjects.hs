@@ -19,11 +19,11 @@ import HasHub.Object.Milestone.Validator as MV
 import HasHub.FixMe (flat, _message, printMessages, printFixMes, Validation(..))
 
 
-execute :: FilePath -> IO ()
-execute yaml = do
+execute :: [FilePath] -> IO ()
+execute fps = do
   putStrLn "\nvalidate all objects."
 
-  parsed <- Parser.readObjects yaml
+  parsed <- Parser.readObjects fps
 
   case parsed of
     Success yamls -> do

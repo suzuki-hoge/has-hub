@@ -10,7 +10,7 @@ import Data.Aeson (FromJSON(..), Value(Object), (.:), (.:?))
 import Data.List (nub)
 import Data.Maybe (mapMaybe)
 
-import HasHub.Yaml.Reader (readYaml, YamlReadingError(..))
+import HasHub.Yaml.Reader (readYamls, YamlReadingError(..))
 
 import HasHub.Object.Object.Type
 import HasHub.Object.Pipeline.Type
@@ -58,8 +58,8 @@ instance FromJSON WrappedYamlObject where
   parseJSON (Object v) = WrappedYamlObject <$> (v .:? "epic-link-number") <*> (v .: "title") <*> (v .:? "body") <*> (v .:? "pipeline") <*> (v .:? "labels") <*> (v .:? "assignees") <*> (v .:? "milestone") <*> (v .:? "estimate") <*> (v .:? "epics")
 
 
-readObjects :: FilePath -> IO (Validation [YamlReadingError] [YamlObject])
-readObjects = readYaml mapping
+readObjects :: [FilePath] -> IO (Validation [YamlReadingError] [YamlObject])
+readObjects = readYamls mapping
   where
     mapping :: WrappedYamlObject -> YamlObject
     mapping (WrappedYamlObject meln t mb mpn ls cs mmt me es) = createEither meln (Title t) (Body <?> mb) (PipelineName <$> mpn) (Label <??> ls) (Collaborator <??> cs) (MilestoneTitle <$> mmt) (Estimate <$> me) (toLinking <??> es)
