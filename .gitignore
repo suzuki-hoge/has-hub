@@ -24,6 +24,4 @@ cabal.project.local~
 out/
 
 .DS_Store
-.idea/
-has-hub.iml
 *.log
