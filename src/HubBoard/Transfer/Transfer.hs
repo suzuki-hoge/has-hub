@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module HubBoard.Transfer.Transfer where
+module HubBoard.Transfer.Transfer where -- todo out and local where
 
 import           Network.HTTP.Client
 import           Network.HTTP.Client.TLS
@@ -12,16 +12,17 @@ import qualified Data.ByteString.Char8         as BS
 import qualified Data.ByteString.Lazy.Internal as LBS
 
 import           HubBoard.Transfer.Type
+import           HubBoard.Transfer.Config
 
 getGitHub :: Mapper a -> IO [a]
-getGitHub = getGitHubRecursive Nothing []
+getGitHub = getGraphQL Nothing []
 
-getGitHubRecursive :: Cursor -> [a] -> Mapper a -> IO [a]
-getGitHubRecursive cursor acc mapper@(Mapper toQuery asHasNext asCursor parse)
+getGraphQL :: Cursor -> [a] -> Mapper a -> IO [a]
+getGraphQL cursor acc mapper@(Mapper toQuery asHasNext asCursor parse)
     = do
-        headers <- headers'
-        let owner      = "suzuki-hoge"
-        let repository = "has-hub-workspace"
+        headers <- graphQLHeaders
+        owner <- getOwner
+        repository <- getRepository
 
         lbs <- secureFetch (parseRequest_ "https://api.github.com/graphql")
             { method         = "POST"
@@ -33,7 +34,7 @@ getGitHubRecursive cursor acc mapper@(Mapper toQuery asHasNext asCursor parse)
         let accumulated = acc ++ (parse lbs)
 
         if asHasNext lbs
-            then getGitHubRecursive (asCursor lbs) accumulated mapper
+            then getGraphQL (asCursor lbs) accumulated mapper
             else return accumulated
 
 secureFetch :: Request -> IO LBS.ByteString
@@ -44,9 +45,9 @@ secureFetch request = do
 
     return response
 
-headers' :: IO RequestHeaders
-headers' = do
-    let token = "xxx"
+graphQLHeaders :: IO RequestHeaders
+graphQLHeaders = do
+    token <- getGitHubToken
     return
         [ ("content-type" , "application/json")
         , ("User-Agent"   , "curl")

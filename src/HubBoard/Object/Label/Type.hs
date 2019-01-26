@@ -1,3 +1,3 @@
-module HubBoard.Object.Label.Type where
+module HubBoard.Object.Label.Type (Label(..)) where
 
-newtype Label = Label String deriving (Eq, Show)
+newtype Label = Label String deriving Show
