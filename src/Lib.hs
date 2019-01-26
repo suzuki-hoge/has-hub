@@ -1,6 +1,12 @@
 module Lib
     ( someFunc
-    ) where
+    )
+where
+
+import           HubBoard.Object.Label.Mapper
+import           HubBoard.Transfer.Transfer
 
 someFunc :: IO ()
-someFunc = putStrLn "someFunc!!!"
+someFunc = do
+    labels <- getGitHub mapper
+    print labels
