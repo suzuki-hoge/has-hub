@@ -1,58 +1,73 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module HubBoard.Transfer.Config (validate, getGitHubToken, getZenHubToken, getOwner, getRepository) where
+module HubBoard.Transfer.Config
+    ( validate
+    , getGitHubToken
+    , getZenHubToken
+    , getOwner
+    , getRepository
+    )
+where
 
-import System.Directory
-import HubBoard.Transfer.Type
+import           System.Directory
+import           HubBoard.Transfer.Core.Type
 
-import Data.String.Utils (startswith)
+import           Data.String.Utils              ( startswith )
 
-import Data.Yaml (decodeFileEither, ParseException(..), YamlException(..))
-import Data.Aeson (FromJSON(..), Value(Object),(.:?))
+import           Data.Yaml                      ( decodeFileEither
+                                                , ParseException(..)
+                                                , YamlException(..)
+                                                )
 
-import Data.Maybe
-import Data.Either.Validation
-import Control.Exception
+import           Data.Aeson              hiding ( Success )
+import           Data.Maybe
+import           Data.Either.Validation
+import           Control.Exception
 
 validate :: IO (Validation [String] ())
-validate = ap <$> getConfigs 
-    where
-        ap :: [ConfigYaml] -> Validation [String] ()
-        ap configs = (\_ _ _ _ -> ())
+validate = ap <$> getConfigs
+  where
+    ap :: [ConfigYaml] -> Validation [String] ()
+    ap configs =
+        (\_ _ _ _ -> ())
             <$> getGitHubToken' configs
             <*> getZenHubToken' configs
             <*> getOwner' configs
             <*> getRepository' configs
 
 getConfigs :: IO [ConfigYaml]
-getConfigs = catMaybes <$> (getCurrentDirectory >>= allUpperDirs >>= (mapM readConfig))
-    where
-        allUpperDirs :: FilePath -> IO [FilePath]
-        allUpperDirs "" = return []
-        allUpperDirs dir = (dir :) <$> allUpperDirs (upper dir)
-            where
-                upper :: FilePath -> FilePath
-                upper = reverse . tail . dropWhile (/= '/') . reverse
-        readConfig :: FilePath -> IO (Maybe ConfigYaml)
-        readConfig dir = do
-            e <- (decodeFileEither (dir ++ "/.hub-board-config.yaml") >>= evaluate) `catch` failure
+getConfigs =
+    catMaybes <$> (getCurrentDirectory >>= allUpperDirs >>= (mapM readConfig))
+  where
+    allUpperDirs :: FilePath -> IO [FilePath]
+    allUpperDirs ""  = return []
+    allUpperDirs dir = (dir :) <$> allUpperDirs (upper dir)
+      where
+        upper :: FilePath -> FilePath
+        upper = reverse . tail . dropWhile (/= '/') . reverse
+    readConfig :: FilePath -> IO (Maybe ConfigYaml)
+    readConfig dir = do
+        e <-
+            (decodeFileEither (dir ++ "/.hub-board-config.yaml") >>= evaluate)
+                `catch` failure
 
-            return $ case e of
-                Right xs -> Just xs
-                _        -> Nothing
-            
-            where
-                failure :: SomeException -> IO (Either ParseException ConfigYaml)
-                failure e = return $ Left (InvalidYaml Nothing)
+        return $ case e of
+            Right xs -> Just xs
+            _        -> Nothing
+
+      where
+        failure :: SomeException -> IO (Either ParseException ConfigYaml)
+        failure e = return $ Left (InvalidYaml Nothing)
 
 data ConfigYaml = ConfigYaml (Maybe Token) (Maybe Token) (Maybe Owner) (Maybe Repository) deriving Show
 
 instance FromJSON ConfigYaml where
-    parseJSON (Object v) = ConfigYaml
-        <$> (v .:? "git-hub-token")
-        <*> (v .:? "zen-hub-token")
-        <*> (v .:? "owner")
-        <*> (v .:? "repository")
+    parseJSON (Object v) =
+        ConfigYaml
+            <$> (v .:? "git-hub-token")
+            <*> (v .:? "zen-hub-token")
+            <*> (v .:? "owner")
+            <*> (v .:? "repository")
 
 getGitHubToken :: IO Token
 getGitHubToken = do
