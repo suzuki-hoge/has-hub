@@ -13,5 +13,5 @@ import           HubBoard.Transfer.GitHubV4.Type
 instance FromJSON Collaborator where
     parseJSON (Object v) = Collaborator <$> (v .: "login")
 
-refer :: Mapper Collaborator
-refer = mkMapper "assignableUsers" "first:100" "login"
+refer :: GetMapper Collaborator
+refer = mkGetMapper "assignableUsers" "first:100" "login"

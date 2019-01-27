@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module HubBoard.Transfer.GitHubV4.Type
-    ( Mapper(..)
-    , mkMapper
+    ( GetMapper(..)
+    , mkGetMapper
     , module HubBoard.Transfer.Core.Type
     )
 where
@@ -14,20 +14,21 @@ import           Data.Aeson
 import           Data.Aeson.Types
 import           Text.Printf                    ( printf )
 
-import HubBoard.Transfer.Core.Type
+import           HubBoard.Transfer.Core.Type
 
 type ToQuery = Owner -> Repository -> Cursor -> String
 type AsHasNext = LBS.ByteString -> Bool
 type AsCursor = LBS.ByteString -> Cursor
-type Parse a = LBS.ByteString -> [a]
+type Parse output = LBS.ByteString -> [output]
 
-data Mapper a = Mapper ToQuery AsHasNext AsCursor (Parse a)
+data GetMapper output = GetMapper ToQuery AsHasNext AsCursor (Parse output)
 
-mkMapper :: (FromJSON a) => T.Text -> String -> String -> Mapper a
-mkMapper name filters elements = Mapper (mkToQuery name filters elements)
-                                        (mkAsHasNext name)
-                                        (mkAsCursor name)
-                                        (mkParse name)
+mkGetMapper :: (FromJSON output) => T.Text -> String -> String -> GetMapper output
+mkGetMapper name filters elements = GetMapper
+    (mkToQuery name filters elements)
+    (mkAsHasNext name)
+    (mkAsCursor name)
+    (mkParse name)
 
   where
     mkToQuery :: T.Text -> String -> String -> ToQuery
@@ -66,7 +67,7 @@ mkMapper name filters elements = Mapper (mkToQuery name filters elements)
             >>= parseMaybe (.: "pageInfo")
             >>= parseMaybe (.: "hasNextPage")
 
-    mkParse :: (FromJSON a) => T.Text -> Parse a
+    mkParse :: (FromJSON output) => T.Text -> Parse output
     mkParse name lbs =
         fromJust
             $   decode lbs

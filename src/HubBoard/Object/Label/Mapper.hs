@@ -13,5 +13,5 @@ import           HubBoard.Transfer.GitHubV4.Type
 instance FromJSON Label where
     parseJSON (Object v) = Label <$> (v .: "name")
 
-refer :: Mapper Label
-refer = mkMapper "labels" "first:100" "name"
+refer :: GetMapper Label
+refer = mkGetMapper "labels" "first:100" "name"

@@ -1,5 +1,5 @@
 module HubBoard.Transfer.ZenHub.Type
-    ( Mapper(..)
+    ( GetMapper(..)
     , module HubBoard.Transfer.Core.Type
     )
 where
@@ -15,4 +15,4 @@ import           HubBoard.Transfer.Core.Type
 type ToResource = RepositoryId -> String
 type Parse a = LBS.ByteString -> [a]
 
-data Mapper a = Mapper ToResource (Parse a)
+data GetMapper a = GetMapper ToResource (Parse a)

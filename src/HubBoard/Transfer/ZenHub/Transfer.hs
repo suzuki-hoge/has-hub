@@ -14,8 +14,8 @@ import           HubBoard.Transfer.Config
 import           Network.HTTP.Types
 import           HubBoard.Transfer.Core.Transfer
 
-getZenHub :: (FromJSON a) => Mapper a -> IO [a]
-getZenHub (Mapper toResource parse) = do
+getZenHub :: (FromJSON a) => GetMapper a -> IO [a]
+getZenHub (GetMapper toResource parse) = do
     headers <- getHeaders
     rid     <- getRepositoryIdFromEnv
     let url = "https://api.zenhub.io/p1/repositories/" ++ (toResource rid)

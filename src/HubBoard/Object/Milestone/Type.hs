@@ -1,7 +1,14 @@
-module HubBoard.Object.Milestone.Type (Milestone(..)) where
+module HubBoard.Object.Milestone.Type (MilestoneTitle(..), MilestoneNumber(..), Milestone(..)) where
 
 import           Text.Printf                    ( printf )
 
-data Milestone = Milestone Int String
-instance Show Milestone where
-    show (Milestone _ title) = printf "Milestone(%s)" title
+data MilestoneTitle = MilestoneTitle String
+instance Show MilestoneTitle where
+    show (MilestoneTitle title) = printf "MilestoneTitle(%s)" title
+
+type Title = String
+type StartOn = String
+type DueOn = String 
+
+data Milestone = Milestone Title StartOn DueOn
+newtype MilestoneNumber = MilestoneNumber String
