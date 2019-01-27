@@ -11,8 +11,8 @@ import qualified HubBoard.Object.Collaborator.Mapper
                                                as C
 import qualified HubBoard.Object.Pipeline.Mapper
                                                as P
-import          HubBoard.Transfer.GitHubV4.Transfer
-import          HubBoard.Transfer.ZenHub.Transfer
+import           HubBoard.Transfer.GitHubV4.Transfer
+import           HubBoard.Transfer.ZenHub.Transfer
 import           HubBoard.Transfer.Config
 
 import           System.Directory
@@ -21,6 +21,8 @@ someFunc :: IO ()
 someFunc = do
     validation <- validate
     print validation
+
+    getRepositoryId >>= setRepositoryIdToEnv
 
     es <- getGitHub E.refer
     print es

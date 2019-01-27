@@ -2,15 +2,18 @@
 
 module HubBoard.Transfer.Config
     ( validate
-    , getGitHubToken
-    , getZenHubToken
     , getOwner
     , getRepository
+    , getGitHubToken
+    , getZenHubToken
+    , setRepositoryIdToEnv
+    , getRepositoryIdFromEnv
     )
 where
 
 import           System.Directory
 import           HubBoard.Transfer.Core.Type
+import System.Environment (setEnv, getEnv)
 
 import           Data.String.Utils              ( startswith )
 
@@ -108,3 +111,9 @@ getRepository' :: [ConfigYaml] -> Validation [String] Repository
 getRepository' configs = case mapMaybe (\(ConfigYaml _ _ _ x) -> x) configs of
     [] -> Failure ["repository not found."]
     xs -> Success (xs !! 0)
+
+setRepositoryIdToEnv :: RepositoryId -> IO ()
+setRepositoryIdToEnv = setEnv "hub-board.repository-id"
+
+getRepositoryIdFromEnv :: IO RepositoryId
+getRepositoryIdFromEnv = getEnv "hub-board.repository-id"
