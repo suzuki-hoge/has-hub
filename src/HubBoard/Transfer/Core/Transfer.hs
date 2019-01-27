@@ -12,4 +12,6 @@ secureFetch request = do
 
     response <- responseBody <$> httpLbs request manager
 
+    print response
+
     return response

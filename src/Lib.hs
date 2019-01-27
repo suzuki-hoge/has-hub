@@ -41,16 +41,15 @@ someFunc = do
     -- ls <- getGitHub L.refer
     -- print ls
 
-    -- let m = M.Milestone "sprint x"
-    --                     "2019-01-01T00:00:00Z"
-    --                     "2019-01-31T23:59:59Z"
-    -- number <- postGitHub (M.create m)
+    let m = M.Milestone "sprint x" "2019-01-31T23:59:59Z"
+    number <- postGitHub (M.create m)
+    updateZenHub (M.setStartOn number $ M.StartOn "2019-01-01T00:00:00Z")
     -- ms <- getGitHub M.refer
     -- print ms
 
-    let i = I.Issue "created" "+ [ ] task 1" [L.Label "dev"] [C.Collaborator "suzuki-hoge"] (Just $ M.MilestoneNumber "4")
-    (I.IssueNumber n) <- postGitHub (I.create i)
-    print n
+    -- let i = I.Issue "created" "+ [ ] task 1" [L.Label "dev"] [C.Collaborator "suzuki-hoge"] (Just $ M.MilestoneNumber "4")
+    -- (I.IssueNumber n) <- postGitHub (I.create i)
+    -- print n
 
     -- cs <- getGitHub C.refer
     -- print cs
