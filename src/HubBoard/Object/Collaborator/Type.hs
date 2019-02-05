@@ -1,7 +1,6 @@
-module HubBoard.Object.Collaborator.Type
-    ( Collaborator(..)
-    )
-where
+module HubBoard.Object.Collaborator.Type  (
+    Collaborator(..)
+) where
 
 import           Text.Printf                    ( printf )
 

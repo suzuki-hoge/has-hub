@@ -1,43 +1,29 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module HubBoard.Object.Milestone.Mapper
-    ( refer
-    , create
-    , setStartOn
-    )
-where
-
-import           Data.Aeson
-import qualified Data.ByteString.Lazy.Internal as LBS
-                                                ( ByteString )
+module HubBoard.Object.Milestone.Mapper (
+    refer
+  , create
+) where
 
 import           HubBoard.Object.Milestone.Type
-import           HubBoard.Transfer.GitHubV4.Type as V4
-import           Data.Maybe
-import           Data.Aeson.Types
-import           HubBoard.Transfer.GitHubV3.Type
-import qualified HubBoard.Transfer.ZenHub.Type as Z
-
-import           Text.Printf                    ( printf )
+import           HubBoard.Fetcher
 
 instance FromJSON MilestoneTitle where
     parseJSON (Object v) = MilestoneTitle <$> (v .: "title")
 
-refer :: GetMapper MilestoneTitle
-refer = mkGetMapper "milestones" "first:100, states:OPEN" "number, title"
-
-instance ToJSON Milestone where
-    toJSON (Milestone title dueOn) =
-        object $ ["title" .= title, "due_on" .= dueOn]
+refer :: IO [MilestoneTitle]
+refer = getFromGitHub toValue (pagenateWith "milestones") parse
+  where
+    toValue owner repository after = let query = printf "{ repository( owner:\"%s\", name:\"%s\" ) { milestones( first:100, states:OPEN%s ) { nodes { title }, pageInfo { hasNextPage, endCursor } } } }" owner repository after :: String
+                                     in  object ["query" .= query]
+    parse = fromJust . (decode >=> parseMaybe (.: "data") >=> parseMaybe (.: "repository") >=> parseMaybe (.: "milestones") >=> parseMaybe (.: "nodes"))
 
 instance FromJSON MilestoneNumber where
     parseJSON (Object v) = MilestoneNumber <$> (v .: "number")
 
-create :: Milestone -> PostMapper Milestone MilestoneNumber
-create milestone = mkPostMapper "milestones" milestone (fromJust . decode)
-
-instance ToJSON StartOn where
-    toJSON (StartOn startOn) = object $ ["start_date" .= startOn]
-
-setStartOn :: MilestoneNumber -> StartOn -> Z.UpdateMapper StartOn
-setStartOn (MilestoneNumber number) = Z.mkPostMapper (\rid -> printf "%s/milestones/%d/start_date" rid number)
+create :: Milestone -> IO MilestoneNumber
+create (Milestone title startOn dueOn) = postToGitHub toResource value parse
+  where
+    toResource = printf "%s/%s/milestones"
+    value = object ["title" .= title, "due_on" .= dueOn]
+    parse = fromJust . decode

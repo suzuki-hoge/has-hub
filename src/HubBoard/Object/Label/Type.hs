@@ -1,7 +1,6 @@
-module HubBoard.Object.Label.Type
-    ( Label(..)
-    )
-where
+module HubBoard.Object.Label.Type (
+    Label(..)
+) where
 
 import           Text.Printf                    ( printf )
 
