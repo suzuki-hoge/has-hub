@@ -27,7 +27,6 @@ getFromGitHub toValue pagenation parse = do
     repository <- getRepository
 
     recGet token owner repository "" toValue pagenation [] parse
-
       where
         recGet :: Token -> Owner -> Repository -> After -> ToValue -> Pagenation -> [a] -> Parse a -> IO [a]
         recGet token owner repository after toValue pagenation@(asHasNext, asAfter) acc parse = do
@@ -48,14 +47,12 @@ noPagenate = (const False, const "")
 
 pagenateWith :: T.Text -> Pagenation
 pagenateWith resource = (mkAsHasNext resource, mkAsCursor resource)
-
   where
     mkAsHasNext :: T.Text -> AsHasNext
     mkAsHasNext resource = fromJust . (decode >=> parseMaybe (.: "data") >=> parseMaybe (.: "repository") >=> parseMaybe (.: resource) >=> parseMaybe (.: "pageInfo") >=> parseMaybe (.: "hasNextPage"))
 
     mkAsCursor :: T.Text -> AsAfter
     mkAsCursor resource = mkAfter . (decode >=> parseMaybe (.: "data") >=> parseMaybe (.: "repository") >=> parseMaybe (.: resource) >=> parseMaybe (.: "pageInfo") >=> parseMaybe (.: "endCursor"))
-
       where
         mkAfter :: Maybe String -> After
         mkAfter = maybe "" (printf ", after:\"%s\"")

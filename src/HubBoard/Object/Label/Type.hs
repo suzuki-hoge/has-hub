@@ -2,8 +2,6 @@ module HubBoard.Object.Label.Type (
     Label(..)
 ) where
 
-import           Text.Printf                    ( printf )
-
-newtype Label = Label String
+newtype Label = Label String deriving Eq
 instance Show Label where
-    show (Label name) = printf "Label(%s)" name
+    show (Label name) = name

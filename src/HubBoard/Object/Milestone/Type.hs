@@ -1,18 +1,19 @@
 module HubBoard.Object.Milestone.Type (
-    MilestoneTitle(..)
-  , Milestone(..)
+    Milestone(..)
   , MilestoneNumber(..)
+  , MilestoneMaterials
 ) where
 
-import           Text.Printf                    ( printf )
-
-newtype MilestoneTitle = MilestoneTitle String
-instance Show MilestoneTitle where
-    show (MilestoneTitle title) = printf "MilestoneTitle(%s)" title
-
+type Number = Int
 type Title = String
+
+data Milestone = Milestone Number Title
+instance Show Milestone where
+    show (Milestone number title) = title
+
+type MilestoneMaterials = (Title, StartOn, DueOn)
+
 type StartOn = String
 type DueOn = String
-data Milestone = Milestone Title StartOn DueOn
 
-newtype MilestoneNumber = MilestoneNumber Int
+newtype MilestoneNumber = MilestoneNumber Int deriving (Show, Eq)

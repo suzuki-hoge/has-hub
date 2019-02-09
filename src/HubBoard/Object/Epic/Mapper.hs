@@ -21,8 +21,8 @@ refer = getFromGitHub toValue (pagenateWith "issues") parse
     parse = fromJust . (decode >=> parseMaybe (.: "data") >=> parseMaybe (.: "repository") >=> parseMaybe (.: "issues") >=> parseMaybe (.: "nodes"))
 
 create :: Epic -> IO EpicNumber
-create (Epic title body labels milestoneNumber pipeline estimate) = do
-    issueNumber <- I.create $ Issue title body labels [] milestoneNumber pipeline Nothing estimate
+create (NewEpic title body labels collaborators milestoneNumber pipeline estimate issues) = do
+    issueNumber <- I.create $ Issue title body labels collaborators milestoneNumber pipeline estimate
 
     toEpic issueNumber
       where

@@ -2,8 +2,6 @@ module HubBoard.Object.Collaborator.Type  (
     Collaborator(..)
 ) where
 
-import           Text.Printf                    ( printf )
-
-newtype Collaborator = Collaborator String
+newtype Collaborator = Collaborator String deriving Eq
 instance Show Collaborator where
-    show (Collaborator name) = printf "Collaborator(%s)" name
+    show (Collaborator name) = name

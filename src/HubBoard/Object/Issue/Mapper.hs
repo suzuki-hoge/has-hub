@@ -11,12 +11,13 @@ instance FromJSON IssueNumber where
     parseJSON (Object v) = IssueNumber <$> (v .: "number")
 
 create :: Issue -> IO IssueNumber
-create (Issue title body labels collaborators milestoneNumber pipeline epicNumber estimate) = do
+create (Issue title body labels collaborators milestoneNumber pipeline estimate) = do
     issueNumber <- createIssue title body labels collaborators milestoneNumber
 
-    mapM_ (setEpic issueNumber) epicNumber
     setPipeline issueNumber pipeline
     setEstimate issueNumber estimate
+
+    guide issueNumber title
 
     return issueNumber
       where
@@ -31,13 +32,13 @@ create (Issue title body labels collaborators milestoneNumber pipeline epicNumbe
                 mn (Just (MilestoneNumber milestoneNumber)) = ["milestone" .= milestoneNumber]
             parse = fromJust . decode
 
-        setEpic (IssueNumber issueNumber) (EpicNumber epicNumber) = do
-            rid <- read <$> getRepositoryId
-            updateZenHub toResource (value rid) "POST" parse
-          where
-            toResource rid = printf "%s/epics/%d/update_issues" rid epicNumber
-            value = (\rid -> object ["add_issues" .= [object ["repo_id" .= rid, "issue_number" .= issueNumber]]]) :: Int -> Value
-            parse = const ()
+        -- setEpic (IssueNumber issueNumber) (EpicNumber epicNumber) = do
+        --     rid <- read <$> getRepositoryId
+        --     updateZenHub toResource (value rid) "POST" parse
+        --   where
+        --     toResource rid = printf "%s/epics/%d/update_issues" rid epicNumber
+        --     value = (\rid -> object ["add_issues" .= [object ["repo_id" .= rid, "issue_number" .= issueNumber]]]) :: Int -> Value
+        --     parse = const ()
 
         setPipeline (IssueNumber issueNumber) (Pipeline pipelineId _) = updateZenHub toResource value "POST" parse
           where
@@ -50,3 +51,5 @@ create (Issue title body labels collaborators milestoneNumber pipeline epicNumbe
             toResource rid = printf "%s/issues/%d/estimate" rid issueNumber
             value = object ["estimate" .= estimate]
             parse = const ()
+
+        guide (IssueNumber issueNumber) title = putStrLn $ printf "created. [#%d] %s" issueNumber title

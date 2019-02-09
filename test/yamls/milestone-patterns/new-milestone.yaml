@@ -1,0 +1,12 @@
+milestone:
+    new-milestone:
+        title   : sprint 1
+        start-on: 2019-02-01
+        due-on  : 2019-02-06
+
+default-pipeline: sprint backlog
+
+epics:
+  - no-epic: 
+      issues: 
+        - title    : issue title 1

@@ -4,6 +4,6 @@ module HubBoard.Object.Pipeline.Type (
 
 import           Text.Printf                    ( printf )
 
-data Pipeline = Pipeline String String
+data Pipeline = Pipeline String String deriving Eq
 instance Show Pipeline where
-    show (Pipeline id name) = printf "Pipeline(%s)" name
+    show (Pipeline id name) = name

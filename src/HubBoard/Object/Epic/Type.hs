@@ -8,16 +8,19 @@ module HubBoard.Object.Epic.Type (
 ) where
 
 import           HubBoard.Object.Collaborator.Type
+import           HubBoard.Object.Issue.Type
 import           HubBoard.Object.Label.Type
 import           HubBoard.Object.Milestone.Type
 import           HubBoard.Object.Pipeline.Type
-import           Text.Printf                    ( printf )
 
 type Title = String
 type Body = String
 type Estimate = Double
-data Epic = Epic Title Body [Label] (Maybe MilestoneNumber) Pipeline Estimate
+data Epic = NewEpic Title Body [Label] [Collaborator] (Maybe MilestoneNumber) Pipeline Estimate [Issue]
+          | ExistingEpic EpicNumber [Issue]
+          | NoEpic [Issue]
+          deriving (Show, Eq)
 
-newtype EpicNumber = EpicNumber Int
+newtype EpicNumber = EpicNumber Int deriving Eq
 instance Show EpicNumber where
-    show (EpicNumber number) = printf "EpicNumber(#%d)" number
+    show (EpicNumber number) = "#" ++ show number

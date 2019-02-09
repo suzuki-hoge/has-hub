@@ -15,10 +15,11 @@ module HubBoard.Fetcher.Config (
 ) where
 
 import           System.Directory            ( getCurrentDirectory )
-import           System.Environment          ( setEnv, getEnv )
+import           System.Environment          ( setEnv, getEnv, lookupEnv )
 import           Data.Yaml                   ( decodeFileEither, ParseException(..) )
-import           Data.Maybe                  ( catMaybes, mapMaybe )
+import           Data.Maybe                  ( catMaybes, mapMaybe, fromMaybe )
 import qualified Data.ByteString.Char8 as BS ( pack, ByteString )
+import           Control.Applicative         ( (<|>) )
 import           Control.Exception           ( SomeException, catch, evaluate )
 
 import           HubBoard.Fetcher.Core
@@ -27,6 +28,7 @@ type Owner = String
 type Repository = String
 type RepositoryId = String
 type Token = BS.ByteString
+type HttpsProxy = String
 type ConfigError = String
 
 data ConfigYaml = ConfigYaml { gitHubToken :: Maybe String, zenHubToken :: Maybe String, owner :: Maybe String, repository :: Maybe String }
@@ -36,10 +38,10 @@ instance FromJSON ConfigYaml where
 
 initialize :: IO [ConfigError]
 initialize = setEnvs >>= setRepositoryId
-
   where
     setEnvs :: IO [ConfigError]
     setEnvs = do
+        putStrLn "\nload configs..."
         configs <- getConfigs
 
         e1 <- setGitHubToken configs
@@ -48,16 +50,13 @@ initialize = setEnvs >>= setRepositoryId
         e4 <- setRepository configs
 
         return $ e1 ++ e2 ++ e3 ++ e4
-
           where
             getConfigs :: IO [ConfigYaml]
             getConfigs = catMaybes <$> (getCurrentDirectory >>= allUpperDirs >>= (mapM readConfig))
-
               where
                 allUpperDirs :: FilePath -> IO [FilePath]
                 allUpperDirs ""  = return []
                 allUpperDirs dir = (dir :) <$> allUpperDirs (upper dir)
-
                   where
                     upper :: FilePath -> FilePath
                     upper = reverse . tail . dropWhile (/= '/') . reverse
@@ -69,7 +68,6 @@ initialize = setEnvs >>= setRepositoryId
                     return $ case e of
                         Right xs -> Just xs
                         _        -> Nothing
-
                   where
                     failure :: SomeException -> IO (Either ParseException ConfigYaml)
                     failure e = return $ Left (InvalidYaml Nothing)
@@ -97,9 +95,16 @@ initialize = setEnvs >>= setRepositoryId
     setRepositoryId :: [ConfigError] -> IO [ConfigError]
     setRepositoryId errors@(e:es) = return errors
     setRepositoryId [] = do
+        putStrLn "  refer RepositoryId"
+
         token <- getGitHubToken
         owner <- getOwner
         repository <- getRepository
+        proxy <- getProxy
+
+        putStrLn $ printf "    Owner ( %s )" owner
+        putStrLn $ printf "    Repository ( %s )" repository
+        putStrLn $ printf "    HttpsProxy ( %s )" (fromMaybe "" proxy)
 
         let headers = [("User-Agent", "curl"), ("Authorization", token)]
         let query = printf "{ repository( owner:\"%s\", name:\"%s\" ) { databaseId } }" owner repository :: String
@@ -108,7 +113,6 @@ initialize = setEnvs >>= setRepositoryId
         show . parse <$> secureFetch "https://api.github.com/graphql" "POST" headers body >>= setEnv "hub-board.repository-id"
 
         return []
-
           where
             parse :: ByteString -> Int
             parse = fromJust . (decode >=> parseMaybe (.: "data") >=> parseMaybe (.: "repository") >=> parseMaybe (.: "databaseId"))
@@ -124,6 +128,13 @@ getOwner = getEnv "hub-board.owner"
 
 getRepository :: IO Repository
 getRepository = getEnv "hub-board.repository"
+
+getProxy :: IO (Maybe HttpsProxy)
+getProxy = do
+    p1 <- lookupEnv "https_proxy"
+    p2 <- lookupEnv "HTTPS_PROXY"
+
+    return $ p1 <|> p2
 
 getRepositoryId :: IO RepositoryId
 getRepositoryId = getEnv "hub-board.repository-id"
