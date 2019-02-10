@@ -1,0 +1,24 @@
+milestone:
+    no-milestone: true
+
+default-pipeline: sprint backlog
+
+epics:
+  - new-epic: 
+      title    : epic title 1
+
+      issues: 
+        - title    : issue title 1
+
+  - new-epic: 
+      title    : epic title 2
+
+  - existing-epic: 
+      number   : 1
+
+      issues: 
+        - title    : issue title 2
+
+  - no-epic: 
+      issues: 
+        - title    : issue title 3

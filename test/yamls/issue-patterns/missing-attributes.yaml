@@ -1,0 +1,10 @@
+milestone:
+    no-milestone: true
+
+default-pipeline: sprint backlog
+
+epics:
+  - no-epic: 
+      issues: 
+        # missing attributes
+        - title    : issue title 1

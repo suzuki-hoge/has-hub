@@ -1,0 +1,34 @@
+milestone:
+    existing-milestone:
+        title: sprint x
+
+default-pipeline: pipeline 1
+
+epics:
+  - new-epic: 
+      title    : epic title 1
+      labels   : [label 1]
+      assignees: [john]
+      pipeline : pipeline 2
+
+      issues: 
+        - title    : issue title 1
+          labels   : [label 2]
+          assignees: [jane]
+          pipeline : pipeline 3
+
+        - title    : issue title 2
+          labels   : [label 1, label 3]
+          assignees: []
+
+  - existing-epic: 
+      number   : 1
+
+      issues: 
+        - title    : issue title 3
+
+  - existing-epic: 
+      number   : 2
+
+      issues: 
+        - title    : issue title 4

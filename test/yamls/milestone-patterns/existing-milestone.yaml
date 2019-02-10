@@ -1,0 +1,17 @@
+milestone:
+    existing-milestone:
+        title: sprint 1
+
+default-pipeline: sprint backlog
+
+epics:
+  - no-epic: 
+      title    : epic title 2
+      body     : epic body 2
+      labels   : [dev]
+      assignees: [suzuki-hoge]
+      pipeline : backlog
+      estimate : 5
+
+      issues: 
+        - title    : issue title 1
