@@ -28,14 +28,14 @@ create (NewEpic title body labels collaborators milestoneNumber pipeline estimat
     issueNumbers <- mapM I.create issues
 
     setIssues epicNumber issueNumbers
+  where
+    toEpic (IssueNumber number) = do
+        updateZenHub toResource value "POST" parse
+        return $ EpicNumber number
       where
-        toEpic (IssueNumber number) = do
-            updateZenHub toResource value "POST" parse
-            return $ EpicNumber number
-          where
-            toResource rid = printf "%s/issues/%d/convert_to_epic" rid number
-            value = object []
-            parse = const ()
+        toResource rid = printf "%s/issues/%d/convert_to_epic" rid number
+        value = object []
+        parse = const ()
 
 create (ExistingEpic epicNumber issues) = do
     issueNumbers <- mapM I.create issues
@@ -48,8 +48,8 @@ setIssues (EpicNumber epicNumber) issueNumbers = do
     rid <- read <$> getRepositoryId
 
     updateZenHub toResource (value rid) "POST" parse
-      where
-        toResource rid = printf "%s/epics/%d/update_issues" rid epicNumber
-        ns = map (\(IssueNumber v) -> v) issueNumbers
-        value = (\rid -> object ["add_issues" .= map (\n -> object ["repo_id" .= rid, "issue_number" .= n]) ns]) :: Int -> Value
-        parse = const ()
+  where
+    toResource rid = printf "%s/epics/%d/update_issues" rid epicNumber
+    ns = map (\(IssueNumber v) -> v) issueNumbers
+    value = (\rid -> object ["add_issues" .= map (\n -> object ["repo_id" .= rid, "issue_number" .= n]) ns]) :: Int -> Value
+    parse = const ()

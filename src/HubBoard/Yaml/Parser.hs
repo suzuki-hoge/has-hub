@@ -10,18 +10,22 @@ import           Data.Yaml                   ( decodeFileEither, ParseException(
 
 import           HubBoard.Yaml.Parser.RawType
 import           HubBoard.Yaml.Parser.Converter
-import           HubBoard.Yaml.Parser.Validator
-import qualified HubBoard.Object.Milestone    as M
-import qualified HubBoard.Object.Pipeline     as P
+import           HubBoard.Yaml.Parser.Validator as V
+import qualified HubBoard.Object.Milestone      as M
+import qualified HubBoard.Object.Pipeline       as P
+
+type SetupMilestone = RawMilestone -> IO (Maybe MilestoneNumber)
+type FetchPipelines = IO [Pipeline]
+type Validator = [RawEpic] -> RawMilestone -> RawDefaultPipelineName -> IO [ErrorMessage]
 
 parse :: FilePath -> IO (Either [ErrorMessage] [Epic])
-parse yaml = parse' yaml setupMilestone P.refer
+parse yaml = parse' yaml setupMilestone P.refer V.validateAll
 
-parse' :: FilePath -> (RawMilestone -> IO (Maybe MilestoneNumber)) -> IO [Pipeline] -> IO (Either [ErrorMessage] [Epic])
-parse' yaml setupMilestone fetchPipelines = do
+parse' :: FilePath -> SetupMilestone -> FetchPipelines -> Validator -> IO (Either [ErrorMessage] [Epic])
+parse' yaml setupMilestone fetchPipelines validator = do
     (Contents rawEpics rawMilestone rawDefaultPipelineName) <- read yaml 
 
-    errorMessages <- validateAll rawEpics rawMilestone rawDefaultPipelineName
+    errorMessages <- validator rawEpics rawMilestone rawDefaultPipelineName
     
     case errorMessages of
         [] -> do

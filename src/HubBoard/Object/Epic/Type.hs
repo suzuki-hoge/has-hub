@@ -21,6 +21,4 @@ data Epic = NewEpic Title Body [Label] [Collaborator] (Maybe MilestoneNumber) Pi
           | NoEpic [Issue]
           deriving (Show, Eq)
 
-newtype EpicNumber = EpicNumber Int deriving Eq
-instance Show EpicNumber where
-    show (EpicNumber number) = "#" ++ show number
+newtype EpicNumber = EpicNumber Int deriving (Show, Eq)
