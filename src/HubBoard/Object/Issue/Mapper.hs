@@ -32,14 +32,6 @@ create (Issue title body labels collaborators milestoneNumber pipeline estimate)
                 mn (Just (MilestoneNumber milestoneNumber)) = ["milestone" .= milestoneNumber]
             parse = fromJust . decode
 
-        -- setEpic (IssueNumber issueNumber) (EpicNumber epicNumber) = do
-        --     rid <- read <$> getRepositoryId
-        --     updateZenHub toResource (value rid) "POST" parse
-        --   where
-        --     toResource rid = printf "%s/epics/%d/update_issues" rid epicNumber
-        --     value = (\rid -> object ["add_issues" .= [object ["repo_id" .= rid, "issue_number" .= issueNumber]]]) :: Int -> Value
-        --     parse = const ()
-
         setPipeline (IssueNumber issueNumber) (Pipeline pipelineId _) = updateZenHub toResource value "POST" parse
           where
             toResource rid = printf "%s/issues/%d/moves" rid issueNumber
@@ -52,4 +44,4 @@ create (Issue title body labels collaborators milestoneNumber pipeline estimate)
             value = object ["estimate" .= estimate]
             parse = const ()
 
-        guide (IssueNumber issueNumber) title = putStrLn $ printf "created. [#%d] %s" issueNumber title
+        guide (IssueNumber issueNumber) title = putStrLn $ printf "  [#%d] %s" issueNumber title
