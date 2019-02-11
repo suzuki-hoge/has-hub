@@ -10,8 +10,8 @@ tests:
       - '-with-rtsopts=-N'
     dependencies:
       - hub-board
-copyright: 2019 Author name here
-maintainer: example@example.com
+copyright: 2019 suzuki-hoge
+maintainer: foo@bar.com
 dependencies:
   - MissingH
   - yaml
@@ -36,11 +36,11 @@ version: 0.1.0.0
 extra-source-files:
   - README.md
   - ChangeLog.md
-author: Author name here
-github: githubuser/hub-board
+author: suzuki-hoge
+github: suzuki-hoge/hub-board
 license: BSD3
 executables:
-  hub-board-exe:
+  hub-board:
     source-dirs: app
     main: Main.hs
     ghc-options:
@@ -51,4 +51,4 @@ executables:
       - hub-board
 description: >-
   Please see the README on GitHub at
-  <https://github.com/githubuser/hub-board#readme>
+  <https://github.com/suzuki-hoge/hub-board#readme>

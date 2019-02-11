@@ -8,14 +8,16 @@ create epics and issues.
 + [yaml description](https://github.com/suzuki-hoge/hub-board#yaml-description)
 
 ## download
-bin path
+download path: https://github.com/suzuki-hoge/hub-board/blob/2.0.0/publish/bin/hub-board?raw=true
+
+get bin and put under `$PATH` env.
 
 ## sub commands
 ```
 $ hub-board -h
 create epics and issues.
 
-Usage: hub-board-exe COMMAND
+Usage: hub-board COMMAND
 
 Available options:
   -h,--help                Show this help text
