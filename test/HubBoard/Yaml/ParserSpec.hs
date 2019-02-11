@@ -69,7 +69,7 @@ spec = do
         ]
 
   describe "issue patterns" $ do
-    it "full attributes, explicit default pipeline, int estiamte" $ do
+    it "full attributes, explicit default pipeline, int estimate" $ do
       epics <- parse' "test/yamls/issue-patterns/full-attributes.yaml" setupMilestoneMock fetchPipelinesMock validateAllMock
 
       epics `shouldBe` Right [
@@ -87,8 +87,8 @@ spec = do
             ]
         ]
 
-    it "missing attributes" $ do
-      epics <- parse' "test/yamls/issue-patterns/missing-attributes.yaml" setupMilestoneMock fetchPipelinesMock validateAllMock
+    it "minimum attributes" $ do
+      epics <- parse' "test/yamls/issue-patterns/minimum-attributes.yaml" setupMilestoneMock fetchPipelinesMock validateAllMock
 
       epics `shouldBe` Right [
           NoEpic [

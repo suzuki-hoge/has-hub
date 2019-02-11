@@ -6,5 +6,5 @@ default-pipeline: sprint backlog
 epics:
   - no-epic: 
       issues: 
-        # missing attributes
+        # minimum attributes
         - title    : issue title 1
