@@ -31,7 +31,7 @@ Available commands:
 
 ### init
 initialize hub-board.
-put config file to home dir with git-hub-token and zen-hub-token attributes.
+put `.hub-board-config.yaml` to home dir with git-hub-token and zen-hub-token attributes.
 this command use only one time after install.
 
 ```
@@ -39,7 +39,7 @@ $ hub-board init
 ```
 
 ### new-workspace
-put config file to new workspace dir with owner and repository attributes.
+put `.hub-board-config.yaml` to new workspace dir with owner and repository attributes.
 this command use every time the destination board increased.
 
 ```
@@ -61,13 +61,40 @@ $ hub-board desc
 ```
 
 ## configure
-+ token
-+ token
-+ owner
-+ repository
-+ proxy
+### config yaml
+configure `git-hub-token`, `zen-hub-token`, `owner`, and `repository` attributes with yaml named `.hub-board-config.yaml`.
+config can be composed of multiple yaml file.
+lookup yaml from current directory upwards and compose. if more than one same attributes found, use attribute found first.
 
-tree
+```
+$ tree ~ --charset=C
+
+~
+|-- .hub-board-config.yaml            # git-hub-token: 123xxxg, zen-hub-token: 123xxxz
+|
+`-- board
+    |
+    |-- project-a
+    |   |-- sprint-1.yaml
+    |   `-- .hub-board-config.yaml    # owner: suzuki-hoge, repository: project-a
+    |
+    |-- project-b
+    |   |-- sprint-1.yaml
+    |   `-- .hub-board-config.yaml    # owner: suzuki-hoge, repository: project-b
+    |
+    `-- project-c
+        |-- sprint-1.yaml
+        `-- .hub-board-config.yaml    # git-hub-token: 789xxxg, zen-hub-token: 789xxxz, owner: suzuki-hoge, repository: project-c
+```
+
+if you execute `hub-board` at `~/board/project-b`, `hub-board` find `123xxxg`, `123xxxz`, `suzuki-hoge`, and `project-b`.
+if you execute `hub-board` at `~/board/project-c`, `hub-board` find `789xxxg`, `789xxxz`, `suzuki-hoge`, and `project-c`.
+
+### helper sub command
+read `init` sub command and `new-workspace` sub command.
+
+### proxy
+proxy config is depends on either `$HTTPS_PROXY` or `$https_proxy`.
 
 ## yaml description
 yaml consists of 3 blocks, `milestone` block, `default-pipeline` block, and `epics` block, like this.
