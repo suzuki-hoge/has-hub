@@ -2,6 +2,7 @@ module HubBoard.Command.NewWorkspace (
     exec
 ) where
 
+import           System.IO        ( hFlush, stdout )
 import           System.Directory ( createDirectory )
 import           Text.Printf      ( printf )
 
@@ -9,20 +10,20 @@ exec :: IO ()
 exec = do
     putStrLn "\nsetup workspace directory"
     putStr "  workspace name: "
-    name <- getLine
+    name <- withEchoGetLine
 
     putStrLn "\nsetup destination board config"
     putStrLn "  input owner and repository."
-    putStrLn "\n  ex: when url is \"https://github.com/suzuki-hoge/hub-board\", owner is \"suzuki-hoge\", repository is \"hub-board\"."
+    putStrLn "\n  ex: when url is \"https://github.com/suzuki-hoge/project-a\", owner is \"suzuki-hoge\", repository is \"project-a\"."
     putStr "\n  owner: "
-    owner <- getLine
+    owner <- withEchoGetLine
     putStr "  repository: "
-    repository <- getLine
+    repository <- withEchoGetLine
 
     let workspace = printf "./%s" name
     createDirectory workspace
 
-    let configPath = printf "%s/.hub-board-config.yaml2" workspace
+    let configPath = printf "%s/.hub-board-config.yaml" workspace
     putStrLn "\nwrite config"
     putStrLn $ "  " ++ configPath
     writeFile configPath $ printf "owner: %s\nrepository: %s\n" owner repository
@@ -73,5 +74,11 @@ exec = do
 
     putStrLn "\ncompleted."
   where
+    withEchoGetLine :: IO String
+    withEchoGetLine = do
+        hFlush stdout
+        value <- getLine
+        putChar '\n'
+        return value
+
     path > line = appendFile path $ line ++ "\n"
-    

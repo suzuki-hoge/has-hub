@@ -8,12 +8,12 @@ create epics and issues.
 + [yaml description](https://github.com/suzuki-hoge/hub-board#yaml-description)
 
 ## download
-download path: https://github.com/suzuki-hoge/hub-board/blob/2.0.0/publish/bin/hub-board?raw=true
+download path: https://github.com/suzuki-hoge/hub-board/blob/v2.0.0/publish/bin/hub-board?raw=true
 
-get bin and put under `$PATH` env.
+get bin by broser or wget or something, add executable permission, and put under `$PATH` env.
 
 ## sub commands
-```
+```bash
 $ hub-board -h
 create epics and issues.
 
@@ -31,37 +31,35 @@ Available commands:
 
 ### init
 initialize hub-board.
-put `.hub-board-config.yaml` to home dir with git-hub-token and zen-hub-token attributes.
-this command use only one time after install.
+put `.hub-board-config.yaml` to home dir with `git-hub-token` and `zen-hub-token` attributes. this command use only one time after install.
 
-```
+```bash
 $ hub-board init
 ```
 
 ### new-workspace
-put `.hub-board-config.yaml` to new workspace dir with owner and repository attributes.
-this command use every time the destination board increased.
+put `.hub-board-config.yaml` to new workspace dir with `owner` and `repository` attributes. this command use every time the destination board increased.
 
-```
+```bash
 $ hub-board new-workspace
 ```
 
 ### post
 post to github and zenhub according yaml.
 
-```
+```bash
 $ hub-board post sprint-1.yaml
 ```
 
 ### desc
 show yaml description url.
 
-```
+```bash
 $ hub-board desc
 ```
 
 ### bash completion
-```
+```bash
 $ source <(hub-board --bash-completion-script `which hub-board`)
 
 $ hub-board 
@@ -73,11 +71,9 @@ sprint-1.yaml  sprint-2.yaml  hub-board.log
 
 ## configure
 ### config yaml
-configure `git-hub-token`, `zen-hub-token`, `owner`, and `repository` attributes with yaml named `.hub-board-config.yaml`.
-config can be composed of multiple yaml file.
-lookup yaml from current directory upwards and compose. if more than one same attributes found, use attribute found first.
+configure `git-hub-token`, `zen-hub-token`, `owner`, and `repository` attributes with yaml named `.hub-board-config.yaml`. config can be composed of multiple yaml file. lookup yaml from current directory upwards and compose. if more than one same attributes found, use attribute found first.
 
-```
+```bash
 $ tree ~ --charset=C
 
 ~
@@ -98,7 +94,7 @@ $ tree ~ --charset=C
         `-- .hub-board-config.yaml    # git-hub-token: 789xxxg, zen-hub-token: 789xxxz, owner: suzuki-hoge, repository: project-c
 ```
 
-if you execute `hub-board` at `~/board/project-b`, `hub-board` find `123xxxg`, `123xxxz`, `suzuki-hoge`, and `project-b`.
+if you execute `hub-board` at `~/board/project-b`, `hub-board` find `123xxxg`, `123xxxz`, `suzuki-hoge`, and `project-b`.  
 if you execute `hub-board` at `~/board/project-c`, `hub-board` find `789xxxg`, `789xxxz`, `suzuki-hoge`, and `project-c`.
 
 ### helper sub command
