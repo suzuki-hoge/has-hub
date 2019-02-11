@@ -11,13 +11,52 @@ create epics and issues.
 bin path
 
 ## sub commands
-### desc
+```
+$ hub-board -h
+create epics and issues.
+
+Usage: hub-board-exe COMMAND
+
+Available options:
+  -h,--help                Show this help text
+
+Available commands:
+  init                     
+  new-workspace            
+  post                     
+  desc                     
+```
 
 ### init
+initialize hub-board.
+put config file to home dir with git-hub-token and zen-hub-token attributes.
+this command use only one time after install.
+
+```
+$ hub-board init
+```
 
 ### new-workspace
+put config file to new workspace dir with owner and repository attributes.
+this command use every time the destination board increased.
+
+```
+$ hub-board new-workspace
+```
 
 ### post
+post to github and zenhub according yaml.
+
+```
+$ hub-board post sprint-1.yaml
+```
+
+### desc
+show yaml description url.
+
+```
+$ hub-board desc
+```
 
 ## configure
 + token
