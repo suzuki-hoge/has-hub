@@ -7,9 +7,7 @@ module HubBoard.Object.Milestone.Type (
 type Number = Int
 type Title = String
 
-data Milestone = Milestone Number Title
-instance Show Milestone where
-    show (Milestone number title) = title
+data Milestone = Milestone Number Title deriving (Show, Eq)
 
 type MilestoneMaterials = (Title, StartOn, DueOn)
 

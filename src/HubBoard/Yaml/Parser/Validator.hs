@@ -1,6 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module HubBoard.Yaml.Parser.Validator where
+module HubBoard.Yaml.Parser.Validator (
+    validateAll
+  , ErrorMessage
+) where
 
 import           Data.List                    ( nub, (\\) )
 

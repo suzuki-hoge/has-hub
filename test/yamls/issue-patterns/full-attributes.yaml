@@ -6,7 +6,7 @@ default-pipeline: sprint backlog
 epics:
   - no-epic: 
       issues: 
-        # full attributes, explicit default pipeline, int estiamte
+        # full attributes, explicit default pipeline, int estimate
         - title    : issue title 1
           body     : issue body 1
           labels   : [setup]

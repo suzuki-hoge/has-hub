@@ -10,6 +10,7 @@ module HubBoard.Fetcher.Core (
   , module Text.Printf
   , module Data.ByteString.Lazy.Char8
   , secureFetch
+  , logFilePath
 ) where
 
 import           Network.HTTP.Client
@@ -31,6 +32,8 @@ import           Data.List.Utils                     ( replace )
 type Url = String
 type LogLine = String
 type Now = String
+
+logFilePath = "./hub-board.log" :: String
 
 secureFetch :: Url -> Method -> RequestHeaders -> Value -> IO ByteString
 secureFetch url method headers value = do
@@ -71,4 +74,4 @@ secureFetch url method headers value = do
         
             let now = head . splitOn "." . show $ utcToLocalTime tz utc
 
-            appendFile "./hub-board.log" $ toLine now
+            appendFile logFilePath $ toLine now
