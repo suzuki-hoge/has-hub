@@ -1,3 +1,3 @@
-# Changelog for has-hub
+# Changelog for hub-board
 
 ## Unreleased changes
