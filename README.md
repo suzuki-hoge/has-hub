@@ -11,11 +11,11 @@ create epics and issues.
 bin path
 
 ## sub commands
-### help
+### desc
 
-### initialize
+### init
 
-### new-board
+### new-workspace
 
 ### post
 
