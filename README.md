@@ -60,6 +60,17 @@ show yaml description url.
 $ hub-board desc
 ```
 
+### bash completion
+```
+$ source <(hub-board --bash-completion-script `which hub-board`)
+
+$ hub-board 
+--help         -h             desc           init           new-workspace  post           
+
+$ hub-board post ./
+sprint-1.yaml  sprint-2.yaml  hub-board.log
+```
+
 ## configure
 ### config yaml
 configure `git-hub-token`, `zen-hub-token`, `owner`, and `repository` attributes with yaml named `.hub-board-config.yaml`.
