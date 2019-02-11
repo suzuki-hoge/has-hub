@@ -23,7 +23,7 @@ exec = do
     zenHubToken <- noEchoGetLine
     putStrLn $ "\n  got: " ++ mask zenHubToken
 
-    path <- (++ "/.hub-board-config.yaml2") <$> getHomeDirectory
+    path <- (++ "/.hub-board-config.yaml") <$> getHomeDirectory
     putStrLn "\nwrite config"
     putStrLn $ "  " ++ path
     writeFile path $ printf "git-hub-token: %s\nzen-hub-token: %s\n" gitHubToken zenHubToken
