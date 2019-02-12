@@ -41,6 +41,6 @@ parse' yaml setupMilestone fetchPipelines validator = do
 setupMilestone :: RawMilestone -> IO (Maybe MilestoneNumber)
 setupMilestone (RawMilestone Nothing Nothing) = return Nothing
 setupMilestone (RawMilestone (Just (RawNewMilestone title startOn dueOn)) Nothing) =
-    Just <$> M.create (title, (startOn ++ "T00:00:00Z"), (dueOn ++ "T23:59:59Z"))
+    Just <$> M.create (title, startOn ++ "T00:00:00Z", dueOn ++ "T23:59:59Z")
 setupMilestone (RawMilestone Nothing (Just (ExistingMilestone title))) =
-    Just . MilestoneNumber . (!! 0) . concatMap (\(Milestone n t) -> if t == title then [n] else []) <$> M.refer
+    Just . MilestoneNumber . (!! 0) . concatMap (\(Milestone n t) -> [n | t == title]) <$> M.refer

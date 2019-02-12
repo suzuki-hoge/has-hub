@@ -17,4 +17,4 @@ type Body = String
 type Estimate = Double
 data Issue = Issue Title Body [Label] [Collaborator] (Maybe MilestoneNumber) Pipeline Estimate deriving (Show, Eq)
 
-data IssueNumber = IssueNumber Int
+newtype IssueNumber = IssueNumber Int

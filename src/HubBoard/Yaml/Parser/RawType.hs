@@ -20,13 +20,13 @@ data RawNewMilestone = RawNewMilestone RawMilestoneTitle RawStartOn RawDueOn
 instance FromJSON RawNewMilestone where
     parseJSON (Object v) = RawNewMilestone <$> (v .: "title") <*> (v .: "start-on") <*> (v .: "due-on")
 
-data ExistingMilestone = ExistingMilestone RawMilestoneTitle
+newtype ExistingMilestone = ExistingMilestone RawMilestoneTitle
 instance FromJSON ExistingMilestone where
     parseJSON (Object v) = ExistingMilestone <$> (v .: "title")
 
 type RawDefaultPipelineName = String
 
-data RawDefaultPipeline = RawDefaultPipeline String
+newtype RawDefaultPipeline = RawDefaultPipeline String
 instance FromJSON RawDefaultPipeline where
     parseJSON (Object v) = RawDefaultPipeline <$> (v .: "name")
 
@@ -51,7 +51,7 @@ data RawExistingEpic = RawExistingEpic RawEpicNumber [RawIssue]
 instance FromJSON RawExistingEpic where
     parseJSON (Object v) = RawExistingEpic <$> (v .: "number") <*> (v .: "issues")
 
-data RawNoEpic = RawNoEpic [RawIssue]
+newtype RawNoEpic = RawNoEpic [RawIssue]
 instance FromJSON RawNoEpic where
     parseJSON (Object v) = RawNoEpic <$> (v .: "issues")
 

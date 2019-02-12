@@ -52,7 +52,7 @@ initialize = setEnvs >>= setRepositoryId
         return $ e1 ++ e2 ++ e3 ++ e4
           where
             getConfigs :: IO [ConfigYaml]
-            getConfigs = catMaybes <$> (getCurrentDirectory >>= allUpperDirs >>= (mapM readConfig))
+            getConfigs = catMaybes <$> (getCurrentDirectory >>= allUpperDirs >>= mapM readConfig)
               where
                 allUpperDirs :: FilePath -> IO [FilePath]
                 allUpperDirs ""  = return []
@@ -75,22 +75,22 @@ initialize = setEnvs >>= setRepositoryId
             setGitHubToken :: [ConfigYaml] -> IO [ConfigError]
             setGitHubToken configs = case mapMaybe gitHubToken configs of
                 [] -> return ["git-hub-token not found."]
-                (x:_) -> setEnv "hub-board.git-hub-token" x >>= return . const []
+                (x:_) -> const [] <$> setEnv "hub-board.git-hub-token" x
 
             setZenHubToken :: [ConfigYaml] -> IO [ConfigError]
             setZenHubToken configs = case mapMaybe zenHubToken configs of
                 [] -> return ["zen-hub-token not found."]
-                (x:_) -> setEnv "hub-board.zen-hub-token" x >>= return . const []
+                (x:_) -> const [] <$> setEnv "hub-board.zen-hub-token" x
 
             setOwner :: [ConfigYaml] -> IO [ConfigError]
             setOwner configs = case mapMaybe owner configs of
                 []    -> return ["owner not found."]
-                (x:_) -> setEnv "hub-board.owner" x >>= return . const []
+                (x:_) -> const [] <$> setEnv "hub-board.owner" x
 
             setRepository :: [ConfigYaml] -> IO [ConfigError]
             setRepository configs = case mapMaybe repository configs of
                 []    -> return ["repository not found."]
-                (x:_) -> setEnv "hub-board.repository" x >>= return . const []
+                (x:_) -> const [] <$> setEnv "hub-board.repository" x
 
     setRepositoryId :: [ConfigError] -> IO [ConfigError]
     setRepositoryId errors@(e:es) = return errors
