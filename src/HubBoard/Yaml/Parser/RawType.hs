@@ -8,7 +8,7 @@ data Contents = Contents [RawEpic] RawMilestone RawPipelineName
 instance FromJSON Contents where
     parseJSON (Object v) = Contents <$> (v .: "epics") <*> (v .: "milestone") <*> (v .: "default-pipeline")
 
-data RawMilestone = RawMilestone (Maybe RawNewMilestone) (Maybe ExistingMilestone) deriving Show -- todo
+data RawMilestone = RawMilestone (Maybe RawNewMilestone) (Maybe ExistingMilestone)
 instance FromJSON RawMilestone where
     parseJSON (Object v) = RawMilestone <$> (v .:? "new-milestone") <*> (v .:? "existing-milestone")
 
@@ -16,11 +16,11 @@ type RawMilestoneTitle = String
 type RawStartOn = String
 type RawDueOn = String
 
-data RawNewMilestone = RawNewMilestone RawMilestoneTitle RawStartOn RawDueOn deriving Show -- todo
+data RawNewMilestone = RawNewMilestone RawMilestoneTitle RawStartOn RawDueOn
 instance FromJSON RawNewMilestone where
     parseJSON (Object v) = RawNewMilestone <$> (v .: "title") <*> (v .: "start-on") <*> (v .: "due-on")
 
-data ExistingMilestone = ExistingMilestone RawMilestoneTitle deriving Show -- todo
+data ExistingMilestone = ExistingMilestone RawMilestoneTitle
 instance FromJSON ExistingMilestone where
     parseJSON (Object v) = ExistingMilestone <$> (v .: "title")
 

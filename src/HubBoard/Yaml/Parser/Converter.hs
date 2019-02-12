@@ -2,6 +2,7 @@
 
 module HubBoard.Yaml.Parser.Converter (
     module HubBoard.Object.Epic.Type
+  , module HubBoard.Object.Issue.Type
   , asEpics
 ) where
 
