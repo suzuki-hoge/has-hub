@@ -36,7 +36,7 @@ getFromGitHub toValue pagenation parse = do
                 [("User-Agent", "curl"), ("Authorization", token)]
                 (toValue owner repository after)
 
-            let accumulated = acc ++ (parse lbs)
+            let accumulated = acc ++ parse lbs
 
             if asHasNext lbs
                 then recGet token owner repository (asAfter lbs) toValue pagenation accumulated parse

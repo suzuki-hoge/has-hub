@@ -2,6 +2,7 @@
 
 module HubBoard.Yaml.Parser.Converter (
     module HubBoard.Object.Epic.Type
+  , module HubBoard.Object.Issue.Type
   , asEpics
 ) where
 
@@ -51,4 +52,4 @@ Nothing   ?? _ = []
 (Just vs) ?? f = map f vs
 
 (?-) :: [Pipeline] -> RawPipelineName -> Pipeline
-ps ?- name = filter (\(Pipeline _ n) -> n == name) ps !! 0
+ps ?- name = head $ filter (\(Pipeline _ n) -> n == name) ps

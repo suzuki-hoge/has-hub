@@ -7,9 +7,7 @@ import           Test.Hspec
 
 import           HubBoard.Yaml.Parser
 
-import           HubBoard.Object.Issue.Type     -- export?
-import           HubBoard.Yaml.Parser.RawType   -- export?
-import           HubBoard.Yaml.Parser.Converter -- export?
+import           HubBoard.Yaml.Parser.RawType ( RawMilestone(..) )
 
 pipeline1 = Pipeline "1" "backlog"
 pipeline2 = Pipeline "2" "sprint backlog"
