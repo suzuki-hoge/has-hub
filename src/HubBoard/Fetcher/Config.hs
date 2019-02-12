@@ -18,7 +18,7 @@ import           System.Directory            ( getCurrentDirectory )
 import           System.Environment          ( setEnv, getEnv, lookupEnv )
 import           Data.Yaml                   ( decodeFileEither, ParseException(..) )
 import           Data.Maybe                  ( catMaybes, mapMaybe, fromMaybe )
-import qualified Data.ByteString.Char8 as BS ( pack, ByteString )
+import qualified Data.ByteString.Char8 as BS ( pack, unpack, ByteString )
 import           Control.Applicative         ( (<|>) )
 import           Control.Exception           ( SomeException, catch, evaluate )
 
@@ -97,16 +97,19 @@ initialize = setEnvs >>= setRepositoryId
     setRepositoryId [] = do
         putStrLn "  refer RepositoryId"
 
-        token <- getGitHubToken
+        gToken <- getGitHubToken
+        zToken <- getZenHubToken
         owner <- getOwner
         repository <- getRepository
         proxy <- getProxy
 
-        putStrLn $ printf "    Owner ( %s )" owner
-        putStrLn $ printf "    Repository ( %s )" repository
-        putStrLn $ printf "    HttpsProxy ( %s )" (fromMaybe "" proxy)
+        putStrLn $ printf "    GitHubToken ( %s )" (mask gToken)
+        putStrLn $ printf "    ZenHubToken ( %s )" (mask zToken)
+        putStrLn $ printf "    Owner       ( %s )" owner
+        putStrLn $ printf "    Repository  ( %s )" repository
+        putStrLn $ printf "    HttpsProxy  ( %s )" (fromMaybe "" proxy)
 
-        let headers = [("User-Agent", "curl"), ("Authorization", token)]
+        let headers = [("User-Agent", "curl"), ("Authorization", gToken)]
         let query = printf "{ repository( owner:\"%s\", name:\"%s\" ) { databaseId } }" owner repository :: String
         let body = object ["query" .= query]
 
@@ -138,3 +141,9 @@ getProxy = do
 
 getRepositoryId :: IO RepositoryId
 getRepositoryId = getEnv "hub-board.repository-id"
+
+mask :: BS.ByteString -> String
+mask token = head ++ map (const '.') remains' ++ reverse tail'
+  where
+    (head, remains) = splitAt 2 (BS.unpack token)
+    (tail', remains') = splitAt 2 $ reverse remains

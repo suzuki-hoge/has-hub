@@ -28,15 +28,15 @@ validateAll rawEpics rawMilestone rawDefaultPipelineName = do
     let rawMilestoneTitles =                 milestoneTitles   rawMilestone
     
     putStrLn "  refer Labels"
-    invalidLabels         <- map ("  no such label      : " ++ ) .            (rawLabels \\)          . (map (\(Label        v) -> v)) <$> L.refer
+    invalidLabels         <- map ("no such label      : " ++ ) .            (rawLabels \\)          . (map (\(Label        v) -> v)) <$> L.refer
     putStrLn "  refer Assignees"
-    invalidCollaborators  <- map ("  no such assignee   : " ++ ) .            (rawCollaborators \\)   . (map (\(Collaborator v) -> v)) <$> C.refer
+    invalidCollaborators  <- map ("no such assignee   : " ++ ) .            (rawCollaborators \\)   . (map (\(Collaborator v) -> v)) <$> C.refer
     putStrLn "  refer Pipelines"
-    invalidPipelineNames  <- map ("  no such pipeline   : " ++ ) .            (rawPipelineNames \\)   . (map (\(Pipeline _   v) -> v)) <$> P.refer
+    invalidPipelineNames  <- map ("no such pipeline   : " ++ ) .            (rawPipelineNames \\)   . (map (\(Pipeline _   v) -> v)) <$> P.refer
     putStrLn "  refer Epics"
-    invalidEpicNumbers    <- map ("  no such epic number: " ++ ) . map show . (rawEpicNumbers \\)     . (map (\(EpicNumber   v) -> v)) <$> E.refer
+    invalidEpicNumbers    <- map ("no such epic number: " ++ ) . map show . (rawEpicNumbers \\)     . (map (\(EpicNumber   v) -> v)) <$> E.refer
     putStrLn "  refer Milestones"
-    invalidMilestoneTitle <- map ("  no such milestone  : " ++ ) .            (rawMilestoneTitles \\) . (map (\(Milestone _  v) -> v)) <$> M.refer
+    invalidMilestoneTitle <- map ("no such milestone  : " ++ ) .            (rawMilestoneTitles \\) . (map (\(Milestone _  v) -> v)) <$> M.refer
 
     return $ invalidLabels ++ invalidCollaborators ++ invalidPipelineNames ++ invalidEpicNumbers ++ invalidMilestoneTitle
 

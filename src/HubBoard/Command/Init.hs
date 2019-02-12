@@ -39,7 +39,7 @@ exec = do
         return value
 
     mask :: String -> String
-    mask s = head ++ map (const '.') remains' ++ reverse tail'
+    mask token = head ++ map (const '.') remains' ++ reverse tail'
       where
-        (head, remains) = splitAt 2 s
+        (head, remains) = splitAt 2 token
         (tail', remains') = splitAt 2 $ reverse remains
