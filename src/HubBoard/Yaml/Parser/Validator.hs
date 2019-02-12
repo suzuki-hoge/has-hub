@@ -25,7 +25,6 @@ validateAll rawEpics rawMilestone rawDefaultPipelineName = do
     let rawCollaborators   = nub $ concatMap epicCollaborators rawEpics
     let rawPipelineNames   = nub $ concatMap epicPipelineNames rawEpics
     let rawEpicNumbers     = nub $ concatMap epicNumbers       rawEpics
-    let rawMilestoneTitles =                 milestoneTitles   rawMilestone
     
     putStrLn "  refer Labels"
     invalidLabels         <- map ("no such label      : " ++ ) .            (rawLabels \\)          . (map (\(Label        v) -> v)) <$> L.refer
@@ -36,9 +35,15 @@ validateAll rawEpics rawMilestone rawDefaultPipelineName = do
     putStrLn "  refer Epics"
     invalidEpicNumbers    <- map ("no such epic number: " ++ ) . map show . (rawEpicNumbers \\)     . (map (\(EpicNumber   v) -> v)) <$> E.refer
     putStrLn "  refer Milestones"
-    invalidMilestoneTitle <- map ("no such milestone  : " ++ ) .            (rawMilestoneTitles \\) . (map (\(Milestone _  v) -> v)) <$> M.refer
+    milestoneTitles <- (map (\(Milestone _ v) -> v)) <$> M.refer
+    invalidMilestoneTitles <- case rawMilestone of
+        (RawMilestone _                                 (Just (ExistingMilestone title))) -> return $ map ("no such milestone: "  ++ ) $ [title] \\ milestoneTitles
+        (RawMilestone (Just (RawNewMilestone title _ _)) Nothing)                         -> return $ if title `elem` milestoneTitles then ["milestone already exists: " ++ title] else []
+        (RawMilestone  Nothing                           Nothing)                         -> return $ []
 
-    return $ invalidLabels ++ invalidCollaborators ++ invalidPipelineNames ++ invalidEpicNumbers ++ invalidMilestoneTitle
+    print invalidMilestoneTitles
+
+    return $ invalidLabels ++ invalidCollaborators ++ invalidPipelineNames ++ invalidEpicNumbers ++ invalidMilestoneTitles
 
 epicLabels :: RawEpic -> [RawLabel]
 epicLabels (RawEpic (Just (RawNewEpic _ _ rawLabels _ _ _ rawIssues)) _ _) = rawLabels ? [] ++ concatMap issueLabels (rawIssues ? [])
@@ -66,11 +71,7 @@ issuePipelineNames (RawIssue _ _ _ _ rawPipelineName _) = asList rawPipelineName
 
 epicNumbers :: RawEpic -> [RawEpicNumber]
 epicNumbers (RawEpic _ (Just (RawExistingEpic epicNumber _)) _) = [epicNumber]
-epicNumbers _ = []
-
-milestoneTitles :: RawMilestone -> [RawMilestoneTitle]
-milestoneTitles (RawMilestone _ (Just (ExistingMilestone title))) = [title]
-milestoneTitles _ = []
+epicNumbers _                                                   = []
 
 (?) :: Maybe a -> a -> a
 Nothing  ? def = def
