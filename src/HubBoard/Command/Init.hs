@@ -10,7 +10,7 @@ import           Text.Printf       ( printf )
 exec :: IO ()
 exec = do
     putStrLn "\ngithub token"
-    putStrLn "  create github token with \"public_repo\" scope."
+    putStrLn "  create github token with \"repo ( Full control of private repositories )\" scope."
     putStrLn "\n  url: https://github.com/settings/tokens/new"
     putStr "\n  input github token ( password prompt ): "
     gitHubToken <- noEchoGetLine
