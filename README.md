@@ -74,6 +74,12 @@ $ pwd
 $ hub-board post sprint-1.yaml
 ```
 
+if you want to yaml check, pass `--dry` option.
+
+```
+$ hub-board post sprint-1.yaml --dry
+```
+
 ### desc
 show yaml description url.
 

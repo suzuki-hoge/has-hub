@@ -8,7 +8,7 @@ import           HubBoard.Command.Desc as D
 
 data Options = InitOptions
              | NewOptions String
-             | PostOptions FilePath
+             | PostOptions FilePath Bool
              | DescOptions
 
 optionsI :: ParserInfo Options
@@ -16,10 +16,10 @@ optionsI = info optionsP $ mconcat [header "create epics and issues.", failureCo
   where
     optionsP :: Parser Options
     optionsP = (<*>) helper $ subparser $ mconcat [
-        command "init" $ info ((<*>) helper $ pure InitOptions)      $ mconcat [header "put \".hub-board-config.yaml\" to home dir with \"git-hub-token\" and \"zen-hub-token\" attributes. this command use only one time after install.", failureCode 1]
-      , command "new"  $ info ((<*>) helper $ NewOptions <$> nameP)  $ mconcat [header "put \".hub-board-config.yaml\" to new workspace dir with \"owner\" and \"repository\" attributes. this command use every time the destination board increased.", failureCode 1]
-      , command "post" $ info ((<*>) helper $ PostOptions <$> yamlP) $ mconcat [header "post to github and zenhub according yaml.", failureCode 1]
-      , command "desc" $ info ((<*>) helper $ pure DescOptions)      $ mconcat [header "show yaml description url.", failureCode 1]
+        command "init" $ info ((<*>) helper $ pure InitOptions)               $ mconcat [header "put \".hub-board-config.yaml\" to home dir with \"git-hub-token\" and \"zen-hub-token\" attributes. this command use only one time after install.", failureCode 1]
+      , command "new"  $ info ((<*>) helper $ NewOptions <$> nameP)           $ mconcat [header "put \".hub-board-config.yaml\" to new workspace dir with \"owner\" and \"repository\" attributes. this command use every time the destination board increased.", failureCode 1]
+      , command "post" $ info ((<*>) helper $ PostOptions <$> yamlP <*> dryP) $ mconcat [header "post to github and zenhub according yaml.", failureCode 1]
+      , command "desc" $ info ((<*>) helper $ pure DescOptions)               $ mconcat [header "show yaml description url.", failureCode 1]
       ]
 
     yamlP :: Parser FilePath
@@ -28,11 +28,14 @@ optionsI = info optionsP $ mconcat [header "create epics and issues.", failureCo
     nameP :: Parser String
     nameP = strArgument $ mconcat [metavar "workspace-name", help "workspace directory name"]
 
+    dryP :: Parser Bool
+    dryP = switch $ mconcat [long "dry", help "dry run"]
+
 main :: IO ()
 main = customExecParser (prefs showHelpOnError) optionsI >>= execute
   where
     execute :: Options -> IO ()
     execute InitOptions = I.exec
     execute (NewOptions name) = N.exec name
-    execute (PostOptions yaml) = P.exec yaml
+    execute (PostOptions yaml dry) = P.exec yaml (if dry then P.Dry else P.Execute)
     execute DescOptions = D.exec
