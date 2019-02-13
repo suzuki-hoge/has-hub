@@ -2,12 +2,12 @@
 create epics and issues.
 
 ## index
-+ [download](https://github.com/suzuki-hoge/hub-board#download)
++ [install](https://github.com/suzuki-hoge/hub-board#install)
 + [sub commands](https://github.com/suzuki-hoge/hub-board#sub-commands)
 + [configure](https://github.com/suzuki-hoge/hub-board#configure)
 + [yaml description](https://github.com/suzuki-hoge/hub-board#yaml-description)
 
-## download
+## install
 download path: https://github.com/suzuki-hoge/hub-board/blob/v2.0.1/publish/bin/hub-board?raw=true
 
 get bin by broser or wget or something, add executable permission, and put under `$PATH` env.
@@ -36,30 +36,41 @@ Available options:
 
 Available commands:
   init                     
-  new-workspace            
+  new
   post                     
   desc                     
 ```
 
 ### init
-initialize hub-board.
 put `.hub-board-config.yaml` to home dir with `git-hub-token` and `zen-hub-token` attributes. this command use only one time after install.
 
 ```bash
 $ hub-board init
 ```
 
-### new-workspace
+`init` command can be executed anywhere.
+
+### new
 put `.hub-board-config.yaml` to new workspace dir with `owner` and `repository` attributes. this command use every time the destination board increased.
 
+to create workspace directory is recommended, like this.
+
 ```bash
-$ hub-board new-workspace
+$ cd ~/path/to/your-hub-board-workspace
+
+$ hub-board new project-b
+
+$ ls
+project-a       project-b
 ```
 
 ### post
 post to github and zenhub according yaml.
 
 ```bash
+$ pwd
+~/path/to/your-hub-board-workspace/project-b
+
 $ hub-board post sprint-1.yaml
 ```
 
@@ -70,12 +81,14 @@ show yaml description url.
 $ hub-board desc
 ```
 
+`desc` command can be executed anywhere.
+
 ### bash completion
 ```bash
 $ source <(hub-board --bash-completion-script `which hub-board`)
 
 $ hub-board 
---help         -h             desc           init           new-workspace  post           
+--help         -h             desc           init           new            post           
 
 $ hub-board post ./
 sprint-1.yaml  sprint-2.yaml  hub-board.log
@@ -91,7 +104,7 @@ $ tree ~ --charset=C
 ~
 |-- .hub-board-config.yaml            # git-hub-token: 123xxxg, zen-hub-token: 123xxxz
 |
-`-- board
+`-- path/to/your-hub-board-workspace
     |
     |-- project-a
     |   |-- sprint-1.yaml
@@ -110,7 +123,7 @@ if you execute `hub-board` at `~/board/project-b`, `hub-board` find `123xxxg`, `
 if you execute `hub-board` at `~/board/project-c`, `hub-board` find `789xxxg`, `789xxxz`, `suzuki-hoge`, and `project-c`.
 
 ### helper sub command
-read `init` sub command and `new-workspace` sub command.
+read `init` sub command and `new` sub command.
 
 ### proxy
 proxy config is depends on either `$HTTPS_PROXY` or `$https_proxy`.
