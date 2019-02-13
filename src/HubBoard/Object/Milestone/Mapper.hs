@@ -22,8 +22,21 @@ instance FromJSON MilestoneNumber where
     parseJSON (Object v) = MilestoneNumber <$> (v .: "number")
 
 create :: MilestoneMaterials -> IO MilestoneNumber
-create (title, startOn, dueOn) = postToGitHub toResource value parse
+create (title, startOn, dueOn) = do
+    number <- create title dueOn
+
+    setStartOn number startOn
+
+    return number
   where
-    toResource = printf "%s/%s/milestones"
-    value = object ["title" .= title, "due_on" .= dueOn]
-    parse = fromJust . decode
+    create title dueOn = postToGitHub toResource value parse
+      where
+        toResource = printf "%s/%s/milestones"
+        value = object ["title" .= title, "due_on" .= dueOn]
+        parse = fromJust . decode
+
+    setStartOn (MilestoneNumber n) startOn = updateZenHub toResource value "POST" parse
+      where
+        toResource rid = printf "%s/milestones/%d/start_date" rid n
+        value = object ["start_date" .= startOn]
+        parse = const ()

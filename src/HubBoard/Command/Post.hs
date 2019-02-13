@@ -29,9 +29,7 @@ exec fp mode = do
                         Execute -> do
                             putStrLn "\ncreating..."
                             mapM_ E.create epics
-                        Dry -> do
-                            putStrLn "\ncreating ( dry )..."
-                            -- nothing to do
+                        Dry -> putStrLn "\ncreating ( dry )..."
 
                     putStrLn "\ncompleted.\n"
                 (Left es) -> do
