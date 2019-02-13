@@ -1,4 +1,4 @@
-module HubBoard.Command.NewWorkspace (
+module HubBoard.Command.New(
     exec
 ) where
 
@@ -6,12 +6,8 @@ import           System.IO        ( hFlush, stdout )
 import           System.Directory ( createDirectory )
 import           Text.Printf      ( printf )
 
-exec :: IO ()
-exec = do
-    putStrLn "\nsetup workspace directory"
-    putStr "  workspace name: "
-    name <- withEchoGetLine
-
+exec :: String -> IO ()
+exec name = do
     putStrLn "\nsetup destination board config"
     putStrLn "  input owner and repository."
     putStrLn "\n  ex: when url is \"https://github.com/suzuki-hoge/project-a\", owner is \"suzuki-hoge\", repository is \"project-a\"."

@@ -41,8 +41,6 @@ validateAll rawEpics rawMilestone rawDefaultPipelineName = do
         (RawMilestone (Just (RawNewMilestone title _ _)) Nothing)                         -> return ["milestone already exists: " ++ title | title `elem` milestoneTitles]
         (RawMilestone  Nothing                           Nothing)                         -> return []
 
-    print invalidMilestoneTitles
-
     return $ invalidLabels ++ invalidCollaborators ++ invalidPipelineNames ++ invalidEpicNumbers ++ invalidMilestoneTitles
 
 epicLabels :: RawEpic -> [RawLabel]

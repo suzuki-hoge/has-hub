@@ -32,7 +32,7 @@ dependencies:
   - optparse-applicative
   - hspec
 name: hub-board
-version: 2.0.1
+version: 2.1.0
 extra-source-files:
   - README.md
   - ChangeLog.md
