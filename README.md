@@ -8,7 +8,7 @@ create epics and issues.
 + [yaml description](https://github.com/suzuki-hoge/hub-board#yaml-description)
 
 ## install
-download path: https://github.com/suzuki-hoge/hub-board/blob/v2.0.1/publish/bin/hub-board?raw=true
+download path: https://github.com/suzuki-hoge/hub-board/blob/v2.1.0/publish/bin/hub-board?raw=true
 
 get bin by broser or wget or something, add executable permission, and put under `$PATH` env.
 
@@ -17,7 +17,7 @@ if you installed `stack` command, execute following commands only.
 ```
 $ cd /tmp
 
-$ git clone --depth=1 -b v2.0.1 git://github.com/suzuki-hoge/hub-board
+$ git clone --depth=1 -b v2.1.0 git://github.com/suzuki-hoge/hub-board
 
 $ cd hub-board
 
