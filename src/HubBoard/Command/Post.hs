@@ -2,7 +2,6 @@
 
 module HubBoard.Command.Post (
     exec
-  , Mode(..)
 ) where
 
 import           Data.List.Utils (replace)
@@ -10,26 +9,26 @@ import           HubBoard.Fetcher     as F
 import           HubBoard.Yaml.Parser
 import           HubBoard.Object.Epic as E
 
-data Mode = Execute | Dry deriving Eq
+type IsDry = Bool
 
-exec :: FilePath -> Mode -> IO ()
-exec fp mode = do
+exec :: FilePath -> IsDry -> IO ()
+exec fp isDry = do
     configErrors <- F.initialize
 
     case configErrors of
         [] -> do
-            validated <- parse fp
+            validated <- parse fp isDry
 
             case validated of
                 (Right epics) -> do
                     putStrLn "\nfound"
                     mapM_ (putStrLn . found) epics
 
-                    case mode of
-                        Execute -> do
+                    case isDry of
+                        False -> do
                             putStrLn "\ncreating..."
                             mapM_ E.create epics
-                        Dry -> putStrLn "\ncreating ( dry )..."
+                        True -> putStrLn "\ncreating ( dry )..."
 
                     putStrLn "\ncompleted.\n"
                 (Left es) -> do

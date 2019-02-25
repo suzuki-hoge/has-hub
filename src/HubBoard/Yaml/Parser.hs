@@ -18,8 +18,10 @@ type SetupMilestone = RawMilestone -> IO (Maybe MilestoneNumber)
 type FetchPipelines = IO [Pipeline]
 type Validator = [RawEpic] -> RawMilestone -> RawDefaultPipelineName -> IO [ErrorMessage]
 
-parse :: FilePath -> IO (Either [ErrorMessage] [Epic])
-parse yaml = parse' yaml setupMilestone P.refer V.validateAll
+type IsDry = Bool
+
+parse :: FilePath -> IsDry -> IO (Either [ErrorMessage] [Epic])
+parse yaml isDry = parse' yaml (setupMilestone isDry) P.refer V.validateAll
 
 parse' :: FilePath -> SetupMilestone -> FetchPipelines -> Validator -> IO (Either [ErrorMessage] [Epic])
 parse' yaml setupMilestone fetchPipelines validator = do
@@ -38,9 +40,10 @@ parse' yaml setupMilestone fetchPipelines validator = do
     read :: FilePath -> IO Contents
     read yaml = either (error . show) id <$> decodeFileEither yaml
 
-setupMilestone :: RawMilestone -> IO (Maybe MilestoneNumber)
-setupMilestone (RawMilestone Nothing Nothing) = return Nothing
-setupMilestone (RawMilestone (Just (RawNewMilestone title startOn dueOn)) Nothing) =
-    Just <$> M.create (title, startOn ++ "T00:00:00Z", dueOn ++ "T23:59:59Z")
-setupMilestone (RawMilestone Nothing (Just (ExistingMilestone title))) =
+setupMilestone :: IsDry -> SetupMilestone
+setupMilestone _ (RawMilestone Nothing Nothing) = return Nothing
+setupMilestone _ (RawMilestone Nothing (Just (ExistingMilestone title))) =
     Just . MilestoneNumber . (!! 0) . concatMap (\(Milestone n t) -> [n | t == title]) <$> M.refer
+setupMilestone False (RawMilestone (Just (RawNewMilestone title startOn dueOn)) Nothing) =
+    Just <$> M.create (title, startOn ++ "T00:00:00Z", dueOn ++ "T23:59:59Z")
+setupMilestone True _ = return Nothing
