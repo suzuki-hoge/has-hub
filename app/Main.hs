@@ -40,5 +40,5 @@ main = execParser optionsI >>= execute
     execute :: Options -> IO ()
     execute InitOptions = I.exec
     execute (NewOptions name) = N.exec name
-    execute (PostOptions yaml dry) = P.exec yaml (if dry then P.Dry else P.Execute)
+    execute (PostOptions yaml isDry) = P.exec yaml isDry
     execute DescOptions = D.exec
