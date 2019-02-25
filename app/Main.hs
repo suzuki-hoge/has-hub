@@ -12,7 +12,7 @@ data Options = InitOptions
              | DescOptions
 
 optionsI :: ParserInfo Options
-optionsI = info optionsP $ mconcat [header "create epics and issues.", failureCode 1]
+optionsI = info (optionsP <**> versionP) $ mconcat [header "create epics and issues.", failureCode 1]
   where
     optionsP :: Parser Options
     optionsP = (<*>) helper $ subparser $ mconcat [
@@ -31,8 +31,11 @@ optionsI = info optionsP $ mconcat [header "create epics and issues.", failureCo
     dryP :: Parser Bool
     dryP = switch $ mconcat [long "dry", help "dry run"]
 
+    versionP :: Parser (a -> a)
+    versionP = infoOption "2.1.1" $ mconcat [short 'v', long "version", help "Show version"]
+
 main :: IO ()
-main = customExecParser (prefs showHelpOnError) optionsI >>= execute
+main = execParser optionsI >>= execute
   where
     execute :: Options -> IO ()
     execute InitOptions = I.exec
