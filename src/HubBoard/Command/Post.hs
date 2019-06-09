@@ -53,4 +53,4 @@ exec fp isDry = do
     found' is = printf "issue count is %d, total estimate of issue is %s" (length is) (total is)
       where
         total :: [Issue] -> String
-        total = replace ".0" "" . take 3 . show . sum . map (\(Issue _ _ _ _ _ _ e) -> e)
+        total = show . sum . map (\(Issue _ _ _ _ _ _ e) -> e)
