@@ -13,6 +13,6 @@ instance FromJSON Label where
 refer :: IO [Label]
 refer = getFromGitHub toValue (pagenateWith "labels") parse
   where
-    toValue owner repository after = let query = printf "{ repository( owner:\"%s\", name:\"%s\" ) { labels( first:1%s ) { nodes { name }, pageInfo { hasNextPage, endCursor } } } }" owner repository after :: String
+    toValue owner repository after = let query = printf "{ repository( owner:\"%s\", name:\"%s\" ) { labels( first:100%s ) { nodes { name }, pageInfo { hasNextPage, endCursor } } } }" owner repository after :: String
                                      in  object ["query" .= query]
     parse = fromJust . (decode >=> parseMaybe (.: "data") >=> parseMaybe (.: "repository") >=> parseMaybe (.: "labels") >=> parseMaybe (.: "nodes"))
