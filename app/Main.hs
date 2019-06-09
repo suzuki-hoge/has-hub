@@ -32,7 +32,7 @@ optionsI = info (optionsP <**> versionP) $ mconcat [header "create epics and iss
     dryP = switch $ mconcat [long "dry", help "dry run"]
 
     versionP :: Parser (a -> a)
-    versionP = infoOption "2.2.0" $ mconcat [short 'v', long "version", help "Show version"]
+    versionP = infoOption "2.2.1" $ mconcat [short 'v', long "version", help "Show version"]
 
 main :: IO ()
 main = execParser optionsI >>= execute
